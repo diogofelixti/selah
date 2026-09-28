@@ -44,6 +44,8 @@ export default defineConfig({
       },
     }),
   ],
+  // Teste local pelo celular: rede de casa (IP) e Tailscale (bilbo-pc.<tailnet>.ts.net).
+  preview: { host: true, port: 4173, strictPort: true, allowedHosts: ['.ts.net'] },
   define: { __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? 'dev') },
   // Testes de componente montam o Svelte no jsdom, que precisa da versão de navegador do runtime.
   resolve: process.env.VITEST ? { conditions: ['browser'] } : undefined,
