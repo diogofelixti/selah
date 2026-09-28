@@ -1,0 +1,16 @@
+:root[data-theme='aurora'] {
+  color-scheme: light;
+  --bg: #fbf8f3;
+  --surface: #ffffff;
+  --surface-2: #f3eee6;
+  --text: #1f1b16;
+  --text-2: #6b6257;
+  --accent: #c9a45c;
+  --accent-strong: #8a6420;
+  --on-accent: #ffffff;
+  --progress: #c9a45c;
+  --progress-track: #ede5d8;
+  --border: #e7dfd2;
+  --flash: #f6e7c4;
+  --shadow: 0 1px 2px rgba(31, 27, 22, 0.05), 0 6px 20px rgba(31, 27, 22, 0.04);
+}

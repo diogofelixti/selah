@@ -1,0 +1,18 @@
+:root {
+  --font-ui: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-read: 'Literata Variable', Georgia, serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 40px;
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 22px;
+  --nav-height: 64px;
+  --read-size-1: 1.0625rem;
+  --read-size-2: 1.1875rem;
+  --read-size-3: 1.3125rem;
+  --read-size-4: 1.5rem;
+}
