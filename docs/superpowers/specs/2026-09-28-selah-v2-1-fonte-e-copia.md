@@ -2,7 +2,7 @@
 
 Complemento das specs `2026-09-27-selah-design.md` e `2026-09-28-selah-v2-visual-controle-design.md`. Data: 2026-09-28.
 
-**Estado:** a cópia de versículos está desenhada. A fonte depende da escolha entre as opções da seção 1, que serão comparadas lado a lado no canvas antes da implementação.
+**Estado:** aprovada. Fonte escolhida: opção A (Lora e Source Sans 3). Cópia de versículos aprovada como está.
 
 ## 1. Nova fonte
 
@@ -23,7 +23,7 @@ Complemento das specs `2026-09-27-selah-design.md` e `2026-09-28-selah-v2-visual
 | C. Moderna limpa | DM Serif Display | DM Sans | Source Serif 4 | Contemporânea, com contraste nos títulos |
 | D. Só sem serifa | Plus Jakarta Sans | Plus Jakarta Sans | Literata | App moderno; a serifa fica só na leitura |
 
-**Decisão pendente:** qual opção, e se o texto bíblico também troca de fonte.
+**Decisão (2026-09-28):** opção A. Lora nos títulos, nos números grandes e no texto bíblico; Source Sans 3 na interface. Fraunces, Manrope e Literata saem do projeto.
 
 **Implementação depois da escolha:** trocar os pacotes Fontsource e os tokens `--font-display`, `--font-ui` e `--font-read`, e só isso. Nenhum componente muda, porque todos já usam os tokens.
 
