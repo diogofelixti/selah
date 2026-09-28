@@ -1,5 +1,6 @@
 import { mount } from 'svelte'
-import '@fontsource-variable/inter'
+import '@fontsource-variable/fraunces'
+import '@fontsource-variable/manrope'
 import '@fontsource-variable/literata'
 import './styles/tokens.css'
 import './styles/themes/aurora.css'

@@ -18,6 +18,7 @@
   import Settings from './routes/Settings.svelte'
   import Topic from './routes/Topic.svelte'
   import Topics from './routes/Topics.svelte'
+  import Tracker from './routes/Tracker.svelte'
 
   onMount(() => {
     initPwa()
@@ -48,10 +49,11 @@
     if (route.name !== 'reader') window.scrollTo(0, 0)
   })
 
-  function tabFor(r: Route): 'home' | 'bible' | 'plans' | 'topics' | null {
+  function tabFor(r: Route): 'home' | 'read' | 'tracker' | 'plans' | 'topics' | null {
     switch (r.name) {
       case 'home': return 'home'
-      case 'bible': case 'book': return 'bible'
+      case 'bible': case 'book': return 'read'
+      case 'tracker': return 'tracker'
       case 'plans': return 'plans'
       case 'topics': case 'topic': return 'topics'
       default: return null
@@ -80,6 +82,8 @@
       {#key `${route.book}.${route.chapter}`}
         <Reader book={route.book} chapter={route.chapter} verse={route.verse} />
       {/key}
+    {:else if route.name === 'tracker'}
+      <Tracker />
     {:else if route.name === 'plans'}
       <Plans />
     {:else if route.name === 'topics'}

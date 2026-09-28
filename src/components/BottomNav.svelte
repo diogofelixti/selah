@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { BookOpen, CalendarCheck, House, LayoutGrid } from '@lucide/svelte'
+  import { BookOpen, CalendarCheck, Heart, House, SquareCheckBig } from '@lucide/svelte'
   import { t } from '../lib/i18n/i18n.svelte'
 
-  let { active }: { active: 'home' | 'bible' | 'plans' | 'topics' | null } = $props()
+  let { active }: { active: 'home' | 'read' | 'tracker' | 'plans' | 'topics' | null } = $props()
 
   const TABS = [
     { id: 'home', href: '#/', icon: House, label: 'nav.home' },
-    { id: 'bible', href: '#/biblia', icon: BookOpen, label: 'nav.bible' },
+    { id: 'read', href: '#/biblia', icon: BookOpen, label: 'nav.read' },
+    { id: 'tracker', href: '#/controle', icon: SquareCheckBig, label: 'nav.tracker' },
     { id: 'plans', href: '#/planos', icon: CalendarCheck, label: 'nav.plans' },
-    { id: 'topics', href: '#/temas', icon: LayoutGrid, label: 'nav.topics' },
+    { id: 'topics', href: '#/temas', icon: Heart, label: 'nav.topics' },
   ] as const
 </script>
 
@@ -24,21 +25,26 @@
 <style>
   .bottom-nav {
     position: fixed;
-    inset: auto 0 0 0;
+    left: 14px;
+    right: 14px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    height: 68px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
+    grid-template-columns: repeat(5, 1fr);
     background: var(--surface);
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow);
+    max-width: 40rem;
+    margin: 0 auto;
   }
   a {
     display: grid;
     place-items: center;
     align-content: center;
-    gap: 2px;
-    font-size: 0.75rem;
+    gap: 3px;
+    font-size: 0.6875rem;
     color: var(--text-2);
   }
-  a[aria-current='page'] { color: var(--accent-strong); font-weight: 600; }
+  a[aria-current='page'] { color: var(--accent-text); font-weight: 700; }
 </style>

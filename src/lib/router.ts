@@ -6,6 +6,7 @@ export type Route =
   | { name: 'bible'; testament: 'OT' | 'NT' }
   | { name: 'book'; book: string }
   | { name: 'reader'; book: string; chapter: number; verse?: number }
+  | { name: 'tracker' }
   | { name: 'plans' }
   | { name: 'topics' }
   | { name: 'topic'; id: string }
@@ -35,6 +36,8 @@ export function parseRoute(hash: string): Route {
       const verse = positiveInt(c)
       return verse === null ? { name: 'reader', book: book.id, chapter } : { name: 'reader', book: book.id, chapter, verse }
     }
+    case 'controle':
+      return { name: 'tracker' }
     case 'planos':
       return { name: 'plans' }
     case 'temas':

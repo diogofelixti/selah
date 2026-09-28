@@ -1,16 +1,22 @@
 :root[data-theme='aurora'] {
   color-scheme: light;
-  --bg: #fbf8f3;
-  --surface: #ffffff;
-  --surface-2: #f3eee6;
-  --text: #1f1b16;
-  --text-2: #6b6257;
-  --accent: #c9a45c;
-  --accent-strong: #8a6420;
-  --on-accent: #ffffff;
-  --progress: #c9a45c;
-  --progress-track: #ede5d8;
-  --border: #e7dfd2;
+  --bg: #f7f2ea;
+  --surface: #fffdf9;
+  --surface-2: #f2eadc;
+  --track: #efe4d1;
+  --border: #e6dccb;
+  --border-strong: #e0d3bc;
+  --text: #221c15;
+  --text-2: #6e6254;
+  --accent: #9a6b1f;
+  --accent-text: #8a5f17;
+  --on-accent: #fffdf9;
+  --nt: #4f7a94;
   --flash: #f6e7c4;
-  --shadow: 0 1px 2px rgba(31, 27, 22, 0.05), 0 6px 20px rgba(31, 27, 22, 0.04);
+  --shadow: 0 8px 24px rgba(34, 28, 21, 0.08);
+
+  /* Nomes da v1, mantidos para as telas que ainda os usam. */
+  --accent-strong: var(--accent-text);
+  --progress: var(--accent);
+  --progress-track: var(--track);
 }

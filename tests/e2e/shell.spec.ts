@@ -3,10 +3,11 @@ import { expect, test } from '@playwright/test'
 test.describe('em português', () => {
   test.use({ locale: 'pt-BR' })
 
-  test('navega pelas abas', async ({ page }) => {
+  test('navega pelas 5 abas', async ({ page }) => {
     await page.goto('/')
     const nav = page.getByRole('navigation', { name: 'Principal' })
-    for (const name of ['Bíblia', 'Planos', 'Temas', 'Início']) {
+    await expect(nav.getByRole('link')).toHaveCount(5)
+    for (const name of ['Ler', 'Controle', 'Planos', 'Temas', 'Início']) {
       await nav.getByRole('link', { name }).click()
       await expect(nav.getByRole('link', { name })).toHaveAttribute('aria-current', 'page')
     }

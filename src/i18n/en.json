@@ -1,15 +1,31 @@
 {
-  "app": { "name": "Selah", "tagline": "Bible reading" },
-  "nav": { "main": "Main", "home": "Home", "bible": "Bible", "plans": "Plans", "topics": "Topics" },
+  "app": {
+    "name": "Selah",
+    "tagline": "Bible reading"
+  },
+  "nav": {
+    "main": "Main",
+    "home": "Home",
+    "bible": "Bible",
+    "plans": "Plans",
+    "topics": "Topics",
+    "read": "Read",
+    "tracker": "Tracker"
+  },
   "common": {
     "notPersistent": "Your browser does not allow saving data. Progress from this session will be lost when you close the app.",
     "saveError": "Could not save on this device. Check for free space and try again.",
     "retry": "Try again",
     "loading": "Loading",
-    "back": "Back"
+    "back": "Back",
+    "to": "to"
   },
   "home": {
-    "greeting": { "morning": "Good morning", "afternoon": "Good afternoon", "evening": "Good evening" },
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
     "subtitle": "Good to have you here.",
     "settings": "Settings",
     "verseOfDay": "Verse of the day",
@@ -22,7 +38,15 @@
     "days": "Read on {count} of the last 7 days",
     "todayPlan": "Today's reading",
     "planDone": "Plan complete. Well done!",
-    "tip": "Tip"
+    "tip": "Tip",
+    "bibleRead": "Bible read",
+    "chapters": "{read} of {total} chapters",
+    "otShort": "Old {percent}%",
+    "ntShort": "New {percent}%",
+    "thisWeek": "This week",
+    "weekSummary": "Read on {count} of the last 7 days",
+    "trackerShortcut": "Log reading",
+    "planToday": "Today: {refs} · {done} of {total} read"
   },
   "bible": {
     "title": "Bible",
@@ -47,20 +71,92 @@
     "revelation": "Revelation"
   },
   "books": {
-    "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
-    "JOS": "Joshua", "JDG": "Judges", "RUT": "Ruth", "1SA": "1 Samuel", "2SA": "2 Samuel",
-    "1KI": "1 Kings", "2KI": "2 Kings", "1CH": "1 Chronicles", "2CH": "2 Chronicles", "EZR": "Ezra",
-    "NEH": "Nehemiah", "EST": "Esther", "JOB": "Job", "PSA": "Psalms", "PRO": "Proverbs",
-    "ECC": "Ecclesiastes", "SNG": "Song of Songs", "ISA": "Isaiah", "JER": "Jeremiah", "LAM": "Lamentations",
-    "EZK": "Ezekiel", "DAN": "Daniel", "HOS": "Hosea", "JOL": "Joel", "AMO": "Amos",
-    "OBA": "Obadiah", "JON": "Jonah", "MIC": "Micah", "NAM": "Nahum", "HAB": "Habakkuk",
-    "ZEP": "Zephaniah", "HAG": "Haggai", "ZEC": "Zechariah", "MAL": "Malachi",
-    "MAT": "Matthew", "MRK": "Mark", "LUK": "Luke", "JHN": "John", "ACT": "Acts",
-    "ROM": "Romans", "1CO": "1 Corinthians", "2CO": "2 Corinthians", "GAL": "Galatians", "EPH": "Ephesians",
-    "PHP": "Philippians", "COL": "Colossians", "1TH": "1 Thessalonians", "2TH": "2 Thessalonians",
-    "1TI": "1 Timothy", "2TI": "2 Timothy", "TIT": "Titus", "PHM": "Philemon", "HEB": "Hebrews",
-    "JAS": "James", "1PE": "1 Peter", "2PE": "2 Peter", "1JN": "1 John", "2JN": "2 John",
-    "3JN": "3 John", "JUD": "Jude", "REV": "Revelation"
+    "GEN": "Genesis",
+    "EXO": "Exodus",
+    "LEV": "Leviticus",
+    "NUM": "Numbers",
+    "DEU": "Deuteronomy",
+    "JOS": "Joshua",
+    "JDG": "Judges",
+    "RUT": "Ruth",
+    "1SA": "1 Samuel",
+    "2SA": "2 Samuel",
+    "1KI": "1 Kings",
+    "2KI": "2 Kings",
+    "1CH": "1 Chronicles",
+    "2CH": "2 Chronicles",
+    "EZR": "Ezra",
+    "NEH": "Nehemiah",
+    "EST": "Esther",
+    "JOB": "Job",
+    "PSA": "Psalms",
+    "PRO": "Proverbs",
+    "ECC": "Ecclesiastes",
+    "SNG": "Song of Songs",
+    "ISA": "Isaiah",
+    "JER": "Jeremiah",
+    "LAM": "Lamentations",
+    "EZK": "Ezekiel",
+    "DAN": "Daniel",
+    "HOS": "Hosea",
+    "JOL": "Joel",
+    "AMO": "Amos",
+    "OBA": "Obadiah",
+    "JON": "Jonah",
+    "MIC": "Micah",
+    "NAM": "Nahum",
+    "HAB": "Habakkuk",
+    "ZEP": "Zephaniah",
+    "HAG": "Haggai",
+    "ZEC": "Zechariah",
+    "MAL": "Malachi",
+    "MAT": "Matthew",
+    "MRK": "Mark",
+    "LUK": "Luke",
+    "JHN": "John",
+    "ACT": "Acts",
+    "ROM": "Romans",
+    "1CO": "1 Corinthians",
+    "2CO": "2 Corinthians",
+    "GAL": "Galatians",
+    "EPH": "Ephesians",
+    "PHP": "Philippians",
+    "COL": "Colossians",
+    "1TH": "1 Thessalonians",
+    "2TH": "2 Thessalonians",
+    "1TI": "1 Timothy",
+    "2TI": "2 Timothy",
+    "TIT": "Titus",
+    "PHM": "Philemon",
+    "HEB": "Hebrews",
+    "JAS": "James",
+    "1PE": "1 Peter",
+    "2PE": "2 Peter",
+    "1JN": "1 John",
+    "2JN": "2 John",
+    "3JN": "3 John",
+    "JUD": "Jude",
+    "REV": "Revelation"
+  },
+  "week": {
+    "0": "S",
+    "1": "M",
+    "2": "T",
+    "3": "W",
+    "4": "T",
+    "5": "F",
+    "6": "S"
+  },
+  "tracker": {
+    "eyebrow": "Tracker",
+    "title": "What I have read",
+    "intro": "{read} of {total} chapters. Tap a book and mark the chapters you read, even if you read them in another Bible.",
+    "ot": "Old {percent}%",
+    "nt": "New {percent}%",
+    "bookCount": "{read} of {total} chapters",
+    "markAll": "Mark whole book",
+    "clear": "Clear",
+    "clearConfirm": "Unmark every chapter of {book}?"
   },
   "reader": {
     "markRead": "Mark as read",
@@ -80,17 +176,37 @@
     "remaining": "{count} reading days left",
     "remainingOne": "1 reading day left",
     "done": "Plan complete. Well done!",
-    "today": "Today's reading",
+    "today": "Today",
     "length": "{count} days",
     "switchConfirm": "You already have a plan in progress. Starting this one replaces it. Continue?",
     "stop": "End plan",
     "stopConfirm": "End the current plan? Chapters you read stay marked.",
     "catalog": {
-      "bible-1y": { "title": "Bible in a year", "desc": "Every book, from Genesis to Revelation, about 3 chapters a day." },
-      "nt-90": { "title": "New Testament in 90 days", "desc": "The life of Jesus and the early church, 2 or 3 chapters a day." },
-      "gospels-30": { "title": "Gospels in 30 days", "desc": "Matthew, Mark, Luke and John, about 3 chapters a day." },
-      "psalms-proverbs-31": { "title": "Psalms and Proverbs in 31 days", "desc": "One chapter of Proverbs and a few psalms each day for a month." }
-    }
+      "bible-1y": {
+        "title": "Bible in a year",
+        "desc": "Every book, from Genesis to Revelation, about 3 chapters a day."
+      },
+      "nt-90": {
+        "title": "New Testament in 90 days",
+        "desc": "The life of Jesus and the early church, 2 or 3 chapters a day."
+      },
+      "gospels-30": {
+        "title": "Gospels in 30 days",
+        "desc": "Matthew, Mark, Luke and John, about 3 chapters a day."
+      },
+      "psalms-proverbs-31": {
+        "title": "Psalms and Proverbs in 31 days",
+        "desc": "One chapter of Proverbs and a few psalms each day for a month."
+      }
+    },
+    "eyebrow": "Current plan",
+    "summary": "{read} of {total} chapters · Day {day} of {days}",
+    "support": "Read it in another Bible? Mark it here. Everything you mark in the plan also counts in the Tracker.",
+    "dayTitle": "Day {n}",
+    "dayCount": "{done} of {total}",
+    "markDay": "Mark the whole day",
+    "readChapter": "Read {ref}",
+    "percent": "{percent}% complete"
   },
   "topics": {
     "title": "Topics",
@@ -104,7 +220,9 @@
     "languagePt": "Português",
     "languageEn": "English",
     "theme": "Theme",
-    "themes": { "aurora": "Aurora" },
+    "themes": {
+      "aurora": "Aurora"
+    },
     "moreThemes": "More themes coming soon",
     "fontSize": "Text size",
     "fontSizeValue": "{n} of 4",
@@ -135,5 +253,9 @@
     "madeBy": "Made by Selatech",
     "version": "Version {version}"
   },
-  "update": { "available": "A new version is available.", "reload": "Update", "dismiss": "Close" }
+  "update": {
+    "available": "A new version is available.",
+    "reload": "Update",
+    "dismiss": "Close"
+  }
 }
