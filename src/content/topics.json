@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ansiedade", "icon": "wind",
+    "title": { "pt": "Ansiedade", "en": "Anxiety" },
+    "intro": { "pt": "Quando a mente não descansa, Deus convida você a entregar a Ele o que pesa no coração.", "en": "When your mind won't rest, God invites you to hand Him what weighs on your heart." },
+    "refs": ["PHP.4.6", "PHP.4.7", "1PE.5.7", "MAT.6.34", "JHN.14.27", "PSA.94.19", "ISA.41.10", "MAT.11.28"]
+  },
+  {
+    "id": "dor", "icon": "heart-crack",
+    "title": { "pt": "Dor e sofrimento", "en": "Pain and suffering" },
+    "intro": { "pt": "Na dor, você não está sozinho. Deus está perto de quem tem o coração quebrantado.", "en": "In pain, you are not alone. God is close to the brokenhearted." },
+    "refs": ["PSA.34.18", "ROM.8.18", "2CO.4.17", "REV.21.4", "PSA.147.3", "ISA.43.2", "2CO.12.9"]
+  },
+  {
+    "id": "saudade", "icon": "flower",
+    "title": { "pt": "Saudade e luto", "en": "Grief and longing" },
+    "intro": { "pt": "A saudade é o amor que continua. Estas palavras trazem consolo e esperança.", "en": "Grief is love that goes on. These words bring comfort and hope." },
+    "refs": ["MAT.5.4", "1TH.4.13", "1TH.4.14", "JHN.11.25", "PSA.30.5", "JHN.14.2", "PSA.23.4"]
+  },
+  {
+    "id": "medo", "icon": "shield",
+    "title": { "pt": "Medo", "en": "Fear" },
+    "intro": { "pt": "Coragem não é a ausência do medo. É confiar que Deus vai com você.", "en": "Courage is not the absence of fear. It is trusting that God goes with you." },
+    "refs": ["JOS.1.9", "PSA.27.1", "2TI.1.7", "PSA.56.3", "ISA.43.1", "DEU.31.6", "PSA.46.1"]
+  },
+  {
+    "id": "amor", "icon": "heart",
+    "title": { "pt": "Amor", "en": "Love" },
+    "intro": { "pt": "O amor é paciente, é bondoso e não desiste. Veja como a Bíblia descreve o amor verdadeiro.", "en": "Love is patient, kind and does not give up. See how the Bible describes true love." },
+    "refs": ["1CO.13.4", "1CO.13.7", "1JN.4.7", "JHN.13.34", "ROM.12.10", "COL.3.14", "1PE.4.8"]
+  },
+  {
+    "id": "amor-de-deus", "icon": "sun",
+    "title": { "pt": "O amor de Deus", "en": "God's love" },
+    "intro": { "pt": "Antes de qualquer coisa que você faça, Deus já ama você.", "en": "Before anything you do, God already loves you." },
+    "refs": ["JHN.3.16", "ROM.5.8", "ROM.8.38", "ROM.8.39", "1JN.4.9", "1JN.4.19", "EPH.2.4", "JER.31.3"]
+  },
+  {
+    "id": "esperanca", "icon": "sunrise",
+    "title": { "pt": "Esperança", "en": "Hope" },
+    "intro": { "pt": "Mesmo nos dias escuros, existe uma esperança que não decepciona.", "en": "Even on dark days, there is a hope that does not disappoint." },
+    "refs": ["JER.29.11", "ROM.15.13", "LAM.3.22", "LAM.3.23", "HEB.11.1", "PSA.42.11", "ISA.40.31"]
+  },
+  {
+    "id": "gratidao", "icon": "sparkles",
+    "title": { "pt": "Gratidão", "en": "Gratitude" },
+    "intro": { "pt": "Agradecer muda o olhar. Estes versículos convidam a reconhecer o bem de cada dia.", "en": "Gratitude changes how you see. These verses invite you to notice the good in each day." },
+    "refs": ["1TH.5.18", "PSA.100.4", "PSA.107.1", "COL.3.17", "PSA.9.1", "PHP.4.4"]
+  },
+  {
+    "id": "perdao", "icon": "bird",
+    "title": { "pt": "Perdão", "en": "Forgiveness" },
+    "intro": { "pt": "Deus perdoa por completo e nos ensina a perdoar também.", "en": "God forgives completely and teaches us to forgive as well." },
+    "refs": ["1JN.1.9", "EPH.4.32", "COL.3.13", "PSA.103.12", "MAT.6.14", "ISA.1.18"]
+  },
+  {
+    "id": "forca", "icon": "mountain",
+    "title": { "pt": "Força", "en": "Strength" },
+    "intro": { "pt": "Quando as forças acabam, Deus renova quem espera Nele.", "en": "When your strength runs out, God renews those who wait on Him." },
+    "refs": ["PHP.4.13", "ISA.40.29", "NEH.8.10", "PSA.73.26", "EPH.6.10", "PSA.28.7"]
+  }
+]
