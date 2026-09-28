@@ -64,12 +64,13 @@ export async function createIdbRepository(name = 'selah'): Promise<Repository> {
     async addReadings(rs) {
       // Uma transação só: se qualquer add falhar, o IndexedDB desfaz o lote inteiro.
       const tx = db.transaction('readings', 'readwrite')
-      const done = tx.done
+      const pending: Promise<unknown>[] = [tx.done]
       try {
-        await Promise.all([...rs.map((r) => tx.store.add(r)), done])
+        for (const r of rs) pending.push(tx.store.add(r))
+        await Promise.all(pending)
       } catch (err) {
-        // A transação desfeita rejeita `done`; o erro que importa é o original.
-        done.catch(() => {})
+        // A transação desfeita rejeita as outras promessas; o erro que importa é o original.
+        for (const p of pending) p.catch(() => {})
         try { tx.abort() } catch { /* já abortada */ }
         throw err
       }
