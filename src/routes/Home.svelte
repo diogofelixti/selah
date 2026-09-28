@@ -18,15 +18,26 @@
   const bookName = (id: string) => t(`books.${id}`)
 
   let verseText = $state<string | null>(null)
+  let verseFailed = $state(false)
+  let verseToken = 0
 
-  $effect(() => {
+  async function loadVerse() {
+    const token = ++verseToken
     const tr = TRANSLATION_BY_LANG[locale.lang]
     const p = parseRef(verseRef)!
     verseText = null
-    bible.getVerse(tr, p.book, p.chapter, p.verse!).then(
-      (text) => (verseText = text),
-      () => (verseText = null),
-    )
+    verseFailed = false
+    try {
+      const text = await bible.getVerse(tr, p.book, p.chapter, p.verse!)
+      if (token === verseToken) verseText = text
+    } catch {
+      if (token === verseToken) verseFailed = true
+    }
+  }
+
+  $effect(() => {
+    void locale.lang
+    void loadVerse()
   })
 
   const set = $derived(readSet(app.readings))
@@ -61,11 +72,19 @@
     <a class="icon-btn" href="#/ajustes" aria-label={t('home.settings')}><SettingsIcon size={22} aria-hidden="true" /></a>
   </header>
 
-  <a class="card verse-card" href={verseLink}>
-    <p class="label">{t('home.verseOfDay')}</p>
-    <blockquote>{verseText ?? ''}</blockquote>
-    <p class="ref">{formatRef(verseRef, bookName)}</p>
-  </a>
+  {#if verseFailed}
+    <section class="card verse-card">
+      <p class="label">{t('home.verseOfDay')}</p>
+      <p>{t('home.verseError')}</p>
+      <button class="btn retry" onclick={() => loadVerse()}>{t('common.retry')}</button>
+    </section>
+  {:else}
+    <a class="card verse-card" href={verseLink}>
+      <p class="label">{t('home.verseOfDay')}</p>
+      <blockquote>{verseText ?? ''}</blockquote>
+      <p class="ref">{formatRef(verseRef, bookName)}</p>
+    </a>
+  {/if}
 
   {#if last}
     <a class="btn btn-primary continue" href={`#/ler/${last.book}/${last.chapter}`}>
@@ -124,6 +143,7 @@
     min-height: 3em;
   }
   .ref { color: var(--text-2); font-size: 0.875rem; }
+  .retry { justify-self: start; }
   .continue { width: 100%; min-height: 52px; }
   .hint { text-align: center; font-size: 0.875rem; margin-top: calc(var(--space-2) * -1); }
   .card { display: grid; gap: var(--space-2); }

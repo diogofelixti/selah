@@ -6,6 +6,8 @@
   import { getBook } from '../lib/bible/books'
   import { chapterRef } from '../lib/bible/refs'
   import { t } from '../lib/i18n/i18n.svelte'
+  import { PLANS } from '../lib/plans/catalog'
+  import { isChapterDone } from '../lib/plans/status'
   import { bookProgress, percent, readSet } from '../lib/progress/progress'
 
   let { book }: { book: string } = $props()
@@ -15,9 +17,15 @@
   const count = $derived(bookProgress(set, info))
   const chapters = $derived(Array.from({ length: info.chapters }, (_, i) => i + 1))
 
+  const activePlan = $derived(
+    app.state.activePlan ? { def: PLANS[app.state.activePlan.id], startedAt: app.state.activePlan.startedAt } : null,
+  )
+
+  // Mesma regra do leitor: com um plano ativo, um capítulo lido antes do plano ainda precisa ser marcado para o plano.
+  // Assim, segurar um capítulo desses adiciona a leitura em vez de apagar o histórico.
   function toggle(chapter: number) {
     const ref = chapterRef(book, chapter)
-    void (set.has(ref) ? unmarkRead(ref) : markRead(ref))
+    void (isChapterDone(ref, app.readings, activePlan) ? unmarkRead(ref) : markRead(ref))
   }
 </script>
 

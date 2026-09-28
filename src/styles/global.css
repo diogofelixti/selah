@@ -75,7 +75,8 @@ main.with-nav { padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bot
   text-align: center;
 }
 @keyframes flash { from { background: var(--flash); } to { background: transparent; } }
-.flash { animation: flash 2.5s ease-out; border-radius: var(--radius-s); }
+/* O destaque é estático; a animação só suaviza a saída. Com movimento reduzido, ele continua visível. */
+.flash { background: var(--flash); animation: flash 2.5s ease-out; border-radius: var(--radius-s); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

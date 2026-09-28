@@ -12,6 +12,7 @@
     "subtitle": "Good to have you here.",
     "settings": "Settings",
     "verseOfDay": "Verse of the day",
+    "verseError": "The verse could not be loaded.",
     "continue": "Continue reading",
     "start": "Start reading",
     "startHint": "Suggestion: the Gospel of John",

@@ -12,6 +12,7 @@
     "subtitle": "Que bom ter você aqui.",
     "settings": "Ajustes",
     "verseOfDay": "Versículo do dia",
+    "verseError": "Não foi possível carregar o versículo.",
     "continue": "Continuar leitura",
     "start": "Começar a ler",
     "startHint": "Sugestão: o Evangelho de João",
