@@ -12,7 +12,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "bibles": "tsx scripts/build-bibles.ts",
     "check:dashes": "tsx scripts/check-dashes.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

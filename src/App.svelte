@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import BottomNav from './components/BottomNav.svelte'
+  import UpdateBanner from './components/UpdateBanner.svelte'
   import { app, initApp } from './lib/app.svelte'
+  import { TRANSLATION_BY_LANG } from './lib/bible/loader'
   import { locale, t } from './lib/i18n/i18n.svelte'
   import { resolveLanguage } from './lib/i18n/lang'
+  import { ensureOffline, initPwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
   import { router } from './lib/router.svelte'
   import About from './routes/About.svelte'
@@ -17,6 +20,7 @@
   import Topics from './routes/Topics.svelte'
 
   onMount(() => {
+    initPwa()
     void initApp()
   })
 
@@ -24,6 +28,10 @@
     const lang = resolveLanguage(app.settings.language, navigator.language)
     locale.lang = lang
     document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en'
+  })
+
+  $effect(() => {
+    if (app.ready) void ensureOffline(TRANSLATION_BY_LANG[locale.lang])
   })
 
   $effect(() => {
@@ -74,6 +82,7 @@
       <About />
     {/if}
   </main>
+  <UpdateBanner />
   {#if route.name !== 'reader'}
     <BottomNav active={tabFor(route)} />
   {/if}

@@ -4,6 +4,7 @@
   import { t } from '../lib/i18n/i18n.svelte'
   import type { LanguageSetting } from '../lib/i18n/lang'
   import { localDayKey } from '../lib/progress/progress'
+  import { pwa } from '../lib/pwa.svelte'
   import { BackupError, parseBackup, serializeBackup } from '../lib/storage/backup'
   import { THEMES, type FontSize } from '../lib/storage/types'
 
@@ -99,7 +100,11 @@
 
     <section class="card">
       <h2>{t('settings.offline')}</h2>
-      <p class="muted small" data-offline-status></p>
+      <p class="muted small" data-offline-status>
+        {pwa.offlineDone === pwa.offlineTotal
+          ? t('settings.offlineReady')
+          : t('settings.offlineProgress', { done: pwa.offlineDone, total: pwa.offlineTotal })}
+      </p>
     </section>
 
     <section class="card data">
