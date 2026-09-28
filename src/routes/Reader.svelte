@@ -1,7 +1,6 @@
 <script lang="ts">
   import { ArrowLeft, ChevronLeft, ChevronRight, Copy, Minus, Plus, Share2, X } from '@lucide/svelte'
   import { tick } from 'svelte'
-  import Toast from '../components/Toast.svelte'
   import { app, markRead, unmarkRead, updateSettings, updateState } from '../lib/app.svelte'
   import { nextChapter, prevChapter } from '../lib/bible/books'
   import { formatSelection } from '../lib/bible/copy'
@@ -10,6 +9,7 @@
   import { chapterRef } from '../lib/bible/refs'
   import type { BookText } from '../lib/bible/types'
   import { copyText } from '../lib/clipboard'
+  import { showToast } from '../lib/toast.svelte'
   import { ui } from '../lib/ui.svelte'
   import { locale, t } from '../lib/i18n/i18n.svelte'
   import { PLANS } from '../lib/plans/catalog'
@@ -26,8 +26,8 @@
   let lastY = 0
   let loadToken = 0
   let selected = $state<number[]>([])
-  let toast = $state<string | null>(null)
-  let toastTimer: ReturnType<typeof setTimeout> | undefined
+  // Só um versículo por vez entra na ordem do Tab; as setas andam entre eles.
+  let focusVerse = $state(1)
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
 
   const ref = $derived(chapterRef(book, chapter))
@@ -45,6 +45,7 @@
     failed = false
     text = null
     selected = []
+    focusVerse = verse ?? 1
     try {
       const result = await bible.loadBook(tr, book)
       if (token !== loadToken) return
@@ -79,13 +80,37 @@
   })
 
   function toggleVerse(n: number) {
+    focusVerse = n
     selected = selected.includes(n) ? selected.filter((v) => v !== n) : [...selected, n]
+  }
+
+  function onVerseClick(e: MouseEvent, n: number) {
+    // Quem está selecionando texto para copiar pelo sistema não quer marcar o versículo.
+    const sel = getSelection()
+    if (sel && !sel.isCollapsed && sel.containsNode(e.currentTarget as Node, true)) return
+    toggleVerse(n)
+  }
+
+  function moveFocus(from: number, step: 1 | -1) {
+    for (let v = from + step; v >= 1 && v <= verses.length; v += step) {
+      if (verses[v - 1]) {
+        focusVerse = v
+        document.getElementById(`v${v}`)?.focus()
+        return
+      }
+    }
   }
 
   function onVerseKey(e: KeyboardEvent, n: number) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       toggleVerse(n)
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault()
+      moveFocus(n, 1)
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault()
+      moveFocus(n, -1)
     }
   }
 
@@ -100,12 +125,6 @@
     })
   }
 
-  function showToast(message: string) {
-    toast = message
-    clearTimeout(toastTimer)
-    toastTimer = setTimeout(() => (toast = null), 2000)
-  }
-
   async function copySelection() {
     const ok = await copyText(selectionText())
     showToast(t(ok ? 'copy.done' : 'copy.failed'))
@@ -116,8 +135,9 @@
     try {
       await navigator.share({ text: selectionText() })
       selected = []
-    } catch {
-      // Cancelado pela pessoa: mantém a seleção.
+    } catch (err) {
+      // Cancelar é normal e fica em silêncio; qualquer outro erro vira aviso.
+      if (!(err instanceof DOMException && err.name === 'AbortError')) showToast(t('copy.shareFailed'))
     }
   }
 
@@ -177,9 +197,9 @@
             class:flash={flash === i + 1}
             class:selected={selected.includes(i + 1)}
             role="button"
-            tabindex="0"
+            tabindex={focusVerse === i + 1 ? 0 : -1}
             aria-pressed={selected.includes(i + 1)}
-            onclick={() => toggleVerse(i + 1)}
+            onclick={(e) => onVerseClick(e, i + 1)}
             onkeydown={(e) => onVerseKey(e, i + 1)}
           >
             <sup>{i + 1}</sup>{#each splitImplied(content) as part, j (j)}{#if part.implied}<em>{part.text}</em>{:else}{part.text}{/if}{/each}
@@ -211,8 +231,8 @@
 </article>
 
 {#if selected.length > 0}
-  <div class="selection-bar" role="toolbar" aria-label={t('copy.copy')}>
-    <span class="count">{selected.length === 1 ? t('copy.countOne') : t('copy.countMany', { n: selected.length })}</span>
+  <div class="selection-bar" role="toolbar" aria-label={t('copy.toolbar')}>
+    <span class="count" aria-live="polite">{selected.length === 1 ? t('copy.countOne') : t('copy.countMany', { n: selected.length })}</span>
     <button class="btn btn-dark" onclick={copySelection}><Copy size={18} aria-hidden="true" />{t('copy.copy')}</button>
     {#if canShare}
       <button class="icon-btn" onclick={shareSelection} aria-label={t('copy.share')}><Share2 size={20} /></button>
@@ -220,7 +240,6 @@
     <button class="icon-btn" onclick={() => (selected = [])} aria-label={t('copy.cancel')}><X size={20} /></button>
   </div>
 {/if}
-<Toast message={toast} />
 
 <style>
   .bar {
@@ -242,7 +261,8 @@
   .num { color: var(--accent-text); }
   .text { font-family: var(--font-read); line-height: 1.75; }
   .verse { padding: 2px 0; cursor: pointer; border-radius: 4px; -webkit-tap-highlight-color: transparent; }
-  .verse.selected { background: var(--flash); box-shadow: 0 0 0 2px var(--flash); }
+  /* Selecionado: fundo claro e sublinhado dourado, diferente do destaque de versículo aberto por link. */
+  .verse.selected { background: var(--flash); box-shadow: inset 0 -2px 0 var(--accent); animation: none; }
   .selection-bar {
     position: fixed;
     left: 14px;

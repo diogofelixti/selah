@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import BottomNav from './components/BottomNav.svelte'
+  import Toast from './components/Toast.svelte'
   import UpdateBanner from './components/UpdateBanner.svelte'
   import { app, initApp } from './lib/app.svelte'
   import { TRANSLATION_BY_LANG } from './lib/bible/loader'
@@ -100,6 +101,7 @@
   {#if pwa.needRefresh && !pwa.dismissed && !ui.selecting}
     <UpdateBanner withNav={route.name !== 'reader'} onUpdate={applyUpdate} onDismiss={dismissUpdate} />
   {/if}
+  <Toast />
   {#if route.name !== 'reader'}
     <BottomNav active={tabFor(route)} />
   {/if}

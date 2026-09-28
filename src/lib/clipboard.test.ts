@@ -30,3 +30,18 @@ describe('copyText', () => {
     expect(await copyText('oi')).toBe(false)
   })
 })
+
+describe('fallback de cópia', () => {
+  it('seleciona o texto inteiro (iOS) e devolve o foco para onde estava', async () => {
+    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true })
+    document.execCommand = vi.fn().mockReturnValue(true)
+    const range = vi.spyOn(HTMLTextAreaElement.prototype, 'setSelectionRange')
+    const input = document.createElement('input')
+    document.body.appendChild(input)
+    input.focus()
+    expect(await copyText('olá mundo')).toBe(true)
+    expect(range).toHaveBeenCalledWith(0, 'olá mundo'.length)
+    expect(document.activeElement).toBe(input)
+    input.remove()
+  })
+})

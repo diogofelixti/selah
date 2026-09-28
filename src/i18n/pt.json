@@ -153,7 +153,9 @@
     "countMany": "{n} versículos",
     "done": "Copiado",
     "failed": "Não foi possível copiar",
-    "verse": "Copiar versículo"
+    "verse": "Copiar versículo",
+    "shareFailed": "Não foi possível compartilhar",
+    "toolbar": "Ações dos versículos selecionados"
   },
   "reader": {
     "markRead": "Marcar como lido",
