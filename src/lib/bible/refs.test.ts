@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chapterRef, formatRef, isValidChapterRef, parseRef } from './refs'
+import { chapterRef, formatChapterList, formatRef, isValidChapterRef, parseRef } from './refs'
 
 describe('refs', () => {
   it('interpreta referências válidas', () => {
@@ -25,5 +25,19 @@ describe('refs', () => {
     const name = (id: string) => ({ JHN: 'João', PSA: 'Salmos' })[id] ?? id
     expect(formatRef('JHN.3.16', name)).toBe('João 3:16')
     expect(formatRef('PSA.23', name)).toBe('Salmos 23')
+  })
+})
+
+describe('formatChapterList', () => {
+  const name = (id: string) => ({ GEN: 'Gênesis', EXO: 'Êxodo', LUK: 'Lucas', PSA: 'Salmos' })[id] ?? id
+
+  it('junta capítulos seguidos do mesmo livro', () => {
+    expect(formatChapterList(['LUK.10', 'LUK.11', 'LUK.12'], name, 'a')).toBe('Lucas 10 a 12')
+    expect(formatChapterList(['LUK.10'], name, 'a')).toBe('Lucas 10')
+  })
+
+  it('separa livros diferentes e saltos de capítulo', () => {
+    expect(formatChapterList(['GEN.50', 'EXO.1', 'EXO.2'], name, 'a')).toBe('Gênesis 50, Êxodo 1 a 2')
+    expect(formatChapterList(['PSA.1', 'PSA.2', 'PSA.5'], name, 'to')).toBe('Salmos 1 to 2, Salmos 5')
   })
 })

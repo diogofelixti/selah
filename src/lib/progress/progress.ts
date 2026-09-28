@@ -62,3 +62,28 @@ export function daysWithReading(readings: readonly Reading[], now: number, windo
   }
   return count
 }
+
+export interface WeekDay {
+  key: string
+  /** 0 = domingo, como Date.getDay(). */
+  weekday: number
+  read: boolean
+  today: boolean
+}
+
+/** Os últimos `count` dias locais, do mais antigo para hoje. */
+export function weekDays(readings: readonly Reading[], now: number, count = 7): WeekDay[] {
+  const keys = new Set(readings.map((r) => localDayKey(r.readAt)))
+  const days: WeekDay[] = []
+  for (let i = count - 1; i >= 0; i--) {
+    const day = new Date(now)
+    day.setDate(day.getDate() - i)
+    const key = localDayKey(day.getTime())
+    days.push({ key, weekday: day.getDay(), read: keys.has(key), today: i === 0 })
+  }
+  return days
+}
+
+export function unreadChapters(bookId: string, set: Set<string>): string[] {
+  return chapterRefs(bookId).filter((ref) => !set.has(ref))
+}

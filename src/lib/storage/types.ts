@@ -36,6 +36,10 @@ export interface Repository {
   getReadings(): Promise<Reading[]>
   addReading(reading: Reading): Promise<void>
   removeReadingsFor(ref: string): Promise<void>
+  /** Grava várias leituras de uma vez: ou todas, ou nenhuma. */
+  addReadings(readings: readonly Reading[]): Promise<void>
+  /** Apaga as leituras de vários capítulos de uma vez: ou todas, ou nenhuma. */
+  removeReadingsForMany(refs: readonly string[]): Promise<void>
   getSettings(): Promise<Settings>
   saveSettings(settings: Settings): Promise<void>
   getState(): Promise<AppState>

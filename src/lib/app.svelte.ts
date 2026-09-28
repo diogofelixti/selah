@@ -60,6 +60,22 @@ export async function unmarkRead(ref: string): Promise<void> {
   await save(() => store().removeReadingsFor(ref), () => (app.readings = app.readings.filter((r) => r.ref !== ref)))
 }
 
+export async function markMany(refs: readonly string[]): Promise<void> {
+  if (refs.length === 0) return
+  const now = Date.now()
+  const readings = refs.map((ref) => ({ ref, readAt: now }))
+  await save(() => store().addReadings(readings), () => (app.readings = [...app.readings, ...readings]))
+}
+
+export async function unmarkMany(refs: readonly string[]): Promise<void> {
+  if (refs.length === 0) return
+  const remove = new Set(refs)
+  await save(
+    () => store().removeReadingsForMany([...remove]),
+    () => (app.readings = app.readings.filter((r) => !remove.has(r.ref))),
+  )
+}
+
 // $state.snapshot: o IndexedDB não consegue clonar os proxies reativos do Svelte.
 export async function updateSettings(patch: Partial<Settings>): Promise<void> {
   const next = { ...$state.snapshot(app.settings), ...patch }

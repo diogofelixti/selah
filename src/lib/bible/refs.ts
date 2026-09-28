@@ -36,3 +36,18 @@ export function formatRef(ref: string, bookName: (id: string) => string): string
   const base = `${bookName(parsed.book)} ${parsed.chapter}`
   return parsed.verse === undefined ? base : `${base}:${parsed.verse}`
 }
+
+/** "Lucas 10 a 12", "Gênesis 50, Êxodo 1 a 2". Só junta capítulos seguidos do mesmo livro. */
+export function formatChapterList(refs: readonly string[], bookName: (id: string) => string, rangeWord: string): string {
+  const groups: { book: string; first: number; last: number }[] = []
+  for (const ref of refs) {
+    const p = parseRef(ref)
+    if (!p) continue
+    const prev = groups[groups.length - 1]
+    if (prev && prev.book === p.book && prev.last + 1 === p.chapter) prev.last = p.chapter
+    else groups.push({ book: p.book, first: p.chapter, last: p.chapter })
+  }
+  return groups
+    .map((g) => `${bookName(g.book)} ${g.first}${g.last > g.first ? ` ${rangeWord} ${g.last}` : ''}`)
+    .join(', ')
+}

@@ -19,6 +19,20 @@ const implementations: [string, () => Promise<Repository>][] = [
 ]
 
 describe.each(implementations)('repositório (%s)', (_name, create) => {
+  it('grava e apaga leituras em lote', async () => {
+    const repo = await create()
+    await repo.addReadings([{ ref: 'RUT.1', readAt: 1 }, { ref: 'RUT.2', readAt: 1 }, { ref: 'RUT.3', readAt: 1 }])
+    await repo.removeReadingsForMany(['RUT.1', 'RUT.3'])
+    expect(await repo.getReadings()).toEqual([{ ref: 'RUT.2', readAt: 1 }])
+  })
+
+  it('lote com uma leitura inválida não grava nenhuma', async () => {
+    const repo = await create()
+    const bad = { ref: 'RUT.2', readAt: 1, extra: () => 0 } as unknown as { ref: string; readAt: number }
+    await expect(repo.addReadings([{ ref: 'RUT.1', readAt: 1 }, bad])).rejects.toThrow()
+    expect(await repo.getReadings()).toEqual([])
+  })
+
   it('começa vazio e com padrões', async () => {
     const repo = await create()
     expect(await repo.getReadings()).toEqual([])

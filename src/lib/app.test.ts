@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { app, initApp, markRead, updateSettings } from './app.svelte'
+import { app, initApp, markMany, markRead, unmarkMany, updateSettings } from './app.svelte'
 import { createMemoryRepository } from './storage/repository'
 import type { Repository } from './storage/types'
 
@@ -29,6 +29,27 @@ describe('app', () => {
     app.saveError = false
     await updateSettings({ fontSize: 4 })
     expect(app.settings.fontSize).toBe(2)
+    expect(app.saveError).toBe(true)
+  })
+})
+
+describe('ações em lote', () => {
+  it('marca e desmarca vários capítulos de uma vez', async () => {
+    await initApp(async () => createMemoryRepository())
+    await markMany(['RUT.1', 'RUT.2'])
+    expect(app.readings.map((r) => r.ref)).toEqual(['RUT.1', 'RUT.2'])
+    await unmarkMany(['RUT.1'])
+    expect(app.readings.map((r) => r.ref)).toEqual(['RUT.2'])
+  })
+
+  it('não muda a tela se a gravação do lote falhar', async () => {
+    const broken: Repository = { ...createMemoryRepository(), addReadings: fail, removeReadingsForMany: fail }
+    await initApp(async () => broken)
+    await markMany(['RUT.1', 'RUT.2'])
+    expect(app.readings).toEqual([])
+    expect(app.saveError).toBe(true)
+    app.saveError = false
+    await unmarkMany(['RUT.1'])
     expect(app.saveError).toBe(true)
   })
 })

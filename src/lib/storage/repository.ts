@@ -18,6 +18,15 @@ export function createMemoryRepository(): Repository {
     async getReadings() { return structuredClone(readings) },
     async addReading(r) { readings.push(structuredClone(r)) },
     async removeReadingsFor(ref) { readings = readings.filter((r) => r.ref !== ref) },
+    async addReadings(rs) {
+      // Clona tudo antes de gravar: se algum item não puder ser clonado, nada entra.
+      const copies = rs.map((r) => structuredClone(r))
+      readings.push(...copies)
+    },
+    async removeReadingsForMany(refs) {
+      const remove = new Set(refs)
+      readings = readings.filter((r) => !remove.has(r.ref))
+    },
     async getSettings() { return structuredClone(settings) },
     async saveSettings(s) { settings = structuredClone(s) },
     async getState() { return structuredClone(state) },
@@ -50,6 +59,22 @@ export async function createIdbRepository(name = 'selah'): Promise<Repository> {
     async removeReadingsFor(ref) {
       const tx = db.transaction('readings', 'readwrite')
       const keys = await tx.store.index('ref').getAllKeys(ref)
+      await Promise.all([...keys.map((k) => tx.store.delete(k)), tx.done])
+    },
+    async addReadings(rs) {
+      // Uma transação só: se qualquer add falhar, o IndexedDB desfaz o lote inteiro.
+      const tx = db.transaction('readings', 'readwrite')
+      try {
+        await Promise.all([...rs.map((r) => tx.store.add(r)), tx.done])
+      } catch (err) {
+        try { tx.abort() } catch { /* já abortada */ }
+        throw err
+      }
+    },
+    async removeReadingsForMany(refs) {
+      const tx = db.transaction('readings', 'readwrite')
+      const index = tx.store.index('ref')
+      const keys = (await Promise.all(refs.map((ref) => index.getAllKeys(ref)))).flat()
       await Promise.all([...keys.map((k) => tx.store.delete(k)), tx.done])
     },
     async getSettings() { return { ...DEFAULT_SETTINGS, ...(await db.get('settings', KEY)) } },
