@@ -76,7 +76,7 @@
             <blockquote>{texts[ref] ?? ''}</blockquote>
             <span class="ref">{formatRef(ref, bookName)}</span>
           </a>
-          <CopyButton text={() => copyFor(ref)} />
+          <CopyButton text={() => copyFor(ref)} disabled={!texts[ref]} />
         </li>
       {/each}
     </ul>

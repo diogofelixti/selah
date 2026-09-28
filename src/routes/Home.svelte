@@ -154,7 +154,7 @@
     <section class="card verse-card">
       <div class="verse-head">
         <p class="eyebrow">{t('home.verseOfDay')}</p>
-        <CopyButton text={verseCopy} />
+        <CopyButton text={verseCopy} disabled={!verseText} />
       </div>
       <a class="verse-link" href={verseLink}>
         <blockquote>{verseText ?? ''}</blockquote>

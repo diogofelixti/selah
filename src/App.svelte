@@ -9,6 +9,7 @@
   import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
   import { router } from './lib/router.svelte'
+  import { ui } from './lib/ui.svelte'
   import About from './routes/About.svelte'
   import Bible from './routes/Bible.svelte'
   import Book from './routes/Book.svelte'
@@ -96,7 +97,7 @@
       <About />
     {/if}
   </main>
-  {#if pwa.needRefresh && !pwa.dismissed}
+  {#if pwa.needRefresh && !pwa.dismissed && !ui.selecting}
     <UpdateBanner withNav={route.name !== 'reader'} onUpdate={applyUpdate} onDismiss={dismissUpdate} />
   {/if}
   {#if route.name !== 'reader'}

@@ -57,3 +57,18 @@ test('copia o versículo do dia e um versículo de tema', async ({ page }) => {
   await page.getByRole('button', { name: 'Copiar versículo' }).first().click()
   expect(await clipboard(page)).toMatch(/Filipenses 4:6 \(BLIVRE\)$/)
 })
+
+test('botão de copiar fica desativado enquanto o versículo carrega', async ({ page }) => {
+  let release!: () => void
+  const gate = new Promise<void>((r) => (release = r))
+  await page.route('**/bibles/**', async (route) => {
+    await gate
+    await route.continue()
+  })
+  await page.goto('/')
+  await page.evaluate(() => navigator.clipboard.writeText('ANTES'))
+  await expect(page.getByRole('button', { name: 'Copiar versículo' })).toBeDisabled()
+  expect(await clipboard(page)).toBe('ANTES')
+  release()
+  await expect(page.getByRole('button', { name: 'Copiar versículo' })).toBeEnabled()
+})

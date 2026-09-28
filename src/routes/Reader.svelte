@@ -10,6 +10,7 @@
   import { chapterRef } from '../lib/bible/refs'
   import type { BookText } from '../lib/bible/types'
   import { copyText } from '../lib/clipboard'
+  import { ui } from '../lib/ui.svelte'
   import { locale, t } from '../lib/i18n/i18n.svelte'
   import { PLANS } from '../lib/plans/catalog'
   import { isChapterDone } from '../lib/plans/status'
@@ -69,6 +70,12 @@
   $effect(() => {
     const pos = app.state.lastPosition
     if (pos?.book !== book || pos?.chapter !== chapter) void updateState({ lastPosition: { book, chapter } })
+  })
+
+  // Enquanto há seleção, o aviso de nova versão sai do caminho da barra de cópia.
+  $effect(() => {
+    ui.selecting = selected.length > 0
+    return () => (ui.selecting = false)
   })
 
   function toggleVerse(n: number) {
