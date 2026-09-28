@@ -20,3 +20,13 @@ test('tem manifesto instalável', async ({ page }) => {
   expect(manifest).toMatchObject({ name: 'Selah · Leitura bíblica', short_name: 'Selah', display: 'standalone', start_url: '/' })
   expect(manifest.icons.some((i: { purpose?: string }) => i.purpose === 'maskable')).toBe(true)
 })
+
+test('tenta de novo o download offline quando a conexão volta', async ({ page, context }) => {
+  let fail = true
+  await context.route('**/bibles/BLIVRE/PSA.json', (route) => (fail ? route.abort() : route.continue()))
+  await page.goto('/#/ajustes')
+  await expect(page.getByText('Baixando para uso offline: 65 de 66 livros')).toBeVisible({ timeout: 60_000 })
+  fail = false
+  await page.evaluate(() => window.dispatchEvent(new Event('online')))
+  await expect(page.getByText('Disponível offline ✓')).toBeVisible({ timeout: 60_000 })
+})

@@ -6,7 +6,7 @@
   import { TRANSLATION_BY_LANG } from './lib/bible/loader'
   import { locale, t } from './lib/i18n/i18n.svelte'
   import { resolveLanguage } from './lib/i18n/lang'
-  import { ensureOffline, initPwa } from './lib/pwa.svelte'
+  import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
   import { router } from './lib/router.svelte'
   import About from './routes/About.svelte'
@@ -31,7 +31,7 @@
   })
 
   $effect(() => {
-    if (app.ready) void ensureOffline(TRANSLATION_BY_LANG[locale.lang])
+    if (app.ready) ensureOffline(TRANSLATION_BY_LANG[locale.lang])
   })
 
   $effect(() => {
@@ -39,6 +39,10 @@
   })
 
   const route = $derived(router.route)
+
+  function onVisibility() {
+    if (document.visibilityState === 'visible') onResume()
+  }
 
   $effect(() => {
     if (route.name !== 'reader') window.scrollTo(0, 0)
@@ -54,6 +58,9 @@
     }
   }
 </script>
+
+<svelte:window ononline={onResume} />
+<svelte:document onvisibilitychange={onVisibility} />
 
 {#if app.ready}
   {#if !app.persistent}
@@ -82,7 +89,9 @@
       <About />
     {/if}
   </main>
-  <UpdateBanner />
+  {#if pwa.needRefresh && !pwa.dismissed}
+    <UpdateBanner withNav={route.name !== 'reader'} onUpdate={applyUpdate} onDismiss={dismissUpdate} />
+  {/if}
   {#if route.name !== 'reader'}
     <BottomNav active={tabFor(route)} />
   {/if}

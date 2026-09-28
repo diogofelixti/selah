@@ -134,5 +134,5 @@
     "madeBy": "Feito pela Selatech",
     "version": "Versão {version}"
   },
-  "update": { "available": "Nova versão disponível.", "reload": "Atualizar" }
+  "update": { "available": "Nova versão disponível.", "reload": "Atualizar", "dismiss": "Fechar" }
 }

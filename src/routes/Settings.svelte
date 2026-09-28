@@ -98,14 +98,16 @@
       </div>
     </section>
 
-    <section class="card">
-      <h2>{t('settings.offline')}</h2>
-      <p class="muted small" data-offline-status>
-        {pwa.offlineDone === pwa.offlineTotal
-          ? t('settings.offlineReady')
-          : t('settings.offlineProgress', { done: pwa.offlineDone, total: pwa.offlineTotal })}
-      </p>
-    </section>
+    {#if pwa.offlineSupported}
+      <section class="card">
+        <h2>{t('settings.offline')}</h2>
+        <p class="muted small" data-offline-status>
+          {pwa.offlineDone === pwa.offlineTotal
+            ? t('settings.offlineReady')
+            : t('settings.offlineProgress', { done: pwa.offlineDone, total: pwa.offlineTotal })}
+        </p>
+      </section>
+    {/if}
 
     <section class="card data">
       <h2>{t('settings.data')}</h2>

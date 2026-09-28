@@ -134,5 +134,5 @@
     "madeBy": "Made by Selatech",
     "version": "Version {version}"
   },
-  "update": { "available": "A new version is available.", "reload": "Update" }
+  "update": { "available": "A new version is available.", "reload": "Update", "dismiss": "Close" }
 }
