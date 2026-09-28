@@ -32,6 +32,7 @@ main.with-nav { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
   padding: var(--space-5);
 }
 .section-title {
+  font-family: var(--font-ui);
   font-size: 0.8125rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -80,6 +81,7 @@ main.with-nav { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 .eyebrow {
+  font-family: var(--font-ui);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;

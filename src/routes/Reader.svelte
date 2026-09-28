@@ -121,7 +121,7 @@
     </div>
 
     <div class="end">
-      <button class="btn mark" class:btn-primary={!done} aria-pressed={done} onclick={toggleDone}>
+      <button class="btn mark" class:btn-dark={!done} aria-pressed={done} onclick={toggleDone}>
         {done ? t('reader.read') : t('reader.markRead')}
       </button>
       <nav class="chapters">
@@ -133,7 +133,7 @@
           <span></span>
         {/if}
         {#if next}
-          <a class="btn" class:btn-primary={done} href={`#/ler/${next.book}/${next.chapter}`}>
+          <a class="btn" class:btn-dark={done} href={`#/ler/${next.book}/${next.chapter}`}>
             {t('reader.next')}<ChevronRight size={18} aria-hidden="true" />
           </a>
         {/if}
@@ -158,8 +158,8 @@
   .bar.hidden { transform: translateY(-100%); }
   .where { text-align: center; font-weight: 600; min-height: 44px; display: grid; place-items: center; }
   .font { display: flex; }
-  .reader h1 { font-family: var(--font-read); font-weight: 600; margin-bottom: var(--space-5); }
-  .num { color: var(--accent-strong); }
+  .reader h1 { font-family: var(--font-display); font-weight: 500; margin-bottom: var(--space-5); }
+  .num { color: var(--accent-text); }
   .text { font-family: var(--font-read); line-height: 1.75; }
   .verse { padding: 2px 0; }
   sup {

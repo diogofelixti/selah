@@ -74,11 +74,11 @@
 </div>
 
 <style>
-  .icon { color: var(--accent-strong); }
+  .icon { color: var(--accent); }
   .intro { font-size: 1.0625rem; line-height: 1.6; color: var(--text-2); }
   .verses { list-style: none; margin: 0; padding: 0; }
   .verses a { display: grid; gap: var(--space-2); }
-  blockquote { margin: 0; font-family: var(--font-read); font-size: 1.125rem; line-height: 1.6; min-height: 1.6em; }
+  blockquote { margin: 0; font-family: var(--font-display); font-size: 1.125rem; line-height: 1.6; min-height: 1.6em; }
   .ref { color: var(--text-2); font-size: 0.875rem; }
   .state { display: grid; gap: var(--space-4); justify-items: start; }
 </style>

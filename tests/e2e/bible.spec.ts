@@ -5,7 +5,7 @@ test.use({ locale: 'pt-BR' })
 test('mostra testamentos, seções e livros com progresso', async ({ page }) => {
   await page.goto('/#/biblia')
   await expect(page.getByRole('heading', { name: 'Pentateuco' })).toBeVisible()
-  await page.getByRole('link', { name: /Novo Testamento/ }).click()
+  await page.getByRole('link', { name: /^Novo/ }).click()
   await expect(page.getByRole('heading', { name: 'Evangelhos' })).toBeVisible()
   await page.getByRole('link', { name: /^João/ }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'João' })).toBeVisible()

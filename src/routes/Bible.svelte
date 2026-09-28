@@ -7,9 +7,9 @@
 
   let { testament }: { testament: Testament } = $props()
 
-  const TABS: { id: Testament; href: string; label: string }[] = [
-    { id: 'OT', href: '#/biblia', label: 'bible.ot' },
-    { id: 'NT', href: '#/biblia/nt', label: 'bible.nt' },
+  const TABS: { id: Testament; href: string }[] = [
+    { id: 'OT', href: '#/biblia' },
+    { id: 'NT', href: '#/biblia/nt' },
   ]
 
   const set = $derived(readSet(app.readings))
@@ -22,11 +22,10 @@
     <p class="muted">{t('bible.overall', { percent: percent(bibleProgress(set)) })}</p>
   </header>
 
-  <nav class="tabs">
+  <nav class="filters">
     {#each TABS as tab (tab.id)}
-      <a href={tab.href} aria-current={tab.id === testament ? 'page' : undefined}>
-        <span>{t(tab.label)}</span>
-        <small>{percent(testamentProgress(set, tab.id))}%</small>
+      <a class="pill pill-dark" href={tab.href} aria-current={tab.id === testament ? 'page' : undefined}>
+        {t(tab.id === 'OT' ? 'tracker.ot' : 'tracker.nt', { percent: percent(testamentProgress(set, tab.id)) })}
       </a>
     {/each}
   </nav>
@@ -51,35 +50,19 @@
 </div>
 
 <style>
-  .tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-2);
-    padding: var(--space-1);
-    background: var(--surface-2);
-    border-radius: var(--radius-m);
-  }
-  .tabs a {
-    display: grid;
-    justify-items: center;
-    min-height: 44px;
-    padding: var(--space-2);
-    border-radius: calc(var(--radius-m) - 4px);
-    color: var(--text-2);
-    font-weight: 550;
-  }
-  .tabs a[aria-current='page'] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
-  .tabs small { font-size: 0.75rem; }
-  .books { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
+  .filters { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .books { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
   .books a {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: var(--space-1) var(--space-3);
-    padding: var(--space-3) var(--space-2);
-    border-radius: var(--radius-s);
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-4);
+    border-radius: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
   }
   .books a:active { background: var(--surface-2); }
-  .name { font-weight: 500; }
+  .name { font-family: var(--font-display); font-size: 1.0625rem; }
   .count { font-size: 0.875rem; }
   .bar { grid-column: 1 / -1; }
 </style>

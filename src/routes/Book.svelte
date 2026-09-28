@@ -64,15 +64,14 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
     gap: var(--space-2);
   }
   .grid a {
     display: grid;
     place-items: center;
-    aspect-ratio: 1;
-    min-height: 44px;
-    border-radius: var(--radius-s);
+    min-height: 46px;
+    border-radius: 999px;
     border: 1px solid var(--border);
     background: var(--surface);
     font-weight: 550;
@@ -81,5 +80,5 @@
     -webkit-touch-callout: none;
     touch-action: manipulation;
   }
-  .grid a.read { background: var(--accent); border-color: var(--accent); color: var(--text); }
+  .grid a.read { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; }
 </style>

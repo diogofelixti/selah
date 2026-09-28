@@ -131,10 +131,10 @@
 </div>
 
 <style>
-  fieldset { border: 1px solid var(--border); margin: 0; display: grid; gap: var(--space-1); }
-  legend { font-weight: 600; padding: 0 var(--space-1); }
+  fieldset { border: 1px solid var(--border); margin: 0; display: grid; gap: var(--space-1); border-radius: var(--radius-l); padding: var(--space-4) var(--space-5); }
+  legend { font-family: var(--font-display); font-size: 1.0625rem; padding: 0 var(--space-1); }
   .option { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; }
-  .option input { width: 20px; height: 20px; accent-color: var(--accent-strong); }
+  .option input { width: 20px; height: 20px; accent-color: var(--accent); }
   .row { display: flex; justify-content: space-between; align-items: center; }
   .stepper { display: flex; align-items: center; gap: var(--space-1); }
   .data { display: grid; gap: var(--space-2); }

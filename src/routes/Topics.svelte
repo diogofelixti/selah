@@ -31,6 +31,6 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: var(--space-3);
   }
-  .grid a { display: grid; gap: var(--space-3); min-height: 104px; align-content: space-between; font-weight: 550; }
-  .icon { color: var(--accent-strong); }
+  .grid a { display: grid; gap: var(--space-3); min-height: 104px; align-content: space-between; border-radius: 20px; font-family: var(--font-display); font-size: 1.0625rem; }
+  .icon { color: var(--accent); }
 </style>
