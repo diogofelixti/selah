@@ -24,9 +24,10 @@ export function chapterRef(book: string, chapter: number): string {
   return `${book}.${chapter}`
 }
 
+/** Só aceita a forma canônica ("JHN.3"), a mesma usada nos dados de leitura. */
 export function isValidChapterRef(ref: string): boolean {
   const parsed = parseRef(ref)
-  return parsed !== null && parsed.verse === undefined
+  return parsed !== null && parsed.verse === undefined && chapterRef(parsed.book, parsed.chapter) === ref
 }
 
 export function formatRef(ref: string, bookName: (id: string) => string): string {

@@ -17,6 +17,7 @@ describe('refs', () => {
     expect(isValidChapterRef('JHN.3')).toBe(true)
     expect(isValidChapterRef('JHN.3.16')).toBe(false)
     expect(isValidChapterRef('JHN.99')).toBe(false)
+    expect(isValidChapterRef('JHN.03')).toBe(false)
     expect(chapterRef('JHN', 3)).toBe('JHN.3')
   })
 

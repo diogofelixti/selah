@@ -9,7 +9,10 @@ export class BackupError extends Error {}
 
 type Obj = Record<string, unknown>
 const isObj = (x: unknown): x is Obj => typeof x === 'object' && x !== null && !Array.isArray(x)
-const isTime = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x)
+// Datas aceitas: de 1970 até um dia à frente (tolera relógios um pouco adiantados).
+const MAX_CLOCK_SKEW = 86_400_000
+const isTime = (x: unknown, now: number): x is number =>
+  typeof x === 'number' && Number.isFinite(x) && x >= 0 && x <= now + MAX_CLOCK_SKEW
 
 export function serializeBackup(data: AppData, now = Date.now()): string {
   return JSON.stringify(
@@ -19,8 +22,8 @@ export function serializeBackup(data: AppData, now = Date.now()): string {
   )
 }
 
-function parseReading(x: unknown): Reading {
-  if (!isObj(x) || typeof x.ref !== 'string' || !isValidChapterRef(x.ref) || !isTime(x.readAt)) {
+function parseReading(x: unknown, now: number): Reading {
+  if (!isObj(x) || typeof x.ref !== 'string' || !isValidChapterRef(x.ref) || !isTime(x.readAt, now)) {
     throw new BackupError('leitura inválida')
   }
   return { ref: x.ref, readAt: x.readAt }
@@ -35,7 +38,7 @@ function parseSettings(x: unknown): Settings {
   return { language, theme: theme as Theme, fontSize: fontSize as FontSize }
 }
 
-function parseState(x: unknown): AppState {
+function parseState(x: unknown, now: number): AppState {
   if (!isObj(x)) throw new BackupError('estado ausente')
   let lastPosition: AppState['lastPosition'] = null
   if (x.lastPosition !== null) {
@@ -49,13 +52,13 @@ function parseState(x: unknown): AppState {
   let activePlan: AppState['activePlan'] = null
   if (x.activePlan !== null) {
     const a = x.activePlan
-    if (!isObj(a) || !isPlanId(a.id) || !isTime(a.startedAt)) throw new BackupError('plano inválido')
+    if (!isObj(a) || !isPlanId(a.id) || !isTime(a.startedAt, now)) throw new BackupError('plano inválido')
     activePlan = { id: a.id, startedAt: a.startedAt }
   }
   return { lastPosition, activePlan }
 }
 
-export function parseBackup(text: string): AppData {
+export function parseBackup(text: string, now = Date.now()): AppData {
   let raw: unknown
   try {
     raw = JSON.parse(text)
@@ -66,8 +69,8 @@ export function parseBackup(text: string): AppData {
   if (raw.version !== BACKUP_VERSION) throw new BackupError('versão não suportada')
   if (!Array.isArray(raw.readings)) throw new BackupError('leituras ausentes')
   return {
-    readings: raw.readings.map(parseReading),
+    readings: raw.readings.map((r) => parseReading(r, now)),
     settings: parseSettings(raw.settings),
-    state: parseState(raw.state),
+    state: parseState(raw.state, now),
   }
 }

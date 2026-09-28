@@ -37,6 +37,10 @@ describe('backup', () => {
     ['plano desconhecido', withChange((r) => { r.state.activePlan = { id: 'nope', startedAt: 1 } })],
     ['posição em capítulo inexistente', withChange((r) => { r.state.lastPosition = { book: 'JHN', chapter: 99 } })],
     ['sem readings', withChange((r) => { delete r.readings })],
+    ['capítulo com zero à esquerda', withChange((r) => { r.readings = [{ ref: 'JHN.03', readAt: 1 }] })],
+    ['data de leitura no futuro distante', withChange((r) => { r.readings = [{ ref: 'JHN.3', readAt: 1e20 }] })],
+    ['data de leitura negativa', withChange((r) => { r.readings = [{ ref: 'JHN.3', readAt: -5 }] })],
+    ['plano começando no futuro', withChange((r) => { r.state.activePlan = { id: 'nt-90', startedAt: Date.now() + 10 * 86_400_000 } })],
   ])('rejeita arquivo com %s', (_name, text) => {
     expect(() => parseBackup(text)).toThrow(BackupError)
   })
