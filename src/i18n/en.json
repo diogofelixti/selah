@@ -3,6 +3,7 @@
   "nav": { "main": "Main", "home": "Home", "bible": "Bible", "plans": "Plans", "topics": "Topics" },
   "common": {
     "notPersistent": "Your browser does not allow saving data. Progress from this session will be lost when you close the app.",
+    "saveError": "Could not save on this device. Check for free space and try again.",
     "retry": "Try again",
     "loading": "Loading",
     "back": "Back"

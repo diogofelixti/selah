@@ -36,3 +36,26 @@ test('durante um plano, tocar e segurar um capítulo lido antes não apaga o his
   await page.goto('/#/ler/JHN/3')
   await expect(page.getByRole('button', { name: 'Lido ✓' })).toBeVisible()
 })
+
+test('avisa quando não consegue salvar no aparelho', async ({ page }) => {
+  await page.addInitScript(() => {
+    IDBObjectStore.prototype.add = function () {
+      throw new DOMException('Sem espaço', 'QuotaExceededError')
+    }
+  })
+  await page.goto('/#/ler/JHN/1')
+  await page.getByRole('button', { name: 'Marcar como lido' }).click()
+  await expect(page.getByText('Não foi possível salvar no aparelho.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Marcar como lido' })).toBeVisible()
+})
+
+test('com o armazenamento quebrado, o app abre mesmo assim', async ({ page }) => {
+  await page.addInitScript(() => {
+    IDBObjectStore.prototype.getAll = function () {
+      throw new DOMException('Banco fechado', 'InvalidStateError')
+    }
+  })
+  await page.goto('/')
+  await expect(page.getByText('Versículo do dia')).toBeVisible()
+  await expect(page.getByText(/Seu navegador não permite salvar dados/)).toBeVisible()
+})

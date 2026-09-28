@@ -40,8 +40,9 @@
     try {
       const data = parseBackup(await file.text())
       if (!confirm(t('settings.importConfirm'))) return
-      await replaceData(data)
-      message = { kind: 'ok', key: 'settings.importDone' }
+      message = (await replaceData(data))
+        ? { kind: 'ok', key: 'settings.importDone' }
+        : { kind: 'error', key: 'common.saveError' }
     } catch (err) {
       if (!(err instanceof BackupError)) throw err
       message = { kind: 'error', key: 'settings.importError' }
@@ -50,8 +51,9 @@
 
   async function erase() {
     if (!confirm(t('settings.clearConfirm1')) || !confirm(t('settings.clearConfirm2'))) return
-    await clearData()
-    message = { kind: 'ok', key: 'settings.clearDone' }
+    message = (await clearData())
+      ? { kind: 'ok', key: 'settings.clearDone' }
+      : { kind: 'error', key: 'common.saveError' }
   }
 </script>
 

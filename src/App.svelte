@@ -66,6 +66,9 @@
   {#if !app.persistent}
     <p class="banner" role="status">{t('common.notPersistent')}</p>
   {/if}
+  {#if app.saveError}
+    <p class="banner" role="alert">{t('common.saveError')}</p>
+  {/if}
   <main class:with-nav={route.name !== 'reader'}>
     {#if route.name === 'home'}
       <Home />

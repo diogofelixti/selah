@@ -3,6 +3,7 @@
   "nav": { "main": "Principal", "home": "Início", "bible": "Bíblia", "plans": "Planos", "topics": "Temas" },
   "common": {
     "notPersistent": "Seu navegador não permite salvar dados. O progresso desta sessão será perdido ao fechar o app.",
+    "saveError": "Não foi possível salvar no aparelho. Verifique se há espaço livre e tente de novo.",
     "retry": "Tentar de novo",
     "loading": "Carregando",
     "back": "Voltar"
