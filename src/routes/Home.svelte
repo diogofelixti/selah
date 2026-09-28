@@ -1,6 +1,8 @@
 <script lang="ts">
   import { BookOpen, Menu, SquareCheckBig } from '@lucide/svelte'
+  import CopyButton from '../components/CopyButton.svelte'
   import { app } from '../lib/app.svelte'
+  import { formatSelection } from '../lib/bible/copy'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
   import { formatChapterList, formatRef, parseRef } from '../lib/bible/refs'
   import { tipOfTheDay, verseOfTheDay } from '../lib/daily/daily'
@@ -73,6 +75,13 @@
     const status = planStatus(PLANS[active.id], since)
     return { id: active.id, status, todayDone: status.todayRefs.filter((r) => since.has(r)).length }
   })
+  function verseCopy() {
+    const p = parseRef(verseRef)!
+    const texts: string[] = []
+    texts[p.verse! - 1] = verseText ?? ''
+    return formatSelection({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts, bookName, translation: TRANSLATION_BY_LANG[locale.lang] })
+  }
+
   const verseLink = $derived.by(() => {
     const p = parseRef(verseRef)!
     return `#/ler/${p.book}/${p.chapter}/${p.verse}`
@@ -142,11 +151,16 @@
       <button class="btn retry" onclick={() => loadVerse()}>{t('common.retry')}</button>
     </section>
   {:else}
-    <a class="card verse-card" href={verseLink}>
-      <p class="eyebrow">{t('home.verseOfDay')}</p>
-      <blockquote>{verseText ?? ''}</blockquote>
-      <p class="muted small">{formatRef(verseRef, bookName)}</p>
-    </a>
+    <section class="card verse-card">
+      <div class="verse-head">
+        <p class="eyebrow">{t('home.verseOfDay')}</p>
+        <CopyButton text={verseCopy} />
+      </div>
+      <a class="verse-link" href={verseLink}>
+        <blockquote>{verseText ?? ''}</blockquote>
+        <p class="muted small">{formatRef(verseRef, bookName)}</p>
+      </a>
+    </section>
   {/if}
 
   {#if plan}
@@ -238,6 +252,8 @@
   .verse-card { display: grid; gap: var(--space-3); }
   .verse-card blockquote { margin: 0; font-family: var(--font-display); font-size: 1.375rem; line-height: 1.45; min-height: 2.9em; }
   .retry { justify-self: start; }
+  .verse-head { display: flex; justify-content: space-between; align-items: center; margin: -8px -8px 0 0; }
+  .verse-link { display: grid; gap: var(--space-3); }
   .plan-card { display: grid; gap: var(--space-3); }
   .plan-title { font-family: var(--font-display); font-size: 1.1875rem; }
   .plan-pct { font-size: 0.8125rem; font-weight: 700; color: var(--accent-text); }

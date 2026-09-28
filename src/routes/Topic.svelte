@@ -1,6 +1,8 @@
 <script lang="ts">
   import { ArrowLeft } from '@lucide/svelte'
+  import CopyButton from '../components/CopyButton.svelte'
   import TopicIcon from '../components/TopicIcon.svelte'
+  import { formatSelection } from '../lib/bible/copy'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
   import { formatRef, parseRef } from '../lib/bible/refs'
   import { locale, t } from '../lib/i18n/i18n.svelte'
@@ -40,6 +42,13 @@
     void load()
   })
 
+  function copyFor(ref: string) {
+    const p = parseRef(ref)!
+    const verseTexts: string[] = []
+    verseTexts[p.verse! - 1] = texts[ref] ?? ''
+    return formatSelection({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts: verseTexts, bookName, translation: TRANSLATION_BY_LANG[locale.lang] })
+  }
+
   function hrefFor(ref: string) {
     const p = parseRef(ref)!
     return `#/ler/${p.book}/${p.chapter}/${p.verse}`
@@ -62,11 +71,12 @@
   {:else}
     <ul class="stack verses">
       {#each topic.refs as ref (ref)}
-        <li>
-          <a class="card" href={hrefFor(ref)}>
+        <li class="card verse">
+          <a class="verse-link" href={hrefFor(ref)}>
             <blockquote>{texts[ref] ?? ''}</blockquote>
             <span class="ref">{formatRef(ref, bookName)}</span>
           </a>
+          <CopyButton text={() => copyFor(ref)} />
         </li>
       {/each}
     </ul>
@@ -77,7 +87,8 @@
   .icon { color: var(--accent); }
   .intro { font-size: 1.0625rem; line-height: 1.6; color: var(--text-2); }
   .verses { list-style: none; margin: 0; padding: 0; }
-  .verses a { display: grid; gap: var(--space-2); }
+  .verse { display: flex; align-items: flex-start; gap: var(--space-2); }
+  .verse-link { display: grid; gap: var(--space-2); flex-grow: 1; }
   blockquote { margin: 0; font-family: var(--font-display); font-size: 1.125rem; line-height: 1.6; min-height: 1.6em; }
   .ref { color: var(--text-2); font-size: 0.875rem; }
   .state { display: grid; gap: var(--space-4); justify-items: start; }

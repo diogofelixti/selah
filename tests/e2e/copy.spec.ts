@@ -44,3 +44,16 @@ test('copia sem a API moderna (rede local sem HTTPS)', async ({ page }) => {
   await page.getByRole('button', { name: 'Copiar', exact: true }).click()
   await expect(page.getByText('Copiado')).toBeVisible()
 })
+
+test('copia o versículo do dia e um versículo de tema', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('.verse-card blockquote')).not.toBeEmpty()
+  await page.getByRole('button', { name: 'Copiar versículo' }).click()
+  await expect(page.getByText('Copiado')).toBeVisible()
+  expect(await clipboard(page)).toMatch(/^“.+” .+ \d+:\d+ \(BLIVRE\)$/)
+
+  await page.goto('/#/temas/ansiedade')
+  await expect(page.getByRole('link', { name: /Filipenses 4:6/ }).locator('blockquote')).not.toBeEmpty()
+  await page.getByRole('button', { name: 'Copiar versículo' }).first().click()
+  expect(await clipboard(page)).toMatch(/Filipenses 4:6 \(BLIVRE\)$/)
+})
