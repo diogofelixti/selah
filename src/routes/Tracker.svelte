@@ -106,6 +106,8 @@
     text-align: left;
     cursor: pointer;
   }
+  /* O cartão corta o que passa da borda; o contorno de foco fica por dentro. */
+  .book-row:focus-visible { outline-offset: -3px; }
   .ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
   .ring-label { position: absolute; inset: 0; display: grid; place-items: center; font-size: 0.6875rem; font-weight: 700; }
   .book-text { display: grid; gap: 2px; }

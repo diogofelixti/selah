@@ -77,9 +77,20 @@ export async function createIdbRepository(name = 'selah'): Promise<Repository> {
     },
     async removeReadingsForMany(refs) {
       const tx = db.transaction('readings', 'readwrite')
-      const index = tx.store.index('ref')
-      const keys = (await Promise.all(refs.map((ref) => index.getAllKeys(ref)))).flat()
-      await Promise.all([...keys.map((k) => tx.store.delete(k)), tx.done])
+      const pending: Promise<unknown>[] = [tx.done]
+      try {
+        const index = tx.store.index('ref')
+        const lookups = refs.map((ref) => index.getAllKeys(ref))
+        pending.push(...lookups)
+        const keys = (await Promise.all(lookups)).flat()
+        for (const k of keys) pending.push(tx.store.delete(k))
+        await Promise.all(pending)
+      } catch (err) {
+        // Mesmo tratamento do addReadings: nada fica sem tratamento se o lote for desfeito.
+        for (const p of pending) p.catch(() => {})
+        try { tx.abort() } catch { /* já abortada */ }
+        throw err
+      }
     },
     async getSettings() { return { ...DEFAULT_SETTINGS, ...(await db.get('settings', KEY)) } },
     async saveSettings(s) { await db.put('settings', s, KEY) },

@@ -1,12 +1,7 @@
 {
-  "app": {
-    "name": "Selah",
-    "tagline": "Bible reading"
-  },
   "nav": {
     "main": "Main",
     "home": "Home",
-    "bible": "Bible",
     "plans": "Plans",
     "topics": "Topics",
     "read": "Read",
@@ -26,17 +21,11 @@
       "afternoon": "Good afternoon",
       "evening": "Good evening"
     },
-    "subtitle": "Good to have you here.",
     "settings": "Settings",
     "verseOfDay": "Verse of the day",
     "verseError": "The verse could not be loaded.",
     "continue": "Continue reading",
     "start": "Start reading",
-    "startHint": "Suggestion: the Gospel of John",
-    "progressTitle": "Your progress",
-    "progress": "{percent}% of the Bible read",
-    "days": "Read on {count} of the last 7 days",
-    "todayPlan": "Today's reading",
     "planDone": "Plan complete. Well done!",
     "tip": "Tip",
     "bibleRead": "Bible read",
@@ -50,8 +39,6 @@
   },
   "bible": {
     "title": "Bible",
-    "ot": "Old Testament",
-    "nt": "New Testament",
     "overall": "{percent}% of the Bible read",
     "chaptersRead": "{read} of {total} chapters read",
     "longPressHint": "Tap to read. Tap and hold to mark as read.",
@@ -170,9 +157,7 @@
   "plans": {
     "title": "Plans",
     "intro": "Pick a plan and read at your own pace. If you stop for a few days, you pick up where you left off.",
-    "current": "Current plan",
     "start": "Start",
-    "day": "Day {day} of {total}",
     "remaining": "{count} reading days left",
     "remainingOne": "1 reading day left",
     "done": "Plan complete. Well done!",

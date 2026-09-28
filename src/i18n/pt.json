@@ -1,12 +1,7 @@
 {
-  "app": {
-    "name": "Selah",
-    "tagline": "Leitura bíblica"
-  },
   "nav": {
     "main": "Principal",
     "home": "Início",
-    "bible": "Bíblia",
     "plans": "Planos",
     "topics": "Temas",
     "read": "Ler",
@@ -26,17 +21,11 @@
       "afternoon": "Boa tarde",
       "evening": "Boa noite"
     },
-    "subtitle": "Que bom ter você aqui.",
     "settings": "Ajustes",
     "verseOfDay": "Versículo do dia",
     "verseError": "Não foi possível carregar o versículo.",
     "continue": "Continuar leitura",
     "start": "Começar a ler",
-    "startHint": "Sugestão: o Evangelho de João",
-    "progressTitle": "Seu progresso",
-    "progress": "{percent}% da Bíblia lida",
-    "days": "Leitura em {count} dos últimos 7 dias",
-    "todayPlan": "Leitura de hoje",
     "planDone": "Plano concluído. Parabéns!",
     "tip": "Dica",
     "bibleRead": "Bíblia lida",
@@ -50,8 +39,6 @@
   },
   "bible": {
     "title": "Bíblia",
-    "ot": "Antigo Testamento",
-    "nt": "Novo Testamento",
     "overall": "{percent}% da Bíblia lida",
     "chaptersRead": "{read} de {total} capítulos lidos",
     "longPressHint": "Toque para ler. Toque e segure para marcar como lido.",
@@ -170,9 +157,7 @@
   "plans": {
     "title": "Planos",
     "intro": "Escolha um plano e leia no seu ritmo. Se parar alguns dias, você continua de onde parou.",
-    "current": "Plano atual",
     "start": "Começar",
-    "day": "Dia {day} de {total}",
     "remaining": "Faltam {count} dias de leitura",
     "remainingOne": "Falta 1 dia de leitura",
     "done": "Plano concluído. Parabéns!",

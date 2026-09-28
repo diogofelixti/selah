@@ -9,11 +9,27 @@
   import { planStatus } from '../lib/plans/status'
   import { bibleProgress, percent, readSet, testamentProgress, weekDays } from '../lib/progress/progress'
 
-  const today = new Date()
-  const hour = today.getHours()
-  const greetingKey = hour < 12 ? 'home.greeting.morning' : hour < 18 ? 'home.greeting.afternoon' : 'home.greeting.evening'
-  const verseRef = verseOfTheDay(today)
-  const tip = tipOfTheDay(today)
+  // "Agora" é estado: se o app ficar aberto depois da meia-noite, a semana, a saudação,
+  // o versículo e a dica mudam de dia ao voltar para o app ou no minuto seguinte.
+  let now = $state(Date.now())
+  $effect(() => {
+    const tick = () => (now = Date.now())
+    const onVisible = () => document.visibilityState === 'visible' && tick()
+    document.addEventListener('visibilitychange', onVisible)
+    const timer = setInterval(tick, 60_000)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      clearInterval(timer)
+    }
+  })
+
+  const today = $derived(new Date(now))
+  const greetingKey = $derived.by(() => {
+    const hour = today.getHours()
+    return hour < 12 ? 'home.greeting.morning' : hour < 18 ? 'home.greeting.afternoon' : 'home.greeting.evening'
+  })
+  const verseRef = $derived(verseOfTheDay(today))
+  const tip = $derived(tipOfTheDay(today))
   const bookName = (id: string) => t(`books.${id}`)
   const OT_SHARE = (929 / 1189) * 100
 
@@ -37,6 +53,7 @@
 
   $effect(() => {
     void locale.lang
+    void verseRef
     void loadVerse()
   })
 
@@ -46,7 +63,7 @@
   const overall = $derived(percent(total))
   const ot = $derived(percent(testamentProgress(set, 'OT')))
   const nt = $derived(percent(testamentProgress(set, 'NT')))
-  const week = $derived(weekDays(app.readings, Date.now()))
+  const week = $derived(weekDays(app.readings, now))
   const weekCount = $derived(week.filter((d) => d.read).length)
   const last = $derived(app.state.lastPosition)
   const plan = $derived.by(() => {
