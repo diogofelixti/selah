@@ -145,6 +145,16 @@
     "clear": "Limpar",
     "clearConfirm": "Desmarcar todos os capítulos de {book}?"
   },
+  "copy": {
+    "copy": "Copiar",
+    "share": "Compartilhar",
+    "cancel": "Cancelar",
+    "countOne": "1 versículo",
+    "countMany": "{n} versículos",
+    "done": "Copiado",
+    "failed": "Não foi possível copiar",
+    "verse": "Copiar versículo"
+  },
   "reader": {
     "markRead": "Marcar como lido",
     "read": "Lido ✓",

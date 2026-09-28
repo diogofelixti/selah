@@ -145,6 +145,16 @@
     "clear": "Clear",
     "clearConfirm": "Unmark every chapter of {book}?"
   },
+  "copy": {
+    "copy": "Copy",
+    "share": "Share",
+    "cancel": "Cancel",
+    "countOne": "1 verse",
+    "countMany": "{n} verses",
+    "done": "Copied",
+    "failed": "Could not copy",
+    "verse": "Copy verse"
+  },
   "reader": {
     "markRead": "Mark as read",
     "read": "Read ✓",
