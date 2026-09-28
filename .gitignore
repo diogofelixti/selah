@@ -5,3 +5,7 @@ dev-dist
 test-results
 playwright-report
 .superpowers
+
+# Prints e imagens soltas de teste manual
+tests/*.jpg
+tests/*.png
