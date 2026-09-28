@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { BookOpen, Settings as SettingsIcon } from '@lucide/svelte'
-  import ProgressBar from '../components/ProgressBar.svelte'
+  import { BookOpen, Menu, SquareCheckBig } from '@lucide/svelte'
   import { app } from '../lib/app.svelte'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
-  import { formatRef, parseRef } from '../lib/bible/refs'
+  import { formatChapterList, formatRef, parseRef } from '../lib/bible/refs'
   import { tipOfTheDay, verseOfTheDay } from '../lib/daily/daily'
   import { locale, t } from '../lib/i18n/i18n.svelte'
   import { PLANS } from '../lib/plans/catalog'
   import { planStatus } from '../lib/plans/status'
-  import { bibleProgress, daysWithReading, percent, readSet } from '../lib/progress/progress'
+  import { bibleProgress, percent, readSet, testamentProgress, weekDays } from '../lib/progress/progress'
 
   const today = new Date()
   const hour = today.getHours()
@@ -16,6 +15,7 @@
   const verseRef = verseOfTheDay(today)
   const tip = tipOfTheDay(today)
   const bookName = (id: string) => t(`books.${id}`)
+  const OT_SHARE = (929 / 1189) * 100
 
   let verseText = $state<string | null>(null)
   let verseFailed = $state(false)
@@ -40,22 +40,21 @@
     void loadVerse()
   })
 
+  const numberFmt = $derived(new Intl.NumberFormat(locale.lang === 'pt' ? 'pt-BR' : 'en'))
   const set = $derived(readSet(app.readings))
-  const overall = $derived(percent(bibleProgress(set)))
-  const days = $derived(daysWithReading(app.readings, Date.now()))
+  const total = $derived(bibleProgress(set))
+  const overall = $derived(percent(total))
+  const ot = $derived(percent(testamentProgress(set, 'OT')))
+  const nt = $derived(percent(testamentProgress(set, 'NT')))
+  const week = $derived(weekDays(app.readings, Date.now()))
+  const weekCount = $derived(week.filter((d) => d.read).length)
   const last = $derived(app.state.lastPosition)
-  const plan = $derived(
-    app.state.activePlan
-      ? {
-          id: app.state.activePlan.id,
-          status: planStatus(PLANS[app.state.activePlan.id], readSet(app.readings, app.state.activePlan.startedAt)),
-        }
-      : null,
-  )
-  const planHref = $derived.by(() => {
-    if (!plan?.status.nextRef) return '#/planos'
-    const p = parseRef(plan.status.nextRef)!
-    return `#/ler/${p.book}/${p.chapter}`
+  const plan = $derived.by(() => {
+    const active = app.state.activePlan
+    if (!active) return null
+    const since = readSet(app.readings, active.startedAt)
+    const status = planStatus(PLANS[active.id], since)
+    return { id: active.id, status, todayDone: status.todayRefs.filter((r) => since.has(r)).length }
   })
   const verseLink = $derived.by(() => {
     const p = parseRef(verseRef)!
@@ -63,90 +62,170 @@
   })
 </script>
 
-<div class="page stack">
+<div class="page stack home">
   <header class="head">
     <div>
-      <h1>{t(greetingKey)}</h1>
-      <p class="muted">{t('home.subtitle')}</p>
+      <p class="muted greeting">{t(greetingKey)}</p>
+      <p class="brand">Selah</p>
     </div>
-    <a class="icon-btn" href="#/ajustes" aria-label={t('home.settings')}><SettingsIcon size={22} aria-hidden="true" /></a>
+    <a class="round" href="#/ajustes" aria-label={t('home.settings')}><Menu size={20} aria-hidden="true" /></a>
   </header>
+
+  <section class="card progress-card">
+    <div class="row">
+      <div>
+        <p class="eyebrow">{t('home.bibleRead')}</p>
+        <p class="big-number percent">{overall}<small>%</small></p>
+      </div>
+      <p class="muted count">{t('home.chapters', { read: numberFmt.format(total.read), total: numberFmt.format(total.total) })}</p>
+    </div>
+    <div class="split" aria-hidden="true">
+      <span class="part" style:flex-grow={OT_SHARE}><span class="fill ot" style:width={`${ot}%`}></span></span>
+      <span class="part" style:flex-grow={100 - OT_SHARE}><span class="fill nt" style:width={`${nt}%`}></span></span>
+    </div>
+    <div class="legend muted">
+      <span><span class="dot ot"></span>{t('home.otShort', { percent: ot })}</span>
+      <span><span class="dot nt"></span>{t('home.ntShort', { percent: nt })}</span>
+    </div>
+    <hr />
+    <p class="muted small">{t('home.thisWeek')}</p>
+    <p class="sr-only">{t('home.weekSummary', { count: weekCount })}</p>
+    <ul class="week" aria-hidden="true">
+      {#each week as day (day.key)}
+        <li data-read={day.read} data-today={day.today}><span class="bubble"></span>{t(`week.${day.weekday}`)}</li>
+      {/each}
+    </ul>
+  </section>
+
+  <div class="shortcuts">
+    {#if last}
+      <a class="shortcut dark" href={`#/ler/${last.book}/${last.chapter}`}>
+        <BookOpen size={24} aria-hidden="true" />
+        <span class="label">{t('home.continue')}</span>
+        <span class="title">{bookName(last.book)} {last.chapter}</span>
+      </a>
+    {:else}
+      <a class="shortcut dark" href="#/ler/JHN/1">
+        <BookOpen size={24} aria-hidden="true" />
+        <span class="label">{t('home.start')}</span>
+        <span class="title">{bookName('JHN')} 1</span>
+      </a>
+    {/if}
+    <a class="shortcut" href="#/controle">
+      <SquareCheckBig size={24} aria-hidden="true" class="accent-icon" />
+      <span class="label">{t('home.trackerShortcut')}</span>
+      <span class="title">{t('nav.tracker')}</span>
+    </a>
+  </div>
 
   {#if verseFailed}
     <section class="card verse-card">
-      <p class="label">{t('home.verseOfDay')}</p>
+      <p class="eyebrow">{t('home.verseOfDay')}</p>
       <p>{t('home.verseError')}</p>
       <button class="btn retry" onclick={() => loadVerse()}>{t('common.retry')}</button>
     </section>
   {:else}
     <a class="card verse-card" href={verseLink}>
-      <p class="label">{t('home.verseOfDay')}</p>
+      <p class="eyebrow">{t('home.verseOfDay')}</p>
       <blockquote>{verseText ?? ''}</blockquote>
-      <p class="ref">{formatRef(verseRef, bookName)}</p>
+      <p class="muted small">{formatRef(verseRef, bookName)}</p>
     </a>
-  {/if}
-
-  {#if last}
-    <a class="btn btn-primary continue" href={`#/ler/${last.book}/${last.chapter}`}>
-      <BookOpen size={20} aria-hidden="true" />
-      <span>{t('home.continue')} · {bookName(last.book)} {last.chapter}</span>
-    </a>
-  {:else}
-    <a class="btn btn-primary continue" href="#/ler/JHN/1">
-      <BookOpen size={20} aria-hidden="true" />
-      <span>{t('home.start')}</span>
-    </a>
-    <p class="muted hint">{t('home.startHint')}</p>
   {/if}
 
   {#if plan}
-    <a class="card" href={planHref}>
-      <p class="label">{t('home.todayPlan')}</p>
-      <h2>{t(`plans.catalog.${plan.id}.title`)}</h2>
+    <a class="card plan-card" href="#/planos">
+      <span class="row">
+        <span class="plan-title">{t(`plans.catalog.${plan.id}.title`)}</span>
+        <span class="plan-pct">{plan.status.percent}%</span>
+      </span>
       {#if plan.status.currentDay === null}
-        <p>{t('home.planDone')}</p>
+        <span class="muted small">{t('home.planDone')}</span>
       {:else}
-        <p class="muted">{t('plans.day', { day: plan.status.currentDay, total: plan.status.totalDays })}</p>
-        <p>{plan.status.todayRefs.map((r) => formatRef(r, bookName)).join(', ')}</p>
+        <span class="muted small">
+          {t('home.planToday', {
+            refs: formatChapterList(plan.status.todayRefs, bookName, t('common.to')),
+            done: plan.todayDone,
+            total: plan.status.todayRefs.length,
+          })}
+        </span>
       {/if}
+      <span class="bar"><span style:width={`${plan.status.percent}%`}></span></span>
     </a>
   {/if}
 
-  <section class="card">
-    <p class="label">{t('home.progressTitle')}</p>
-    <p>{t('home.progress', { percent: overall })}</p>
-    <ProgressBar value={overall} label={t('home.progressTitle')} />
-    <p class="muted small">{t('home.days', { count: days })}</p>
-  </section>
-
   <section class="card tip">
-    <p class="label">{t('home.tip')}</p>
+    <p class="eyebrow">{t('home.tip')}</p>
     <p>{tip[locale.lang]}</p>
   </section>
 </div>
 
 <style>
-  .head { display: flex; justify-content: space-between; align-items: start; }
-  .label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent-strong);
-    margin-bottom: var(--space-2);
+  .home { gap: var(--space-5); }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  .greeting { font-size: 0.875rem; }
+  .brand { font-family: var(--font-display); font-size: 1.875rem; font-weight: 500; line-height: 1.1; }
+  .round {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    color: var(--text-2);
   }
-  .verse-card blockquote {
-    margin: 0 0 var(--space-3);
-    font-family: var(--font-read);
-    font-size: 1.1875rem;
-    line-height: 1.6;
-    min-height: 3em;
-  }
-  .ref { color: var(--text-2); font-size: 0.875rem; }
-  .retry { justify-self: start; }
-  .continue { width: 100%; min-height: 52px; }
-  .hint { text-align: center; font-size: 0.875rem; margin-top: calc(var(--space-2) * -1); }
-  .card { display: grid; gap: var(--space-2); }
+  .progress-card { display: grid; gap: var(--space-4); }
+  .row { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-3); }
+  .percent { font-size: 4rem; margin-top: var(--space-1); }
+  .count { font-size: 0.875rem; text-align: right; max-width: 9rem; }
+  .split { display: flex; gap: 4px; height: 10px; }
+  .part { display: block; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .fill { display: block; height: 100%; }
+  .fill.ot, .dot.ot { background: var(--accent); }
+  .fill.nt, .dot.nt { background: var(--nt); }
+  .legend { display: flex; justify-content: space-between; font-size: 0.8125rem; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 999px; margin-right: 6px; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 0; width: 100%; }
   .small { font-size: 0.875rem; }
+  .week {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-2);
+  }
+  .week li { display: grid; justify-items: center; gap: 6px; }
+  .bubble { width: 30px; height: 30px; border-radius: 999px; background: var(--track); }
+  .week li[data-read='true'] .bubble { background: var(--accent); }
+  .week li[data-today='true'] .bubble { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+  .shortcuts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .shortcut {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    min-height: 120px;
+    padding: var(--space-4);
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .shortcut.dark { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .shortcut :global(.accent-icon) { color: var(--accent); }
+  .label { font-size: 0.8125rem; font-weight: 600; color: var(--text-2); }
+  .shortcut.dark .label { color: var(--track); }
+  .title { font-family: var(--font-display); font-size: 1.375rem; }
+  .verse-card { display: grid; gap: var(--space-3); }
+  .verse-card blockquote { margin: 0; font-family: var(--font-display); font-size: 1.375rem; line-height: 1.45; min-height: 2.9em; }
+  .retry { justify-self: start; }
+  .plan-card { display: grid; gap: var(--space-3); }
+  .plan-title { font-family: var(--font-display); font-size: 1.1875rem; }
+  .plan-pct { font-size: 0.8125rem; font-weight: 700; color: var(--accent-text); }
+  .bar { display: block; height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--accent); }
+  .tip { display: grid; gap: var(--space-2); }
   .tip p:last-child { line-height: 1.6; }
 </style>
