@@ -53,3 +53,17 @@ describe('ações em lote', () => {
     expect(app.saveError).toBe(true)
   })
 })
+
+describe('toques repetidos', () => {
+  it('ignora marcar de novo um capítulo que ainda está sendo gravado', async () => {
+    await initApp(async () => createMemoryRepository())
+    await Promise.all([markRead('RUT.1'), markRead('RUT.1')])
+    expect(app.readings.map((r) => r.ref)).toEqual(['RUT.1'])
+  })
+
+  it('não duplica leituras quando o mesmo lote é disparado duas vezes', async () => {
+    await initApp(async () => createMemoryRepository())
+    await Promise.all([markMany(['RUT.1', 'RUT.2']), markMany(['RUT.1', 'RUT.2'])])
+    expect(app.readings.map((r) => r.ref).sort()).toEqual(['RUT.1', 'RUT.2'])
+  })
+})

@@ -18,7 +18,7 @@
     position: fixed;
     left: var(--space-4);
     right: var(--space-4);
-    bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-3));
+    bottom: calc(var(--nav-offset) + env(safe-area-inset-bottom));
     display: flex;
     justify-content: space-between;
     align-items: center;

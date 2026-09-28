@@ -111,8 +111,9 @@
   .book-text { display: grid; gap: 2px; }
   .name { font-family: var(--font-display); font-size: 1.1875rem; }
   .small { font-size: 0.8125rem; }
-  .panel { display: grid; gap: var(--space-4); padding: 2px 18px 18px; }
-  .chapters { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-2); }
+  .panel { display: grid; gap: var(--space-4); padding: 2px 12px 16px; }
+  /* 6 por linha com alvos de 45px mesmo num celular de 360px. */
+  .chapters { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
   .chapter { min-height: 46px; padding: 0; font-weight: 500; }
   .actions { display: flex; gap: var(--space-3); }
   .grow { flex-grow: 1; }

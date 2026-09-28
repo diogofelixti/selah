@@ -68,9 +68,11 @@
           <li data-complete={day.complete} data-current={day.current}>{day.n}</li>
         {/each}
       </ol>
-      <p class="muted small">
-        {status.remainingDays === 1 ? t('plans.remainingOne') : t('plans.remaining', { count: status.remainingDays })}
-      </p>
+      {#if status.currentDay !== null}
+        <p class="muted small">
+          {status.remainingDays === 1 ? t('plans.remainingOne') : t('plans.remaining', { count: status.remainingDays })}
+        </p>
+      {/if}
     </section>
 
     <p class="muted support">{t('plans.support')}</p>

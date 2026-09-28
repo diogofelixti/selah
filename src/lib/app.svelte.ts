@@ -51,29 +51,50 @@ async function save(write: () => Promise<void>, apply: () => void): Promise<void
   apply()
 }
 
+// Capítulos com gravação em andamento. A tela só muda depois que o aparelho confirma a gravação,
+// então um segundo toque rápido veria o estado antigo; esses toques são ignorados.
+const inFlight = new Set<string>()
+
+async function guarded(refs: readonly string[], run: (refs: string[]) => Promise<void>): Promise<void> {
+  const free = [...new Set(refs)].filter((ref) => !inFlight.has(ref))
+  if (free.length === 0) return
+  for (const ref of free) inFlight.add(ref)
+  try {
+    await run(free)
+  } finally {
+    for (const ref of free) inFlight.delete(ref)
+  }
+}
+
 export async function markRead(ref: string): Promise<void> {
-  const reading = { ref, readAt: Date.now() }
-  await save(() => store().addReading(reading), () => (app.readings = [...app.readings, reading]))
+  await guarded([ref], async () => {
+    const reading = { ref, readAt: Date.now() }
+    await save(() => store().addReading(reading), () => (app.readings = [...app.readings, reading]))
+  })
 }
 
 export async function unmarkRead(ref: string): Promise<void> {
-  await save(() => store().removeReadingsFor(ref), () => (app.readings = app.readings.filter((r) => r.ref !== ref)))
+  await guarded([ref], async () => {
+    await save(() => store().removeReadingsFor(ref), () => (app.readings = app.readings.filter((r) => r.ref !== ref)))
+  })
 }
 
 export async function markMany(refs: readonly string[]): Promise<void> {
-  if (refs.length === 0) return
-  const now = Date.now()
-  const readings = refs.map((ref) => ({ ref, readAt: now }))
-  await save(() => store().addReadings(readings), () => (app.readings = [...app.readings, ...readings]))
+  await guarded(refs, async (free) => {
+    const now = Date.now()
+    const readings = free.map((ref) => ({ ref, readAt: now }))
+    await save(() => store().addReadings(readings), () => (app.readings = [...app.readings, ...readings]))
+  })
 }
 
 export async function unmarkMany(refs: readonly string[]): Promise<void> {
-  if (refs.length === 0) return
-  const remove = new Set(refs)
-  await save(
-    () => store().removeReadingsForMany([...remove]),
-    () => (app.readings = app.readings.filter((r) => !remove.has(r.ref))),
-  )
+  await guarded(refs, async (free) => {
+    const remove = new Set(free)
+    await save(
+      () => store().removeReadingsForMany(free),
+      () => (app.readings = app.readings.filter((r) => !remove.has(r.ref))),
+    )
+  })
 }
 
 // $state.snapshot: o IndexedDB não consegue clonar os proxies reativos do Svelte.

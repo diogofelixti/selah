@@ -12,6 +12,8 @@
   --radius-m: 14px;
   --radius-l: 24px;
   --nav-height: 64px;
+  /* Espaço ocupado pela barra flutuante: 68px de altura + 16px de margem + 16px de folga. */
+  --nav-offset: 100px;
   --read-size-1: 1.0625rem;
   --read-size-2: 1.1875rem;
   --read-size-3: 1.3125rem;
