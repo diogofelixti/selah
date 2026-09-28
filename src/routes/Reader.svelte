@@ -10,6 +10,7 @@
   import { locale, t } from '../lib/i18n/i18n.svelte'
   import { PLANS } from '../lib/plans/catalog'
   import { isChapterDone } from '../lib/plans/status'
+  import { canGoBack } from '../lib/router.svelte'
   import type { FontSize } from '../lib/storage/types'
 
   let { book, chapter, verse }: { book: string; chapter: number; verse?: number } = $props()
@@ -78,7 +79,7 @@
   }
 
   function back() {
-    if (history.length > 1) history.back()
+    if (canGoBack()) history.back()
     else location.hash = `#/livro/${book}`
   }
 </script>

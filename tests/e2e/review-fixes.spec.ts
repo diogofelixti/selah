@@ -59,3 +59,22 @@ test('com o armazenamento quebrado, o app abre mesmo assim', async ({ page }) =>
   await expect(page.getByText('Versículo do dia')).toBeVisible()
   await expect(page.getByText(/Seu navegador não permite salvar dados/)).toBeVisible()
 })
+
+test('voltar no leitor aberto por link externo fica no app', async ({ page }) => {
+  await page.goto('about:blank')
+  await page.goto('/#/ler/JHN/3')
+  await expect(page.locator('#v16')).toBeVisible()
+  await page.getByRole('button', { name: 'Voltar' }).click()
+  await expect(page).toHaveURL(/#\/livro\/JHN$/)
+})
+
+test('voltar no leitor depois de navegar no app volta para a tela anterior', async ({ page }) => {
+  await page.goto('/#/livro/RUT')
+  await page.getByRole('link', { name: 'Capítulo 2', exact: true }).click()
+  await page.getByRole('link', { name: 'Próximo capítulo' }).click()
+  await expect(page).toHaveURL(/#\/ler\/RUT\/3$/)
+  await page.getByRole('button', { name: 'Voltar' }).click()
+  await expect(page).toHaveURL(/#\/ler\/RUT\/2$/)
+  await page.getByRole('button', { name: 'Voltar' }).click()
+  await expect(page).toHaveURL(/#\/livro\/RUT$/)
+})
