@@ -33,8 +33,16 @@ Uma tradução por idioma no lançamento, todas livres para distribuição:
 
 | Idioma | Tradução | Sigla | Licença |
 |---|---|---|---|
-| Português | Bíblia Livre | BLIVRE | Licença aberta com atribuição (confirmar termos exatos na tarefa 1 do plano) |
-| Inglês | Berean Standard Bible | BSB | Domínio público (desde 2023) |
+| Português | Bíblia Livre | BLIVRE | Creative Commons Atribuição 4.0 Brasil (uso livre com menção de fonte, autores e data da versão) |
+| Inglês | Berean Standard Bible | BSB | Domínio público |
+
+**Fontes (confirmadas em 2026-09-27):**
+
+- BLIVRE: `https://ebible.org/Scriptures/porbr2018_vpl.zip` (formato VPL, uma linha por versículo, códigos de livro no padrão BibleWorks).
+- BSB: `https://bereanbible.com/bsb.txt` (uma linha por versículo, separada por tabulação).
+- As duas têm 66 livros, 1.189 capítulos e o mesmo número de versículos em cada capítulo.
+- A BSB deixa 17 versículos vazios (variantes textuais, como Mateus 17:21). O leitor simplesmente pula versículos vazios.
+- A BLIVRE marca palavras implícitas entre colchetes, como `[que eu saiba]`. O leitor mostra essas palavras em itálico e sem os colchetes, como fazem as Bíblias impressas. O texto em si não muda.
 
 - A tela "Sobre" mostra a atribuição de cada tradução.
 - A tradução acompanha o idioma escolhido: português lê BLIVRE, inglês lê BSB. A estrutura de dados já aceita várias traduções por idioma, mas o seletor de versão não existe no MVP.
@@ -42,7 +50,7 @@ Uma tradução por idioma no lançamento, todas livres para distribuição:
 
 ### Formato dos dados
 
-- Os livros são identificados pelos códigos USFM (`GEN`, `EXO`, ..., `REV`), iguais nas duas traduções. São 66 livros e 1.189 capítulos (cânon protestante).
+- Os livros são identificados pelos códigos USFM (`GEN`, `EXO`, ..., `REV`). O script de conversão atribui esses códigos pela ordem canônica e confere o número de capítulos de cada livro. São 66 livros e 1.189 capítulos (cânon protestante).
 - Um script de build converte o arquivo de origem de cada tradução em um JSON por livro: `bibles/<sigla>/<LIVRO>.json`, no formato `{ "book": "JHN", "chapters": [[ "versículo 1", "versículo 2", ... ], ...] }`.
 - Uma referência é sempre escrita como `LIVRO.capítulo` (capítulo) ou `LIVRO.capítulo.versículo` (versículo). Exemplo: `JHN.3.16`.
 - Os nomes dos livros em cada idioma ficam nos arquivos de tradução da interface, não no JSON da Bíblia.
@@ -84,7 +92,7 @@ Planos prontos no MVP:
 | Evangelhos em 30 dias | 30 dias | Mateus, Marcos, Lucas e João (89 capítulos) |
 | Salmos e Provérbios em 31 dias | 31 dias | Provérbios 1 a 31, um por dia, mais cerca de 5 salmos por dia |
 
-- Cada plano é um arquivo de dados com a lista de dias, e cada dia é uma lista de referências de capítulo. Os planos são gerados por script e versionados no repositório.
+- Cada plano é uma lista de dias, e cada dia é uma lista de referências de capítulo. Os planos são definidos em código a partir da lista de livros, com os capítulos distribuídos de forma uniforme entre os dias (os primeiros dias recebem um capítulo a mais quando a divisão não é exata).
 - Só um plano fica ativo por vez. Iniciar outro pede confirmação.
 - **O plano não pune.** O plano mostra "Dia X de Y", sempre com base no próximo dia não concluído, e não na data. Se a pessoa ficar uma semana sem ler, ela continua de onde parou. Uma linha discreta informa quanto tempo falta no ritmo atual.
 - Um dia do plano está concluído quando todos os capítulos dele foram marcados como lidos **depois da data de início do plano**. Assim, marcar um capítulo no leitor já conta para o plano, e reler a Bíblia com um plano novo funciona.
@@ -210,8 +218,8 @@ Cada módulo em `lib/` tem uma responsabilidade só e expõe funções puras sem
 
 - O build gera a pasta `dist/` estática.
 - No frodo, os arquivos ficam em `/var/www/selah` e são servidos pelo servidor web que já roda lá (nginx, Caddy ou outro, verificado na tarefa de deploy do plano), com o host `selah.selatech.com.br`.
-- DNS: registro `A` de `selah` apontando para o IP do frodo.
-- HTTPS obrigatório (o PWA exige), com certificado Let's Encrypt.
+- HTTPS obrigatório (o PWA exige). O frodo usa nginx atrás da Cloudflare (proxy ligado) com um Origin Certificate curinga `*.selatech.com.br` em `/etc/ssl/cloudflare/`, que já cobre `selah.selatech.com.br`.
+- O registro DNS `selah` é criado na Cloudflare com o proxy ligado.
 - Cabeçalhos de cache: `index.html` e `sw.js` sem cache longo; arquivos com hash no nome com cache longo e imutável.
 - Deploy por um script `scripts/deploy.sh` que roda o build e envia o `dist/` com `rsync` via SSH.
 
@@ -239,8 +247,7 @@ Em ordem aproximada de prioridade:
 
 ## 11. Pendências fora do código
 
-- Confirmar os termos de licença da Bíblia Livre e registrar a atribuição exigida.
 - Enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA).
-- Criar o registro DNS `selah.selatech.com.br`.
+- Criar o registro DNS `selah.selatech.com.br` na Cloudflare, com proxy ligado.
 - Criar o ícone e a identidade visual do Selah (ícone do app em 192px, 512px e versão maskable).
 - Revisar a curadoria de temas, dicas e versículos do dia antes do lançamento.
