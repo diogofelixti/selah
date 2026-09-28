@@ -36,7 +36,7 @@
     </a>
     <h1>{t(`books.${book}`)}</h1>
     <p class="muted">{t('bible.chaptersRead', { read: count.read, total: count.total })}</p>
-    <ProgressBar value={percent(count)} />
+    <ProgressBar value={percent(count)} label={t(`books.${book}`)} />
   </header>
 
   <p class="hint muted">{t('bible.longPressHint')}</p>

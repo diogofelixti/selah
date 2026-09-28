@@ -115,7 +115,7 @@
   <section class="card">
     <p class="label">{t('home.progressTitle')}</p>
     <p>{t('home.progress', { percent: overall })}</p>
-    <ProgressBar value={overall} />
+    <ProgressBar value={overall} label={t('home.progressTitle')} />
     <p class="muted small">{t('home.days', { count: days })}</p>
   </section>
 
