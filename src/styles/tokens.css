@@ -1,7 +1,7 @@
 :root {
-  --font-display: 'Fraunces Variable', Georgia, serif;
-  --font-ui: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-read: 'Literata Variable', Georgia, serif;
+  --font-display: 'Lora Variable', Georgia, serif;
+  --font-ui: 'Source Sans 3 Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-read: 'Lora Variable', Georgia, serif;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
