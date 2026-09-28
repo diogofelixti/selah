@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run check:dashes && vite build",
     "preview": "vite preview",
     "test": "TZ=America/Sao_Paulo vitest run",
     "test:watch": "TZ=America/Sao_Paulo vitest",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "bibles": "tsx scripts/build-bibles.ts"
+    "bibles": "tsx scripts/build-bibles.ts",
+    "check:dashes": "tsx scripts/check-dashes.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
