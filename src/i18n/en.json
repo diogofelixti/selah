@@ -167,6 +167,21 @@
     "paused": "Paused at verse {n}",
     "toolbar": "Read aloud"
   },
+  "search": {
+    "title": "Search the Bible",
+    "placeholder": "Words from the verse",
+    "all": "Whole Bible",
+    "ot": "Old",
+    "nt": "New",
+    "preparing": "Preparing search: {done} of {total} books",
+    "minLetters": "Type at least 2 letters",
+    "count": "{n} results",
+    "countOne": "1 result",
+    "none": "No verses found",
+    "limited": "Showing {shown} of {total} results",
+    "missing": "Some books are not available offline.",
+    "hint": "Type words from a verse. Accents and capitals do not matter."
+  },
   "reader": {
     "markRead": "Mark as read",
     "read": "Read ✓",

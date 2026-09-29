@@ -20,6 +20,7 @@
   import Reader from './routes/Reader.svelte'
   import Settings from './routes/Settings.svelte'
   import Topic from './routes/Topic.svelte'
+  import Search from './routes/Search.svelte'
   import Topics from './routes/Topics.svelte'
   import Tracker from './routes/Tracker.svelte'
 
@@ -67,7 +68,7 @@
   function tabFor(r: Route): 'home' | 'read' | 'tracker' | 'plans' | 'topics' | null {
     switch (r.name) {
       case 'home': return 'home'
-      case 'bible': case 'book': return 'read'
+      case 'bible': case 'book': case 'search': return 'read'
       case 'tracker': return 'tracker'
       case 'plans': return 'plans'
       case 'topics': case 'topic': return 'topics'
@@ -97,6 +98,8 @@
       {#key `${route.book}.${route.chapter}`}
         <Reader book={route.book} chapter={route.chapter} verse={route.verse} />
       {/key}
+    {:else if route.name === 'search'}
+      <Search query={route.query} />
     {:else if route.name === 'tracker'}
       <Tracker />
     {:else if route.name === 'plans'}

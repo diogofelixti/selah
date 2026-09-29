@@ -7,6 +7,7 @@ export type Route =
   | { name: 'book'; book: string }
   | { name: 'reader'; book: string; chapter: number; verse?: number }
   | { name: 'tracker' }
+  | { name: 'search'; query: string }
   | { name: 'plans' }
   | { name: 'topics' }
   | { name: 'topic'; id: string }
@@ -35,6 +36,15 @@ export function parseRoute(hash: string): Route {
       if (!book || chapter === null || chapter > book.chapters) return HOME
       const verse = positiveInt(c)
       return verse === null ? { name: 'reader', book: book.id, chapter } : { name: 'reader', book: book.id, chapter, verse }
+    }
+    case 'busca': {
+      let query = ''
+      try {
+        query = decodeURIComponent(a ?? '')
+      } catch {
+        query = ''
+      }
+      return { name: 'search', query }
     }
     case 'controle':
       return { name: 'tracker' }

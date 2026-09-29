@@ -167,6 +167,21 @@
     "paused": "Pausado no versículo {n}",
     "toolbar": "Leitura em voz alta"
   },
+  "search": {
+    "title": "Buscar na Bíblia",
+    "placeholder": "Palavras do versículo",
+    "all": "Toda a Bíblia",
+    "ot": "Antigo",
+    "nt": "Novo",
+    "preparing": "Preparando a busca: {done} de {total} livros",
+    "minLetters": "Digite pelo menos 2 letras",
+    "count": "{n} resultados",
+    "countOne": "1 resultado",
+    "none": "Nenhum versículo encontrado",
+    "limited": "Mostrando {shown} de {total} resultados",
+    "missing": "Alguns livros não estão disponíveis offline.",
+    "hint": "Digite palavras de um versículo. Acentos e maiúsculas não importam."
+  },
   "reader": {
     "markRead": "Marcar como lido",
     "read": "Lido ✓",

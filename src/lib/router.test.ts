@@ -16,6 +16,8 @@ describe('parseRoute', () => {
     ['#/ajustes', { name: 'settings' }],
     ['#/sobre', { name: 'about' }],
     ['#/controle', { name: 'tracker' }],
+    ['#/busca', { name: 'search', query: '' }],
+    ['#/busca/amor%20de%20Deus', { name: 'search', query: 'amor de Deus' }],
   ])('%s', (hash, route) => {
     expect(parseRoute(hash)).toEqual(route)
   })

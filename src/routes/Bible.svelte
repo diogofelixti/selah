@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Search } from '@lucide/svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
   import { app } from '../lib/app.svelte'
   import { BOOKS, SECTIONS, type Testament } from '../lib/bible/books'
@@ -21,6 +22,8 @@
     <h1>{t('bible.title')}</h1>
     <p class="muted">{t('bible.overall', { percent: percent(bibleProgress(set)) })}</p>
   </header>
+
+  <a class="search-link" href="#/busca"><Search size={20} aria-hidden="true" />{t('search.title')}</a>
 
   <nav class="filters">
     {#each TABS as tab (tab.id)}
@@ -51,6 +54,18 @@
 
 <style>
   .filters { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .search-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 52px;
+    padding: 0 var(--space-4);
+    margin-bottom: var(--space-4);
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-2);
+  }
   .books { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
   .books a {
     display: grid;
