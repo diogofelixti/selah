@@ -1,5 +1,7 @@
 import { Hono } from 'hono'
+import { accountRoutes, authRoutes } from './auth.js'
 import type { Sql } from './db.js'
+import type { VerifyGoogle } from './google.js'
 import { rateLimit } from './rate-limit.js'
 import { reminderRoutes } from './reminders.js'
 
@@ -7,6 +9,9 @@ export interface Deps {
   sql: Sql
   now: () => Date
   vapidPublicKey: string
+  /** Sem client ID, o login fica desligado (o app mostra "Em breve"). */
+  googleClientId?: string
+  verifyGoogle?: VerifyGoogle
 }
 
 export function createApp(deps: Deps): Hono {
@@ -22,6 +27,8 @@ export function createApp(deps: Deps): Hono {
   app.use('*', (c, next) => (c.req.path === '/api/health' ? next() : limiter(c, next)))
   app.get('/push/key', (c) => c.json({ key: deps.vapidPublicKey }))
   app.route('/reminders', reminderRoutes(deps))
+  app.route('/auth', authRoutes(deps))
+  app.route('/account', accountRoutes(deps))
 
   app.notFound((c) => c.json({ error: 'not_found' }, 404))
   app.onError((err, c) => {

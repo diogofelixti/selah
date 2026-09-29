@@ -16,7 +16,7 @@ describe('esqueleto', () => {
   it('migrações criam as tabelas e podem rodar de novo sem erro', async () => {
     await migrate(sql)
     const rows = await sql`select name from migrations order by name`
-    expect(rows.map((r) => r.name)).toEqual(['001_reminders.sql'])
+    expect(rows.map((r) => r.name)).toEqual(['001_reminders.sql', '002_accounts.sql'])
     const [{ exists }] = await sql`select to_regclass('reminders') is not null as exists`
     expect(exists).toBe(true)
   })

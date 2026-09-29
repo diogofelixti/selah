@@ -31,6 +31,8 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:?defina no .env}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:?defina no .env}
       VAPID_SUBJECT: ${VAPID_SUBJECT:?defina no .env}
+      # Login com Google: sem ele, a área de conta mostra "Em breve".
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       TZ: UTC
     # Só o nginx do próprio servidor acessa a API.
     ports:
