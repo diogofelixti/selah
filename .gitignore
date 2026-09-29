@@ -9,3 +9,6 @@ playwright-report
 # Prints e imagens soltas de teste manual
 tests/*.jpg
 tests/*.png
+
+# Segredos do servidor
+.env
