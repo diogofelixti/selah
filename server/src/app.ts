@@ -4,6 +4,7 @@ import type { Sql } from './db.js'
 import type { VerifyGoogle } from './google.js'
 import { rateLimit } from './rate-limit.js'
 import { reminderRoutes } from './reminders.js'
+import { syncRoutes } from './sync.js'
 
 export interface Deps {
   sql: Sql
@@ -29,6 +30,7 @@ export function createApp(deps: Deps): Hono {
   app.route('/reminders', reminderRoutes(deps))
   app.route('/auth', authRoutes(deps))
   app.route('/account', accountRoutes(deps))
+  app.route('/sync', syncRoutes(deps))
 
   app.notFound((c) => c.json({ error: 'not_found' }, 404))
   app.onError((err, c) => {
