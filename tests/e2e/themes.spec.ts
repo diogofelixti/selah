@@ -97,3 +97,34 @@ test.describe('aparelho no modo escuro', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'pergaminho')
   })
 })
+
+test('ao abrir com tema salvo, o tema e a cor da barra nunca passam por outro', async ({ page }) => {
+  await chooseTheme(page, 'Oliveira (escuro, ilustrado)')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'oliveira')
+  await page.addInitScript(() => {
+    const w = window as unknown as { __seen: string[] }
+    w.__seen = []
+    const record = () => {
+      const meta = document.querySelector('meta[name="theme-color"]')?.getAttribute('content')
+      w.__seen.push(`${document.documentElement.dataset.theme}|${meta}`)
+    }
+    new MutationObserver(record).observe(document, { attributes: true, subtree: true, attributeFilter: ['data-theme', 'content'] })
+  })
+  await page.reload()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  const seen = await page.evaluate(() => (window as unknown as { __seen: string[] }).__seen)
+  expect(new Set(seen)).toEqual(new Set(['oliveira|#1b1f16']))
+})
+
+test.describe('tela estreita com letra grande', () => {
+  test.use({ viewport: { width: 320, height: 700 } })
+
+  test('o botão de Ajustes da tela inicial mantém 44px no tema ilustrado', async ({ page }) => {
+    await chooseTheme(page, 'Pergaminho (claro, ilustrado)')
+    await page.goto('/')
+    await page.addStyleTag({ content: 'html { font-size: 150% }' })
+    const box = await page.getByRole('link', { name: 'Ajustes' }).boundingBox()
+    expect(box!.width).toBeGreaterThanOrEqual(44)
+    expect(box!.height).toBeGreaterThanOrEqual(44)
+  })
+})

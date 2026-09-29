@@ -49,10 +49,12 @@
   })
 
   $effect(() => {
+    // Até os ajustes salvos chegarem, vale o tema que o index.html já aplicou (sem piscar o padrão).
+    if (!app.ready) return
     const root = document.documentElement
     root.dataset.theme = resolveTheme(app.settings.theme, prefersDark)
-    // Só guarda depois de ler os ajustes salvos, para não trocar a escolha pelo padrão.
-    if (app.ready) rememberTheme(app.settings.theme)
+    // Ajustes de memória (banco bloqueado ou indisponível) são o padrão, não a escolha da pessoa.
+    if (app.persistent && !app.blocked) rememberTheme(app.settings.theme)
     // A barra do navegador acompanha o fundo do tema.
     const bg = getComputedStyle(root).getPropertyValue('--bg').trim()
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg)

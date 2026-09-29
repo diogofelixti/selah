@@ -18,7 +18,11 @@
         var saved = null
         try { saved = localStorage.getItem('selah-theme') } catch (e) {}
         var dark = matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = themes.indexOf(saved) >= 0 ? saved : dark ? 'noite' : 'aurora'
+        var theme = themes.indexOf(saved) >= 0 ? saved : dark ? 'noite' : 'aurora'
+        document.documentElement.dataset.theme = theme
+        // Cor da barra do navegador igual ao --bg de cada tema.
+        var bars = { aurora: '#f7f2ea', noite: '#12161f', pergaminho: '#f1e7d0', oliveira: '#1b1f16' }
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', bars[theme])
       })()
     </script>
   </head>
