@@ -7,6 +7,7 @@ export type Route =
   | { name: 'book'; book: string }
   | { name: 'reader'; book: string; chapter: number; verse?: number }
   | { name: 'tracker' }
+  | { name: 'marks' }
   | { name: 'search'; query: string }
   | { name: 'plans' }
   | { name: 'topics' }
@@ -46,6 +47,8 @@ export function parseRoute(hash: string): Route {
       }
       return { name: 'search', query }
     }
+    case 'marcacoes':
+      return { name: 'marks' }
     case 'controle':
       return { name: 'tracker' }
     case 'planos':

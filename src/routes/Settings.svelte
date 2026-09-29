@@ -123,6 +123,11 @@
       {/if}
     </section>
 
+    <a class="card row link" href="#/marcacoes">
+      <span>{t('marks.title')}</span>
+      <ChevronRight size={20} aria-hidden="true" />
+    </a>
+
     <a class="card row link" href="#/sobre">
       <span>{t('settings.about')}</span>
       <ChevronRight size={20} aria-hidden="true" />

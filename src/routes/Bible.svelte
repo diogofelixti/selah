@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Search } from '@lucide/svelte'
+  import { Bookmark, Search } from '@lucide/svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
   import { app } from '../lib/app.svelte'
   import { BOOKS, SECTIONS, type Testament } from '../lib/bible/books'
@@ -23,7 +23,10 @@
     <p class="muted">{t('bible.overall', { percent: percent(bibleProgress(set)) })}</p>
   </header>
 
-  <a class="search-link" href="#/busca"><Search size={20} aria-hidden="true" />{t('search.title')}</a>
+  <div class="tools">
+    <a class="search-link" href="#/busca"><Search size={20} aria-hidden="true" />{t('search.title')}</a>
+    <a class="marks-link" href="#/marcacoes" aria-label={t('marks.title')}><Bookmark size={20} aria-hidden="true" /></a>
+  </div>
 
   <nav class="filters">
     {#each TABS as tab (tab.id)}
@@ -54,13 +57,25 @@
 
 <style>
   .filters { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .tools { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); }
+  .marks-link {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--accent-text);
+  }
   .search-link {
+    flex-grow: 1;
     display: flex;
     align-items: center;
     gap: var(--space-3);
     min-height: 52px;
     padding: 0 var(--space-4);
-    margin-bottom: var(--space-4);
     border-radius: 999px;
     background: var(--surface);
     border: 1px solid var(--border-strong);
