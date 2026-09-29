@@ -3,6 +3,8 @@ import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const API = process.env.SELAH_API ?? 'http://127.0.0.1:8787'
+
 export default defineConfig({
   plugins: [
     svelte(),
@@ -39,9 +41,10 @@ export default defineConfig({
     }),
   ],
   // A API (npm run server:up) responde em /api, no mesmo endereço do app, como no frodo.
-  server: { proxy: { '/api': 'http://127.0.0.1:8787' } },
+  // SELAH_API troca o destino (teste de integração com uma API própria).
+  server: { proxy: { '/api': API } },
   // Teste local pelo celular: rede de casa (IP) e Tailscale (bilbo-pc.<tailnet>.ts.net).
-  preview: { host: true, port: 4173, strictPort: true, allowedHosts: ['.ts.net'], proxy: { '/api': 'http://127.0.0.1:8787' } },
+  preview: { host: true, port: 4173, strictPort: true, allowedHosts: ['.ts.net'], proxy: { '/api': API } },
   define: { __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? 'dev') },
   // Testes de componente montam o Svelte no jsdom, que precisa da versão de navegador do runtime.
   resolve: process.env.VITEST ? { conditions: ['browser'] } : undefined,
