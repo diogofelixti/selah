@@ -86,6 +86,15 @@
     return map
   })
   let colorsOpen = $state(false)
+  // Cor em comum dos versículos selecionados (null se não houver uma só).
+  const selectedColor = $derived.by(() => {
+    const colors = new Set(selected.map((n) => chapterMarks.get(n)?.color ?? null))
+    return colors.size === 1 ? [...colors][0] : null
+  })
+
+  function onKey(e: KeyboardEvent) {
+    if (e.key === 'Escape' && colorsOpen) colorsOpen = false
+  }
   let noteVerse = $state<number | null>(null)
   const verseRef = (n: number) => `${book}.${chapter}.${n}`
   const verseLabel = (n: number) => `${t(`books.${book}`)} ${chapter}:${n}`
@@ -238,7 +247,7 @@
   }
 </script>
 
-<svelte:window onscroll={onScroll} />
+<svelte:window onscroll={onScroll} onkeydown={onKey} />
 
 <header class="bar" class:hidden={barHidden}>
   <button class="icon-btn" onclick={back} aria-label={t('common.back')}><ArrowLeft size={22} /></button>
@@ -338,7 +347,7 @@
 {#if selected.length > 0 && colorsOpen}
   <div class="colors" role="group" aria-label={t('marks.colors')}>
     {#each MARK_COLORS as color (color)}
-      <button class="swatch" data-color={color} onclick={() => highlight(color)} aria-label={t(`marks.${color}`)}></button>
+      <button class="swatch" data-color={color} aria-pressed={selectedColor === color} onclick={() => highlight(color)} aria-label={t(`marks.${color}`)}></button>
     {/each}
     <button class="pill" onclick={() => highlight(null)}>{t('marks.clear')}</button>
   </div>
@@ -454,6 +463,7 @@
   .colors { gap: var(--space-2); }
   .colors .pill { padding: 0 var(--space-3); white-space: nowrap; flex-shrink: 0; }
   .swatch { flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; border: 2px solid var(--border-strong); cursor: pointer; }
+  .swatch[aria-pressed='true'] { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent-text); }
   .swatch[data-color='gold'] { background: var(--mark-gold); }
   .swatch[data-color='green'] { background: var(--mark-green); }
   .swatch[data-color='blue'] { background: var(--mark-blue); }

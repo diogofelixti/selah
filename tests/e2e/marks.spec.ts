@@ -89,3 +89,18 @@ test.describe('celular de 360px', () => {
     expect(clear.height).toBeLessThanOrEqual(50)
   })
 })
+
+test('as cores mostram a cor atual e o seletor fecha com Esc', async ({ page }) => {
+  await page.goto('/#/ler/JHN/3')
+  await page.locator('#v16').click()
+  await page.getByRole('button', { name: 'Destacar' }).click()
+  await page.getByRole('button', { name: 'Azul' }).click()
+  await expect(page.locator('#v16')).toHaveAttribute('data-mark', 'blue')
+  await page.locator('#v16').click()
+  await page.getByRole('button', { name: 'Destacar' }).click()
+  await expect(page.getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('button', { name: 'Verde' })).toHaveAttribute('aria-pressed', 'false')
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('group', { name: 'Cores de destaque' })).toHaveCount(0)
+  await expect(page.locator('#v16')).toHaveAttribute('aria-pressed', 'true')
+})
