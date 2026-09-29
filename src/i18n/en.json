@@ -180,7 +180,8 @@
     "none": "No verses found",
     "limited": "Showing {shown} of {total} results",
     "missing": "Some books are not available offline.",
-    "hint": "Type words from a verse. Accents and capitals do not matter."
+    "hint": "Type words from a verse. Accents and capitals do not matter.",
+    "more": "Show more"
   },
   "marks": {
     "highlight": "Highlight",

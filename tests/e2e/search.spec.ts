@@ -36,10 +36,15 @@ test('tocar num resultado abre o versículo no leitor', async ({ page }) => {
   await expect(page.locator('#v16')).toHaveClass(/flash/)
 })
 
-test('limita a 200 resultados e mostra o total', async ({ page }) => {
+test('mostra 50 por vez até o limite de 200, com o total', async ({ page }) => {
   await page.goto('/#/busca/deus')
   await expect(page.getByText(/Mostrando 200 de [\d.]+ resultados/)).toBeVisible({ timeout: 20_000 })
-  await expect(page.locator('.results li')).toHaveCount(200)
+  await expect(page.locator('.results li')).toHaveCount(50)
+  for (const n of [100, 150, 200]) {
+    await page.getByRole('button', { name: 'Mostrar mais' }).click()
+    await expect(page.locator('.results li')).toHaveCount(n)
+  }
+  await expect(page.getByRole('button', { name: 'Mostrar mais' })).toHaveCount(0)
 })
 
 test('pede pelo menos 2 letras', async ({ page }) => {
@@ -57,4 +62,13 @@ test.describe('sem alguns livros', () => {
     await expect(page.getByRole('link', { name: /João 3:16/ })).toBeVisible({ timeout: 20_000 })
     await expect(page.getByText('Alguns livros não estão disponíveis offline.')).toBeVisible()
   })
+})
+
+test('sair da busca logo depois de digitar não muda o endereço da tela seguinte', async ({ page }) => {
+  await page.goto('/#/biblia')
+  await page.getByRole('link', { name: 'Buscar na Bíblia' }).click()
+  await page.getByRole('searchbox', { name: 'Buscar na Bíblia' }).fill('amor')
+  await page.goBack()
+  await page.waitForTimeout(500)
+  await expect(page).toHaveURL(/#\/biblia$/)
 })

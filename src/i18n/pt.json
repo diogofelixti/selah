@@ -180,7 +180,8 @@
     "none": "Nenhum versículo encontrado",
     "limited": "Mostrando {shown} de {total} resultados",
     "missing": "Alguns livros não estão disponíveis offline.",
-    "hint": "Digite palavras de um versículo. Acentos e maiúsculas não importam."
+    "hint": "Digite palavras de um versículo. Acentos e maiúsculas não importam.",
+    "more": "Mostrar mais"
   },
   "marks": {
     "highlight": "Destacar",

@@ -14,17 +14,28 @@
   let query = $state(untrack(() => initial))
   let debounced = $state(untrack(() => initial))
   let testament = $state<Testament | null>(null)
-  let index = $state<IndexedVerse[] | null>(null)
+  // raw: 31 mil versículos não precisam ser reativos um a um (isso travava a tela a cada busca).
+  let index = $state.raw<IndexedVerse[] | null>(null)
   let missing = $state(0)
   let progress = $state({ done: 0, total: 66 })
   let loadToken = 0
   let timer: ReturnType<typeof setTimeout> | undefined
+  // Desenhar muitos resultados de uma vez trava celulares fracos: mostra 50 por vez.
+  const PAGE = 50
+  let visible = $state(PAGE)
 
   const bookName = (id: string) => t(`books.${id}`)
   const numberFmt = $derived(new Intl.NumberFormat(locale.lang === 'pt' ? 'pt-BR' : 'en'))
   const terms = $derived(searchTerms(debounced))
   const tooShort = $derived(debounced.trim().length > 0 && terms.length === 0)
   const found = $derived(index && terms.length > 0 ? searchVerses(index, debounced, { testament: testament ?? undefined }) : null)
+
+  // Nova busca ou novo filtro volta para a primeira página.
+  $effect(() => {
+    void debounced
+    void testament
+    visible = PAGE
+  })
 
   async function loadIndex() {
     const token = ++loadToken
@@ -42,6 +53,9 @@
     void locale.lang
     void loadIndex()
   })
+
+  // Sair da tela cancela a atualização pendente do endereço, para não sobrescrever a tela seguinte.
+  $effect(() => () => clearTimeout(timer))
 
   function onInput() {
     clearTimeout(timer)
@@ -109,7 +123,7 @@
 
   {#if found && found.results.length > 0}
     <ul class="results">
-      {#each found.results as v (`${v.book}.${v.chapter}.${v.verse}`)}
+      {#each found.results.slice(0, visible) as v (`${v.book}.${v.chapter}.${v.verse}`)}
         <li>
           <a href={`#/ler/${v.book}/${v.chapter}/${v.verse}`}>
             <span class="ref">{formatRef(`${v.book}.${v.chapter}.${v.verse}`, bookName)}</span>
@@ -118,6 +132,9 @@
         </li>
       {/each}
     </ul>
+    {#if found.results.length > visible}
+      <button class="btn more" onclick={() => (visible += PAGE)}>{t('search.more')}</button>
+    {/if}
   {/if}
 </div>
 
@@ -151,5 +168,6 @@
   .results a { display: grid; gap: var(--space-1); padding: var(--space-4); border-radius: 18px; background: var(--surface); border: 1px solid var(--border); }
   .ref { font-weight: 700; font-size: 0.875rem; color: var(--accent-text); }
   .text { font-family: var(--font-read); line-height: 1.55; }
+  .more { width: 100%; margin-top: var(--space-4); }
   mark { background: var(--flash); color: inherit; border-radius: 3px; padding: 0 1px; }
 </style>

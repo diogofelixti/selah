@@ -3,7 +3,7 @@ import type { BookText } from './bible/types'
 import { buildIndex, highlightParts, normalize, searchTerms, searchVerses } from './search'
 
 const gen: BookText = { book: 'GEN', chapters: [['No princípio criou Deus', ''], ['A misericórdia [do] SENHOR']] }
-const jhn: BookText = { book: 'JHN', chapters: [['No princípio era o Verbo'], [], ['Porque Deus amou ao mundo de tal maneira', 'Deus enviou o Filho']] }
+const jhn: BookText = { book: 'JHN', chapters: [['No princípio era o Verbo'], [], ['Porque Deus amou ao mundo de tal maneira', 'Deus enviou o Filho', 'E chamou a luz Dia; (Deus) viu que era bom.']] }
 const index = buildIndex([gen, jhn])
 
 describe('normalize', () => {
@@ -14,7 +14,7 @@ describe('normalize', () => {
 
 describe('buildIndex', () => {
   it('guarda os versículos em ordem canônica, pulando os vazios, com o testamento', () => {
-    expect(index.map((v) => `${v.book}.${v.chapter}.${v.verse}`)).toEqual(['GEN.1.1', 'GEN.2.1', 'JHN.1.1', 'JHN.3.1', 'JHN.3.2'])
+    expect(index.map((v) => `${v.book}.${v.chapter}.${v.verse}`)).toEqual(['GEN.1.1', 'GEN.2.1', 'JHN.1.1', 'JHN.3.1', 'JHN.3.2', 'JHN.3.3'])
     expect(index[0].testament).toBe('OT')
     expect(index[2].testament).toBe('NT')
   })
@@ -51,8 +51,18 @@ describe('searchVerses', () => {
 
   it('o limite corta a lista mas o total conta tudo', () => {
     const r = searchVerses(index, 'deus', { limit: 1 })
-    expect(r.total).toBe(3)
+    expect(r.total).toBe(4)
     expect(r.results).toHaveLength(1)
+  })
+
+  it('casa pelo início da palavra, não no meio dela', () => {
+    expect(searchVerses(index, 'amou').results.map((v) => v.verse)).toEqual([1])
+    expect(searchVerses(index, 'chamou').total).toBe(1)
+    expect(searchVerses(index, 'ra').total).toBe(0)
+  })
+
+  it('pontuação antes da palavra não atrapalha', () => {
+    expect(searchVerses(index, 'deus viu').results.map((v) => v.verse)).toEqual([3])
   })
 
   it('sem termos válidos não devolve nada', () => {
@@ -66,6 +76,13 @@ describe('highlightParts', () => {
       { text: 'Misericórdia', hit: true },
       { text: ' e ', hit: false },
       { text: 'paz', hit: true },
+    ])
+  })
+
+  it('não destaca o termo no meio de outra palavra', () => {
+    expect(highlightParts('E chamou: amou', ['amou'])).toEqual([
+      { text: 'E chamou: ', hit: false },
+      { text: 'amou', hit: true },
     ])
   })
 
