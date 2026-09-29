@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowLeft, ChevronLeft, ChevronRight, Copy, Minus, Plus, Share2, X } from '@lucide/svelte'
+  import { ArrowLeft, ChevronLeft, ChevronRight, Copy, Headphones, Minus, Pause, Play, Plus, Share2, Square, X } from '@lucide/svelte'
   import { tick } from 'svelte'
   import { app, markRead, unmarkRead, updateSettings, updateState } from '../lib/app.svelte'
   import { nextChapter, prevChapter } from '../lib/bible/books'
@@ -15,6 +15,7 @@
   import { PLANS } from '../lib/plans/catalog'
   import { isChapterDone } from '../lib/plans/status'
   import { canGoBack } from '../lib/router.svelte'
+  import { SPEECH_RATES, browserEngine, createChapterSpeaker, type SpeakerState } from '../lib/speech'
   import type { FontSize } from '../lib/storage/types'
 
   let { book, chapter, verse }: { book: string; chapter: number; verse?: number } = $props()
@@ -45,6 +46,7 @@
     failed = false
     text = null
     selected = []
+    speaker?.stop()
     focusVerse = verse ?? 1
     try {
       const result = await bible.loadBook(tr, book)
@@ -73,10 +75,43 @@
     if (pos?.book !== book || pos?.chapter !== chapter) void updateState({ lastPosition: { book, chapter } })
   })
 
-  // Enquanto há seleção, o aviso de nova versão sai do caminho da barra de cópia.
+  // Leitura em voz alta: um controlador por abertura do leitor, criado no primeiro toque.
+  const canSpeak = typeof window !== 'undefined' && !!window.speechSynthesis
+  let speech = $state<SpeakerState>({ status: 'idle', verse: null, rate: 1 })
+  let speaker: ReturnType<typeof createChapterSpeaker> | null = null
+  const rateFmt = $derived(new Intl.NumberFormat(locale.lang === 'pt' ? 'pt-BR' : 'en'))
+
+  function onSpeech(s: SpeakerState) {
+    speech = s
+    if (s.status === 'playing' && s.verse) {
+      const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches
+      document.getElementById(`v${s.verse}`)?.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' })
+    }
+  }
+
+  function listen() {
+    const engine = browserEngine(locale.lang === 'pt' ? 'pt-BR' : 'en-US')
+    if (!engine) return
+    speaker?.stop()
+    speaker = createChapterSpeaker(engine, onSpeech)
+    speaker.setRate(speech.rate)
+    const from = selected.length > 0 ? Math.min(...selected) : 1
+    selected = []
+    speaker.play(verses.map((text, i) => ({ n: i + 1, text })), from)
+  }
+
+  function nextRate() {
+    const i = SPEECH_RATES.indexOf(speech.rate as (typeof SPEECH_RATES)[number])
+    speaker?.setRate(SPEECH_RATES[(i + 1) % SPEECH_RATES.length])
+  }
+
+  // Sair do leitor (ou trocar de capítulo, que recria o leitor) para a voz.
+  $effect(() => () => speaker?.stop())
+
+  // Enquanto uma barra do leitor ocupa o rodapé, o aviso de nova versão sai do caminho.
   $effect(() => {
-    ui.selecting = selected.length > 0
-    return () => (ui.selecting = false)
+    ui.readerBar = selected.length > 0 || speech.status !== 'idle'
+    return () => (ui.readerBar = false)
   })
 
   function toggleVerse(n: number) {
@@ -168,6 +203,9 @@
   <button class="icon-btn" onclick={back} aria-label={t('common.back')}><ArrowLeft size={22} /></button>
   <a class="where" href={`#/livro/${book}`}>{t(`books.${book}`)} {chapter}</a>
   <div class="font">
+    {#if canSpeak}
+      <button class="icon-btn" onclick={listen} aria-label={t('speech.listen')}><Headphones size={20} /></button>
+    {/if}
     <button class="icon-btn" onclick={() => changeFont(-1)} disabled={app.settings.fontSize === 1} aria-label={t('reader.fontSmaller')}>
       <Minus size={18} />
     </button>
@@ -196,6 +234,7 @@
             class="verse"
             class:flash={flash === i + 1}
             class:selected={selected.includes(i + 1)}
+            class:speaking={speech.verse === i + 1}
             role="button"
             tabindex={focusVerse === i + 1 ? 0 : -1}
             aria-pressed={selected.includes(i + 1)}
@@ -229,6 +268,21 @@
     </div>
   {/if}
 </article>
+
+{#if speech.status !== 'idle' && selected.length === 0}
+  <div class="selection-bar speech-bar" role="toolbar" aria-label={t('speech.toolbar')}>
+    <span class="count" aria-live="polite">
+      {speech.status === 'paused' ? t('speech.paused', { n: speech.verse ?? 0 }) : t('speech.reading', { n: speech.verse ?? 0 })}
+    </span>
+    {#if speech.status === 'playing'}
+      <button class="icon-btn" onclick={() => speaker?.pause()} aria-label={t('speech.pause')}><Pause size={20} /></button>
+    {:else}
+      <button class="icon-btn" onclick={() => speaker?.resume()} aria-label={t('speech.resume')}><Play size={20} /></button>
+    {/if}
+    <button class="pill rate" onclick={nextRate} aria-label={t('speech.rate', { rate: rateFmt.format(speech.rate) })}>{rateFmt.format(speech.rate)}×</button>
+    <button class="icon-btn" onclick={() => speaker?.stop()} aria-label={t('speech.stop')}><Square size={18} /></button>
+  </div>
+{/if}
 
 {#if selected.length > 0}
   <div class="selection-bar" role="toolbar" aria-label={t('copy.toolbar')}>
@@ -281,6 +335,9 @@
     z-index: 2;
   }
   .count { flex-grow: 1; font-weight: 600; }
+  .rate { min-width: 64px; padding: 0 var(--space-3); }
+  /* Versículo sendo lido: contorno, diferente da seleção (fundo) e do destaque por link. */
+  .verse.speaking { outline: 2px solid var(--accent); outline-offset: 2px; }
   sup {
     font-family: var(--font-ui);
     font-size: 0.6em;

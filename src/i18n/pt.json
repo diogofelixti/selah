@@ -157,6 +157,16 @@
     "shareFailed": "Não foi possível compartilhar",
     "toolbar": "Ações dos versículos selecionados"
   },
+  "speech": {
+    "listen": "Ouvir capítulo",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "stop": "Parar",
+    "rate": "Velocidade {rate}×",
+    "reading": "Lendo versículo {n}",
+    "paused": "Pausado no versículo {n}",
+    "toolbar": "Leitura em voz alta"
+  },
   "reader": {
     "markRead": "Marcar como lido",
     "read": "Lido ✓",

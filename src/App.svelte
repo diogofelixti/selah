@@ -111,7 +111,7 @@
       <About />
     {/if}
   </main>
-  {#if pwa.needRefresh && !pwa.dismissed && !ui.selecting}
+  {#if pwa.needRefresh && !pwa.dismissed && !ui.readerBar}
     <UpdateBanner withNav={route.name !== 'reader'} onUpdate={applyUpdate} onDismiss={dismissUpdate} />
   {/if}
   <Toast />

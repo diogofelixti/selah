@@ -157,6 +157,16 @@
     "shareFailed": "Could not share",
     "toolbar": "Actions for selected verses"
   },
+  "speech": {
+    "listen": "Listen to chapter",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "rate": "Speed {rate}×",
+    "reading": "Reading verse {n}",
+    "paused": "Paused at verse {n}",
+    "toolbar": "Read aloud"
+  },
   "reader": {
     "markRead": "Mark as read",
     "read": "Read ✓",

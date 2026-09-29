@@ -114,7 +114,7 @@ export function pickVoice(voices: readonly SpeechSynthesisVoice[], lang: string)
 
 /** Motor do navegador. null quando não há síntese de voz. */
 export function browserEngine(lang: string): SpeechEngine | null {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+  if (typeof window === 'undefined' || !window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') {
     return null
   }
   const synth = window.speechSynthesis
