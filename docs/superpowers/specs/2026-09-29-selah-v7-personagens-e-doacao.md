@@ -6,7 +6,7 @@ Complemento das specs anteriores. Data: 2026-09-29.
 
 ## Planos: Personagens da Bíblia
 
-É um grupo novo na tela Planos, **Personagens da Bíblia** / **People of the Bible**. Ele fica entre "Para aprofundar" e "A Bíblia inteira".
+É um grupo novo na tela Planos, **Personagens da Bíblia** / **People of the Bible**. Ele fica por último, depois de "A Bíblia inteira", para não empurrar os planos da Bíblia toda para o fim da lista.
 
 - **Ritmo:** um capítulo por dia.
 - **Ordem:** a ordem em que os personagens aparecem na Bíblia.
@@ -23,11 +23,11 @@ Complemento das specs anteriores. Data: 2026-09-29.
 | `elijah` | Elias | 1 Reis 17, 18, 19 e 21; 2 Reis 1 e 2 | 6 |
 | `esther` | Ester | Ester 1 a 10 | 10 |
 | `daniel` | Daniel | Daniel 1 a 12 | 12 |
-| `paul` | Paulo | Atos 9 e 13 a 28 | 17 |
+| `paul-story` | Paulo | Atos 9, 11 e 13 a 28 | 18 |
 
 - **Moisés:** do nascimento até os Dez Mandamentos. A peregrinação no deserto fica para um plano futuro.
 - **Samuel e Davi:** os dois planos compartilham 1 Samuel 16, a unção de Davi.
-- **Paulo:** conversão (Atos 9) e viagens (Atos 13 a 28). As cartas já têm o plano próprio.
+- **Paulo:** conversão (Atos 9), chegada a Antioquia (Atos 11), viagens, prisão e Roma (Atos 13 a 28). As cartas já têm o plano próprio.
 
 ## Doação
 

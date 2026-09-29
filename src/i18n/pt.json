@@ -295,7 +295,7 @@
       },
       "david": {
         "title": "História de Davi",
-        "desc": "O pastor, o gigante, o rei, a queda e o arrependimento. De 1 Samuel 16 a 1 Reis 2."
+        "desc": "O pastor que venceu o gigante, o rei, a queda e o arrependimento. De 1 Samuel 16 a 1 Reis 2."
       },
       "elijah": {
         "title": "História de Elias",
@@ -309,9 +309,9 @@
         "title": "História de Daniel",
         "desc": "Fidelidade na Babilônia, a cova dos leões e as visões. O livro de Daniel."
       },
-      "paul": {
+      "paul-story": {
         "title": "História de Paulo",
-        "desc": "Da estrada de Damasco às viagens missionárias. Atos 9 e 13 a 28."
+        "desc": "Da estrada de Damasco à prisão em Roma. Atos 9, 11 e 13 a 28."
       }
     },
     "eyebrow": "Plano atual",
@@ -327,7 +327,8 @@
       "deeper": "Para aprofundar",
       "people": "Personagens da Bíblia",
       "whole": "A Bíblia inteira"
-    }
+    },
+    "startPlan": "Começar: {plan}"
   },
   "topics": {
     "title": "Temas",
@@ -389,6 +390,7 @@
     "copy": "Copiar chave Pix",
     "copied": "Chave Pix copiada",
     "contact": "Dúvidas, sugestões ou outra forma de ajudar? Fale com a gente.",
-    "whatsapp": "Falar no WhatsApp"
+    "whatsapp": "Falar no WhatsApp",
+    "copyShort": "Copiar"
   }
 }

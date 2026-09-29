@@ -91,7 +91,7 @@ describe('planos de personagens', () => {
     ['elijah', ['1KI.17', '1KI.18', '1KI.19', '1KI.21', '2KI.1', '2KI.2']],
     ['esther', chapterRefs('EST')],
     ['daniel', chapterRefs('DAN')],
-    ['paul', ['ACT.9', ...range('ACT', 13, 28)]],
+    ['paul-story', ['ACT.9', 'ACT.11', ...range('ACT', 13, 28)]],
   ]
 
   it.each(cases)('%s: um capítulo por dia, na ordem da história', (id, refs) => {
@@ -102,8 +102,8 @@ describe('planos de personagens', () => {
     expect(PLANS.david.days).toHaveLength(42)
   })
 
-  it('o grupo de personagens vem antes da Bíblia inteira, na ordem da Bíblia', () => {
-    expect(PLAN_GROUPS.map((g) => g.id)).toEqual(['start', 'deeper', 'people', 'whole'])
+  it('o grupo de personagens vem por último, na ordem da Bíblia', () => {
+    expect(PLAN_GROUPS.map((g) => g.id)).toEqual(['start', 'deeper', 'whole', 'people'])
     expect(PLAN_GROUPS.find((g) => g.id === 'people')!.plans).toEqual(cases.map(([id]) => id))
   })
 })

@@ -20,7 +20,7 @@ export const PLAN_IDS = [
   'elijah',
   'esther',
   'daniel',
-  'paul',
+  'paul-story',
 ] as const
 export type PlanId = (typeof PLAN_IDS)[number]
 
@@ -28,8 +28,8 @@ export type PlanId = (typeof PLAN_IDS)[number]
 export const PLAN_GROUPS: readonly { id: 'start' | 'deeper' | 'people' | 'whole'; plans: readonly PlanId[] }[] = [
   { id: 'start', plans: ['john-21', 'proverbs-31', 'psalms-30'] },
   { id: 'deeper', plans: ['gospels-30', 'paul-30', 'psalms-proverbs-31', 'nt-90'] },
-  { id: 'people', plans: ['abraham', 'joseph', 'moses', 'ruth', 'samuel', 'david', 'elijah', 'esther', 'daniel', 'paul'] },
   { id: 'whole', plans: ['bible-1y', 'bible-2y'] },
+  { id: 'people', plans: ['abraham', 'joseph', 'moses', 'ruth', 'samuel', 'david', 'elijah', 'esther', 'daniel', 'paul-story'] },
 ]
 
 export interface PlanDef {
@@ -83,7 +83,8 @@ function build(): Record<PlanId, PlanDef> {
     elijah: { id: 'elijah', days: daily(['1KI.17', '1KI.18', '1KI.19', '1KI.21', '2KI.1', '2KI.2']) },
     esther: { id: 'esther', days: oneADay('EST') },
     daniel: { id: 'daniel', days: oneADay('DAN') },
-    paul: { id: 'paul', days: daily(['ACT.9', ...chapters('ACT', 13, 28)]) },
+    // Conversão (9), chegada a Antioquia com Barnabé (11), viagens, prisão e Roma (13 a 28).
+    'paul-story': { id: 'paul-story', days: daily(['ACT.9', 'ACT.11', ...chapters('ACT', 13, 28)]) },
   }
 }
 

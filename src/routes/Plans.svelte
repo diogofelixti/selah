@@ -124,7 +124,7 @@
               {#if active?.id === id && status}
                 <span class="badge">{t('plans.percent', { percent: status.percent })}</span>
               {:else}
-                <button class="pill" onclick={() => start(id)}>{t('plans.start')}</button>
+                <button class="pill" onclick={() => start(id)} aria-label={t('plans.startPlan', { plan: t(`plans.catalog.${id}.title`) })}>{t('plans.start')}</button>
               {/if}
             </div>
           </article>

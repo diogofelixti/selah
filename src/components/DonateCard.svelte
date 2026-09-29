@@ -19,7 +19,7 @@
       <p class="eyebrow">{t('donate.pix')}</p>
       <p class="key">{PIX_KEY_LABEL}</p>
     </div>
-    <button class="icon-btn" onclick={copyPix} aria-label={t('donate.copy')}><Copy size={18} aria-hidden="true" /></button>
+    <button class="pill copy" onclick={copyPix} aria-label={t('donate.copy')}><Copy size={16} aria-hidden="true" />{t('donate.copyShort')}</button>
   </div>
   <p class="small muted">{t('donate.contact')}</p>
   <a class="btn" href={WHATSAPP_URL} target="_blank" rel="noopener">
@@ -37,7 +37,10 @@
     padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
     border-radius: var(--radius-m); background: var(--surface-2);
   }
-  .key { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pix > div { min-width: 0; }
+  /* Com letra grande, a chave quebra em vez de empurrar o botão para fora. */
+  .key { font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .copy { flex-shrink: 0; padding-inline: var(--space-3); }
   .nowrap { white-space: nowrap; }
   .btn { justify-self: start; text-align: left; padding-block: var(--space-2); border-radius: var(--radius-m); }
   .btn :global(svg) { flex-shrink: 0; }

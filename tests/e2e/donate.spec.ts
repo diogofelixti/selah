@@ -9,6 +9,7 @@ for (const path of ['/#/ajustes', '/#/sobre']) {
     await page.goto(path)
     await expect(card(page).getByText('Chave Pix (CNPJ)')).toBeVisible()
     await expect(card(page).getByText('41.123.299/0001-59')).toBeVisible()
+    await expect(card(page).getByRole('button', { name: 'Copiar chave Pix' })).toContainText('Copiar')
     await card(page).getByRole('button', { name: 'Copiar chave Pix' }).click()
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('41123299000159')
     await expect(page.getByText('Chave Pix copiada')).toBeVisible()

@@ -295,7 +295,7 @@
       },
       "david": {
         "title": "The story of David",
-        "desc": "The shepherd, the giant, the king, the fall and repentance. From 1 Samuel 16 to 1 Kings 2."
+        "desc": "The shepherd who faced the giant, the king, the fall and repentance. From 1 Samuel 16 to 1 Kings 2."
       },
       "elijah": {
         "title": "The story of Elijah",
@@ -309,9 +309,9 @@
         "title": "The story of Daniel",
         "desc": "Faithfulness in Babylon, the lions' den and the visions. The book of Daniel."
       },
-      "paul": {
+      "paul-story": {
         "title": "The story of Paul",
-        "desc": "From the road to Damascus to the missionary journeys. Acts 9 and 13 to 28."
+        "desc": "From the road to Damascus to chains in Rome. Acts 9, 11 and 13 to 28."
       }
     },
     "eyebrow": "Current plan",
@@ -327,7 +327,8 @@
       "deeper": "Going deeper",
       "people": "People of the Bible",
       "whole": "The whole Bible"
-    }
+    },
+    "startPlan": "Start: {plan}"
   },
   "topics": {
     "title": "Topics",
@@ -389,6 +390,7 @@
     "copy": "Copy Pix key",
     "copied": "Pix key copied",
     "contact": "Questions, suggestions or another way to help? Talk to us.",
-    "whatsapp": "Chat on WhatsApp"
+    "whatsapp": "Chat on WhatsApp",
+    "copyShort": "Copy"
   }
 }
