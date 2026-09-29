@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { app, initApp, markMany, markRead, setMarks, unmarkMany, updateSettings } from './app.svelte'
+import { app, initApp, markMany, markRead, setMarks, unmarkMany, unmarkRead, updateSettings, updateState } from './app.svelte'
 import { createMemoryRepository } from './storage/repository'
 import type { Repository } from './storage/types'
 
@@ -87,5 +87,36 @@ describe('marcações', () => {
     await setMarks(['JHN.3.16'], { color: 'gold' })
     expect(app.marks).toEqual([])
     expect(app.saveError).toBe(true)
+  })
+})
+
+describe('registro para a sincronização', () => {
+  it('desmarcar, remover marca e mudar plano ou posição ficam registrados com a data', async () => {
+    const repo = createMemoryRepository()
+    await initApp(async () => repo)
+    const before = Date.now()
+    await markMany(['RUT.1', 'RUT.2'])
+    await unmarkRead('RUT.1')
+    await unmarkMany(['RUT.2'])
+    await setMarks(['RUT.1.16'], { color: 'gold' })
+    await setMarks(['RUT.1.16'], { color: null })
+    await updateState({ activePlan: { id: 'nt-90', startedAt: before } })
+    await updateState({ lastPosition: { book: 'RUT', chapter: 1 } })
+    const meta = await repo.getSyncMeta()
+    expect(meta.cleared['RUT.1']).toBeGreaterThanOrEqual(before)
+    expect(meta.cleared['RUT.2']).toBeGreaterThanOrEqual(before)
+    expect(meta.removedMarks['RUT.1.16']).toBeGreaterThanOrEqual(before)
+    expect(meta.activePlanAt).toBeGreaterThanOrEqual(before)
+    expect(meta.lastPositionAt).toBeGreaterThanOrEqual(before)
+    expect(app.syncMeta).toEqual(meta)
+  })
+
+  it('marcar de novo tira o versículo da lista de marcas removidas', async () => {
+    const repo = createMemoryRepository()
+    await initApp(async () => repo)
+    await setMarks(['RUT.1.1'], { color: 'gold' })
+    await setMarks(['RUT.1.1'], { color: null })
+    await setMarks(['RUT.1.1'], { color: 'blue' })
+    expect((await repo.getSyncMeta()).removedMarks).toEqual({})
   })
 })

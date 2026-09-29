@@ -1,16 +1,19 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import {
-  DEFAULT_SETTINGS, DEFAULT_STATE, isEmptyMark, type AppState, type Reading, type Repository, type Settings, type VerseMark,
+  DEFAULT_SETTINGS, DEFAULT_STATE, EMPTY_SYNC_META, isEmptyMark, type AppState, type Reading, type Repository, type Settings,
+  type SyncMeta, type VerseMark,
 } from './types'
 
 interface SelahDB extends DBSchema {
   readings: { key: number; value: Reading; indexes: { ref: string } }
   settings: { key: string; value: Settings }
-  state: { key: string; value: AppState }
+  // Chave "current": o estado do app; chave "sync": os metadados da sincronização.
+  state: { key: string; value: AppState | SyncMeta }
   marks: { key: string; value: VerseMark }
 }
 
 const KEY = 'current'
+const SYNC_KEY = 'sync'
 
 /** Outra janela com versão antiga do app segura o banco e impede a atualização. */
 export class StorageBlockedError extends Error {}
@@ -20,6 +23,7 @@ export function createMemoryRepository(): Repository {
   let settings: Settings = structuredClone(DEFAULT_SETTINGS)
   let state: AppState = structuredClone(DEFAULT_STATE)
   let marks = new Map<string, VerseMark>()
+  let meta: SyncMeta = structuredClone(EMPTY_SYNC_META)
   return {
     persistent: false,
     async getReadings() { return structuredClone(readings) },
@@ -57,6 +61,16 @@ export function createMemoryRepository(): Repository {
       settings = structuredClone(DEFAULT_SETTINGS)
       state = structuredClone(DEFAULT_STATE)
       marks = new Map()
+      meta = structuredClone(EMPTY_SYNC_META)
+    },
+    async getSyncMeta() { return structuredClone(meta) },
+    async saveSyncMeta(m) { meta = structuredClone(m) },
+    async applySync(d, m) {
+      const copy = structuredClone({ d, m })
+      readings = copy.d.readings
+      marks = new Map(copy.d.marks.map((x) => [x.ref, x]))
+      state = copy.d.state
+      meta = copy.m
     },
   }
 }
@@ -140,7 +154,7 @@ export async function createIdbRepository(
     },
     async getSettings() { return { ...DEFAULT_SETTINGS, ...(await db.get('settings', KEY)) } },
     async saveSettings(s) { await db.put('settings', s, KEY) },
-    async getState() { return { ...DEFAULT_STATE, ...(await db.get('state', KEY)) } },
+    async getState() { return { ...DEFAULT_STATE, ...((await db.get('state', KEY)) as AppState | undefined) } },
     async saveState(s) { await db.put('state', s, KEY) },
     async getMarks() { return db.getAll('marks') },
     async saveMarks(ms) {
@@ -176,6 +190,23 @@ export async function createIdbRepository(
         tx.objectStore('settings').clear(),
         tx.objectStore('state').clear(),
         tx.objectStore('marks').clear(),
+        tx.done,
+      ])
+    },
+    async getSyncMeta() { return { ...EMPTY_SYNC_META, ...((await db.get('state', SYNC_KEY)) as SyncMeta | undefined) } },
+    async saveSyncMeta(m) { await db.put('state', m, SYNC_KEY) },
+    async applySync(d, m) {
+      const tx = db.transaction(['readings', 'state', 'marks'], 'readwrite')
+      const readings = tx.objectStore('readings')
+      const marks = tx.objectStore('marks')
+      const state = tx.objectStore('state')
+      await Promise.all([
+        readings.clear(),
+        ...d.readings.map((r) => readings.add(r)),
+        marks.clear(),
+        ...d.marks.map((x) => marks.put(x)),
+        state.put(d.state, KEY),
+        state.put(m, SYNC_KEY),
         tx.done,
       ])
     },

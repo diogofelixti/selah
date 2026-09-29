@@ -45,6 +45,19 @@ export interface VerseMark {
 
 export const isEmptyMark = (m: VerseMark) => m.color === null && m.note.trim() === ''
 
+/**
+ * O que a sincronização precisa saber e que não aparece nos dados: quando um capítulo foi desmarcado,
+ * quando uma marca foi removida e quando o plano e a posição mudaram.
+ */
+export interface SyncMeta {
+  cleared: Record<string, number>
+  removedMarks: Record<string, number>
+  activePlanAt: number
+  lastPositionAt: number
+}
+
+export const EMPTY_SYNC_META: SyncMeta = { cleared: {}, removedMarks: {}, activePlanAt: 0, lastPositionAt: 0 }
+
 export interface AppData {
   readings: Reading[]
   settings: Settings
@@ -76,4 +89,8 @@ export interface Repository {
   saveMarks(marks: readonly VerseMark[]): Promise<void>
   replaceAll(data: AppData): Promise<void>
   clearAll(): Promise<void>
+  getSyncMeta(): Promise<SyncMeta>
+  saveSyncMeta(meta: SyncMeta): Promise<void>
+  /** Grava o resultado de uma sincronização (tudo menos os ajustes) numa transação só. */
+  applySync(data: Pick<AppData, 'readings' | 'marks' | 'state'>, meta: SyncMeta): Promise<void>
 }

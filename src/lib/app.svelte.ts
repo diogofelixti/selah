@@ -1,7 +1,7 @@
 import { createMemoryRepository, openRepository } from './storage/repository'
 import {
-  DEFAULT_SETTINGS, DEFAULT_STATE, isEmptyMark, type AppData, type AppState, type MarkColor, type Reading, type Repository,
-  type Settings, type VerseMark,
+  DEFAULT_SETTINGS, DEFAULT_STATE, EMPTY_SYNC_META, isEmptyMark, type AppData, type AppState, type MarkColor, type Reading,
+  type Repository, type Settings, type SyncMeta, type VerseMark,
 } from './storage/types'
 
 export const app = $state({
@@ -15,6 +15,9 @@ export const app = $state({
   marks: [] as VerseMark[],
   settings: { ...DEFAULT_SETTINGS } as Settings,
   state: { ...DEFAULT_STATE } as AppState,
+  syncMeta: structuredClone(EMPTY_SYNC_META) as SyncMeta,
+  /** Aumenta a cada mudança que precisa ir para a conta (a sincronização observa). */
+  changes: 0,
 })
 
 let repo: Repository | null = null
@@ -25,12 +28,15 @@ function store(): Repository {
 }
 
 async function load(r: Repository): Promise<void> {
-  const [readings, settings, state, marks] = await Promise.all([r.getReadings(), r.getSettings(), r.getState(), r.getMarks()])
+  const [readings, settings, state, marks, syncMeta] = await Promise.all([
+    r.getReadings(), r.getSettings(), r.getState(), r.getMarks(), r.getSyncMeta(),
+  ])
   repo = r
   app.readings = readings
   app.settings = settings
   app.state = state
   app.marks = marks
+  app.syncMeta = syncMeta
   app.persistent = r.persistent
   app.blocked = r.blocked ?? false
 }
@@ -59,6 +65,14 @@ async function save(write: () => Promise<void>, apply: () => void): Promise<void
   apply()
 }
 
+/** Registra o que a sincronização precisa saber sobre uma mudança e avisa que há algo a enviar. */
+async function recordSync(change: (meta: SyncMeta) => void): Promise<void> {
+  const next = $state.snapshot(app.syncMeta)
+  change(next)
+  await save(() => store().saveSyncMeta(next), () => (app.syncMeta = next))
+  app.changes++
+}
+
 // Capítulos com gravação em andamento. A tela só muda depois que o aparelho confirma a gravação,
 // então um segundo toque rápido veria o estado antigo; esses toques são ignorados.
 const inFlight = new Set<string>()
@@ -78,12 +92,14 @@ export async function markRead(ref: string): Promise<void> {
   await guarded([ref], async () => {
     const reading = { ref, readAt: Date.now() }
     await save(() => store().addReading(reading), () => (app.readings = [...app.readings, reading]))
+    if (!app.saveError) app.changes++
   })
 }
 
 export async function unmarkRead(ref: string): Promise<void> {
   await guarded([ref], async () => {
     await save(() => store().removeReadingsFor(ref), () => (app.readings = app.readings.filter((r) => r.ref !== ref)))
+    if (!app.saveError) await recordSync((m) => (m.cleared[ref] = Date.now()))
   })
 }
 
@@ -92,6 +108,7 @@ export async function markMany(refs: readonly string[]): Promise<void> {
     const now = Date.now()
     const readings = free.map((ref) => ({ ref, readAt: now }))
     await save(() => store().addReadings(readings), () => (app.readings = [...app.readings, ...readings]))
+    if (!app.saveError) app.changes++
   })
 }
 
@@ -102,6 +119,10 @@ export async function unmarkMany(refs: readonly string[]): Promise<void> {
       () => store().removeReadingsForMany(free),
       () => (app.readings = app.readings.filter((r) => !remove.has(r.ref))),
     )
+    if (!app.saveError) {
+      const now = Date.now()
+      await recordSync((m) => free.forEach((ref) => (m.cleared[ref] = now)))
+    }
   })
 }
 
@@ -123,6 +144,14 @@ export async function setMarks(refs: readonly string[], patch: { color?: MarkCol
         app.marks = [...app.marks.filter((m) => !changed.has(m.ref)), ...next.filter((m) => !isEmptyMark(m))]
       },
     )
+    if (!app.saveError) {
+      await recordSync((meta) => {
+        for (const m of next) {
+          if (isEmptyMark(m)) meta.removedMarks[m.ref] = m.updatedAt
+          else delete meta.removedMarks[m.ref]
+        }
+      })
+    }
   })
 }
 
@@ -135,6 +164,12 @@ export async function updateSettings(patch: Partial<Settings>): Promise<void> {
 export async function updateState(patch: Partial<AppState>): Promise<void> {
   const next = { ...$state.snapshot(app.state), ...patch }
   await save(() => store().saveState(next), () => (app.state = next))
+  if (app.saveError) return
+  const now = Date.now()
+  await recordSync((m) => {
+    if ('activePlan' in patch) m.activePlanAt = now
+    if ('lastPosition' in patch) m.lastPositionAt = now
+  })
 }
 
 /** Retorna false se não conseguiu gravar (app.saveError fica ligado). */
@@ -145,6 +180,8 @@ export async function replaceData(data: AppData): Promise<boolean> {
     app.state = data.state
     app.marks = data.marks
   })
+  // Com conta, o que veio do backup se junta ao que está na conta na próxima sincronização.
+  if (!app.saveError) app.changes++
   return !app.saveError
 }
 
@@ -154,6 +191,7 @@ export async function clearData(): Promise<boolean> {
     app.settings = { ...DEFAULT_SETTINGS }
     app.state = { ...DEFAULT_STATE }
     app.marks = []
+    app.syncMeta = structuredClone(EMPTY_SYNC_META)
   })
   return !app.saveError
 }

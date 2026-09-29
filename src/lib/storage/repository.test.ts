@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StorageBlockedError, createIdbRepository, createMemoryRepository, openRepository } from './repository'
-import { DEFAULT_SETTINGS, DEFAULT_STATE, type Repository } from './types'
+import { DEFAULT_SETTINGS, DEFAULT_STATE, EMPTY_SYNC_META, type Repository } from './types'
 
 const realIndexedDB = globalThis.indexedDB
 
@@ -19,6 +19,34 @@ const implementations: [string, () => Promise<Repository>][] = [
 ]
 
 describe.each(implementations)('repositório (%s)', (_name, create) => {
+  it('guarda os metadados de sincronização à parte: substituir mantém, apagar tudo zera', async () => {
+    const repo = await create()
+    expect(await repo.getSyncMeta()).toEqual(EMPTY_SYNC_META)
+    const meta = { cleared: { 'JHN.1': 5 }, removedMarks: { 'JHN.3.16': 6 }, activePlanAt: 7, lastPositionAt: 8 }
+    await repo.saveSyncMeta(meta)
+    expect(await repo.getSyncMeta()).toEqual(meta)
+    // O estado continua separado dos metadados.
+    expect(await repo.getState()).toEqual(DEFAULT_STATE)
+    await repo.replaceAll({ readings: [], settings: DEFAULT_SETTINGS, state: DEFAULT_STATE, marks: [] })
+    expect(await repo.getSyncMeta()).toEqual(meta)
+    await repo.clearAll()
+    expect(await repo.getSyncMeta()).toEqual(EMPTY_SYNC_META)
+  })
+
+  it('aplica o resultado da sincronização sem mexer nos ajustes', async () => {
+    const repo = await create()
+    await repo.saveSettings({ ...DEFAULT_SETTINGS, fontSize: 4 })
+    await repo.addReading({ ref: 'GEN.1', readAt: 1 })
+    const state = { lastPosition: { book: 'JHN', chapter: 2 }, activePlan: null }
+    const meta = { cleared: { 'GEN.1': 2 }, removedMarks: {}, activePlanAt: 0, lastPositionAt: 3 }
+    await repo.applySync({ readings: [{ ref: 'JHN.1', readAt: 4 }], marks: [{ ref: 'JHN.3.16', color: 'gold', note: '', updatedAt: 5 }], state }, meta)
+    expect(await repo.getReadings()).toEqual([{ ref: 'JHN.1', readAt: 4 }])
+    expect(await repo.getMarks()).toEqual([{ ref: 'JHN.3.16', color: 'gold', note: '', updatedAt: 5 }])
+    expect(await repo.getState()).toEqual(state)
+    expect(await repo.getSyncMeta()).toEqual(meta)
+    expect((await repo.getSettings()).fontSize).toBe(4)
+  })
+
   it('salva, atualiza e apaga marcações em lote', async () => {
     const repo = await create()
     await repo.saveMarks([
