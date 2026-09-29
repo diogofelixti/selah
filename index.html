@@ -11,8 +11,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Selah" />
     <title>Selah</title>
-    <!-- Evita um clarão de tela clara no modo escuro antes de o app carregar os ajustes. -->
-    <script>if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'noite'</script>
+    <!-- Aplica o tema escolhido (ou o do aparelho) antes de o app carregar os ajustes, sem clarão. -->
+    <script>
+      (function () {
+        var themes = ['aurora', 'noite', 'pergaminho', 'oliveira']
+        var saved = null
+        try { saved = localStorage.getItem('selah-theme') } catch (e) {}
+        var dark = matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.dataset.theme = themes.indexOf(saved) >= 0 ? saved : dark ? 'noite' : 'aurora'
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

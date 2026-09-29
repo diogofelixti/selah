@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
-test.use({ locale: 'pt-BR' })
+// Sem service worker: a interceptação de rede precisa ver os pedidos do app.
+test.use({ locale: 'pt-BR', serviceWorkers: 'block' })
 
 /** Classes dos elementos que mostram uma ilustração (pseudo-elemento visível com máscara). */
 const illustrated = (page: Page) =>
@@ -63,4 +64,36 @@ test('as amostras dos Ajustes usam as cores de cada tema', async ({ page }) => {
   expect(await bg('pergaminho')).toBe('rgb(241, 231, 208)')
   expect(await bg('oliveira')).toBe('rgb(27, 31, 22)')
   expect(await bg('noite')).toBe('rgb(18, 22, 31)')
+})
+
+test('o tema escolhido vale antes de o app carregar', async ({ page }) => {
+  await chooseTheme(page, 'Oliveira (escuro, ilustrado)')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'oliveira')
+  // Sem o JavaScript do app, só o script do index.html decide o tema.
+  await page.route('**/assets/*.js', (route) => route.abort())
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'oliveira')
+})
+
+test.describe('aparelho no modo escuro', () => {
+  test.use({ colorScheme: 'dark' })
+
+  test('sem escolha salva, segue o aparelho antes de o app carregar', async ({ page }) => {
+    await page.route('**/assets/*.js', (route) => route.abort())
+    await page.goto('/')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'noite')
+  })
+
+  test('localStorage bloqueado não impede o app de abrir', async ({ page }) => {
+    await page.addInitScript(() =>
+      Object.defineProperty(window, 'localStorage', {
+        get() {
+          throw new DOMException('bloqueado', 'SecurityError')
+        },
+      }),
+    )
+    await page.goto('/#/ajustes')
+    await page.getByLabel('Pergaminho (claro, ilustrado)').check()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'pergaminho')
+  })
 })

@@ -14,3 +14,13 @@ describe('resolveTheme', () => {
     expect(resolveTheme('oliveira', false)).toBe('oliveira')
   })
 })
+
+describe('script do index.html', () => {
+  it('conhece todos os temas fixos', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { THEMES } = await import('./storage/types')
+    const html = readFileSync('index.html', 'utf8')
+    const list = /var themes = \[([^\]]*)\]/.exec(html)![1]
+    expect(list.split(',').map((s) => s.trim().replace(/'/g, ''))).toEqual(THEMES.filter((t) => t !== 'auto'))
+  })
+})

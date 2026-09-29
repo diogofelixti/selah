@@ -7,7 +7,7 @@
   import { TRANSLATION_BY_LANG } from './lib/bible/loader'
   import { locale, t } from './lib/i18n/i18n.svelte'
   import { resolveLanguage } from './lib/i18n/lang'
-  import { resolveTheme } from './lib/theme'
+  import { rememberTheme, resolveTheme } from './lib/theme'
   import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
   import { router } from './lib/router.svelte'
@@ -51,6 +51,8 @@
   $effect(() => {
     const root = document.documentElement
     root.dataset.theme = resolveTheme(app.settings.theme, prefersDark)
+    // Só guarda depois de ler os ajustes salvos, para não trocar a escolha pelo padrão.
+    if (app.ready) rememberTheme(app.settings.theme)
     // A barra do navegador acompanha o fundo do tema.
     const bg = getComputedStyle(root).getPropertyValue('--bg').trim()
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg)
