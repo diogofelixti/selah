@@ -42,6 +42,10 @@ test('anota, abre, edita e apaga a nota de um versículo', async ({ page }) => {
   await expect(dialog.getByRole('textbox')).toHaveValue('Lembrar do amor de Deus')
   await dialog.getByRole('textbox').fill('Mudou')
   await dialog.getByRole('button', { name: 'Salvar' }).click()
+  // A tela só muda depois que o aparelho confirma a gravação: reabrir com o texto novo prova que já foi salvo.
+  await page.getByRole('button', { name: 'Ver nota de João 3:16' }).click()
+  await expect(dialog.getByRole('textbox')).toHaveValue('Mudou')
+  await dialog.getByRole('button', { name: 'Cancelar' }).click()
   await page.reload()
   await page.getByRole('button', { name: 'Ver nota de João 3:16' }).click()
   await expect(dialog.getByRole('textbox')).toHaveValue('Mudou')
