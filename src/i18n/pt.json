@@ -182,6 +182,27 @@
     "missing": "Alguns livros não estão disponíveis offline.",
     "hint": "Digite palavras de um versículo. Acentos e maiúsculas não importam."
   },
+  "marks": {
+    "highlight": "Destacar",
+    "note": "Anotar",
+    "gold": "Dourado",
+    "green": "Verde",
+    "blue": "Azul",
+    "clear": "Tirar destaque",
+    "noteTitle": "Nota em {ref}",
+    "noteLabel": "Nota",
+    "save": "Salvar",
+    "deleteNote": "Apagar nota",
+    "cancel": "Cancelar",
+    "openNote": "Ver nota de {ref}",
+    "colors": "Cores de destaque",
+    "title": "Minhas marcações",
+    "empty": "Selecione um versículo no leitor e use Destacar ou Anotar. Suas marcações aparecem aqui.",
+    "filterAll": "Todas",
+    "filterNotes": "Com nota",
+    "count": "{n} marcações",
+    "countOne": "1 marcação"
+  },
   "reader": {
     "markRead": "Marcar como lido",
     "read": "Lido ✓",

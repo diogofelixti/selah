@@ -182,6 +182,27 @@
     "missing": "Some books are not available offline.",
     "hint": "Type words from a verse. Accents and capitals do not matter."
   },
+  "marks": {
+    "highlight": "Highlight",
+    "note": "Note",
+    "gold": "Gold",
+    "green": "Green",
+    "blue": "Blue",
+    "clear": "Remove highlight",
+    "noteTitle": "Note on {ref}",
+    "noteLabel": "Note",
+    "save": "Save",
+    "deleteNote": "Delete note",
+    "cancel": "Cancel",
+    "openNote": "View note on {ref}",
+    "colors": "Highlight colors",
+    "title": "My highlights",
+    "empty": "Select a verse in the reader and use Highlight or Note. Your highlights and notes show up here.",
+    "filterAll": "All",
+    "filterNotes": "With note",
+    "count": "{n} highlights",
+    "countOne": "1 highlight"
+  },
   "reader": {
     "markRead": "Mark as read",
     "read": "Read ✓",

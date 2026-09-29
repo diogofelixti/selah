@@ -35,6 +35,12 @@ describe.each(['aurora', 'noite'])('contraste do tema %s', (theme) => {
     expect(ratio(token('bg'), token('text'))).toBeGreaterThanOrEqual(4.5)
   })
 
+  it('texto legível sobre as cores de destaque (4,5:1)', () => {
+    for (const color of ['mark-gold', 'mark-green', 'mark-blue']) {
+      expect(ratio(token('text'), token(color)), color).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
   it('preenchimentos de progresso se distinguem do trilho (3:1)', () => {
     expect(ratio(token('accent'), token('track'))).toBeGreaterThanOrEqual(3)
     expect(ratio(token('nt'), token('track'))).toBeGreaterThanOrEqual(3)

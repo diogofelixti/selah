@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { ArrowLeft, ChevronLeft, ChevronRight, Copy, Headphones, Minus, Pause, Play, Plus, Share2, Square, X } from '@lucide/svelte'
+  import {
+    ArrowLeft, ChevronLeft, ChevronRight, Copy, Headphones, Highlighter, Minus, NotebookPen, Pause, Play, Plus, Share2, Square, StickyNote, X,
+  } from '@lucide/svelte'
+  import NoteDialog from '../components/NoteDialog.svelte'
   import { tick } from 'svelte'
-  import { app, markRead, unmarkRead, updateSettings, updateState } from '../lib/app.svelte'
+  import { app, markRead, setMarks, unmarkRead, updateSettings, updateState } from '../lib/app.svelte'
   import { nextChapter, prevChapter } from '../lib/bible/books'
   import { formatSelection } from '../lib/bible/copy'
   import { splitImplied } from '../lib/bible/format'
@@ -16,7 +19,7 @@
   import { isChapterDone } from '../lib/plans/status'
   import { canGoBack } from '../lib/router.svelte'
   import { SPEECH_RATES, browserEngine, createChapterSpeaker, type SpeakerState } from '../lib/speech'
-  import type { FontSize } from '../lib/storage/types'
+  import { MARK_COLORS, type FontSize, type MarkColor, type VerseMark } from '../lib/storage/types'
 
   let { book, chapter, verse }: { book: string; chapter: number; verse?: number } = $props()
 
@@ -74,6 +77,44 @@
     const pos = app.state.lastPosition
     if (pos?.book !== book || pos?.chapter !== chapter) void updateState({ lastPosition: { book, chapter } })
   })
+
+  // Marcações deste capítulo, por número do versículo.
+  const chapterMarks = $derived.by(() => {
+    const prefix = `${book}.${chapter}.`
+    const map = new Map<number, VerseMark>()
+    for (const m of app.marks) if (m.ref.startsWith(prefix)) map.set(Number(m.ref.slice(prefix.length)), m)
+    return map
+  })
+  let colorsOpen = $state(false)
+  let noteVerse = $state<number | null>(null)
+  const verseRef = (n: number) => `${book}.${chapter}.${n}`
+  const verseLabel = (n: number) => `${t(`books.${book}`)} ${chapter}:${n}`
+
+  async function highlight(color: MarkColor | null) {
+    const refs = selected.map(verseRef)
+    colorsOpen = false
+    selected = []
+    await setMarks(refs, { color })
+  }
+
+  function openNote(n: number) {
+    colorsOpen = false
+    noteVerse = n
+  }
+
+  async function saveNote(note: string) {
+    const n = noteVerse
+    noteVerse = null
+    selected = []
+    if (n !== null) await setMarks([verseRef(n)], { note })
+  }
+
+  async function deleteNote() {
+    const n = noteVerse
+    noteVerse = null
+    selected = []
+    if (n !== null) await setMarks([verseRef(n)], { note: '' })
+  }
 
   // Leitura em voz alta: um controlador por abertura do leitor, criado no primeiro toque.
   const canSpeak = typeof window !== 'undefined' && !!window.speechSynthesis
@@ -235,6 +276,7 @@
             class:flash={flash === i + 1}
             class:selected={selected.includes(i + 1)}
             class:speaking={speech.verse === i + 1}
+            data-mark={chapterMarks.get(i + 1)?.color ?? undefined}
             role="button"
             tabindex={focusVerse === i + 1 ? 0 : -1}
             aria-pressed={selected.includes(i + 1)}
@@ -243,6 +285,11 @@
           >
             <sup>{i + 1}</sup>{#each splitImplied(content) as part, j (j)}{#if part.implied}<em>{part.text}</em>{:else}{part.text}{/if}{/each}
           </span>
+          {#if chapterMarks.get(i + 1)?.note}
+            <button class="note-btn" onclick={() => openNote(i + 1)} aria-label={t('marks.openNote', { ref: verseLabel(i + 1) })}>
+              <StickyNote size={14} aria-hidden="true" />
+            </button>
+          {/if}
         {/if}
       {/each}
     </div>
@@ -284,15 +331,40 @@
   </div>
 {/if}
 
+{#if selected.length > 0 && colorsOpen}
+  <div class="colors" role="group" aria-label={t('marks.colors')}>
+    {#each MARK_COLORS as color (color)}
+      <button class="swatch" data-color={color} onclick={() => highlight(color)} aria-label={t(`marks.${color}`)}></button>
+    {/each}
+    <button class="pill" onclick={() => highlight(null)}>{t('marks.clear')}</button>
+  </div>
+{/if}
+
 {#if selected.length > 0}
   <div class="selection-bar" role="toolbar" aria-label={t('copy.toolbar')}>
     <span class="count" aria-live="polite">{selected.length === 1 ? t('copy.countOne') : t('copy.countMany', { n: selected.length })}</span>
-    <button class="btn btn-dark" onclick={copySelection}><Copy size={18} aria-hidden="true" />{t('copy.copy')}</button>
+    <button class="icon-btn filled" onclick={copySelection} aria-label={t('copy.copy')}><Copy size={18} /></button>
+    <button class="icon-btn" onclick={() => (colorsOpen = !colorsOpen)} aria-expanded={colorsOpen} aria-label={t('marks.highlight')}>
+      <Highlighter size={20} />
+    </button>
+    {#if selected.length === 1}
+      <button class="icon-btn" onclick={() => openNote(selected[0])} aria-label={t('marks.note')}><NotebookPen size={20} /></button>
+    {/if}
     {#if canShare}
       <button class="icon-btn" onclick={shareSelection} aria-label={t('copy.share')}><Share2 size={20} /></button>
     {/if}
-    <button class="icon-btn" onclick={() => (selected = [])} aria-label={t('copy.cancel')}><X size={20} /></button>
+    <button class="icon-btn" onclick={() => ((selected = []), (colorsOpen = false))} aria-label={t('copy.cancel')}><X size={20} /></button>
   </div>
+{/if}
+
+{#if noteVerse !== null}
+  <NoteDialog
+    title={t('marks.noteTitle', { ref: verseLabel(noteVerse) })}
+    initial={chapterMarks.get(noteVerse)?.note ?? ''}
+    onSave={saveNote}
+    onDelete={deleteNote}
+    onClose={() => (noteVerse = null)}
+  />
 {/if}
 
 <style>
@@ -315,8 +387,8 @@
   .num { color: var(--accent-text); }
   .text { font-family: var(--font-read); line-height: 1.75; }
   .verse { padding: 2px 0; cursor: pointer; border-radius: 4px; -webkit-tap-highlight-color: transparent; }
-  /* Selecionado: fundo claro e sublinhado dourado, diferente do destaque de versículo aberto por link. */
-  .verse.selected { background: var(--flash); box-shadow: inset 0 -2px 0 var(--accent); animation: none; }
+  /* Selecionado: contorno tracejado e sublinhado, sem fundo, para não se confundir com os destaques coloridos. */
+  .verse.selected { box-shadow: inset 0 -2px 0 var(--accent); outline: 2px dashed var(--accent); outline-offset: 1px; animation: none; }
   .selection-bar {
     position: fixed;
     left: 14px;
@@ -334,7 +406,48 @@
     margin: 0 auto;
     z-index: 2;
   }
-  .count { flex-grow: 1; font-weight: 600; }
+  .count { flex-grow: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .filled { background: var(--text); color: var(--bg); }
+  .verse[data-mark='gold'] { background: var(--mark-gold); }
+  .verse[data-mark='green'] { background: var(--mark-green); }
+  .verse[data-mark='blue'] { background: var(--mark-blue); }
+  .note-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin: 0 2px;
+    vertical-align: middle;
+    border: 0;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--accent-text);
+    cursor: pointer;
+  }
+  /* Área de toque de 44px sem empurrar o texto. */
+  .note-btn { position: relative; }
+  .note-btn::after { content: ''; position: absolute; inset: -8px; }
+  .colors {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: calc(92px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow);
+    max-width: 40rem;
+    margin: 0 auto;
+    z-index: 2;
+  }
+  .swatch { width: 44px; height: 44px; border-radius: 999px; border: 2px solid var(--border-strong); cursor: pointer; }
+  .swatch[data-color='gold'] { background: var(--mark-gold); }
+  .swatch[data-color='green'] { background: var(--mark-green); }
+  .swatch[data-color='blue'] { background: var(--mark-blue); }
   .rate { min-width: 64px; padding: 0 var(--space-3); }
   /* Versículo sendo lido: contorno, diferente da seleção (fundo) e do destaque por link. */
   .verse.speaking { outline: 2px solid var(--accent); outline-offset: 2px; }
