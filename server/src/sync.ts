@@ -10,7 +10,7 @@ const MAX_BODY = 2 * 1024 * 1024
 export function syncRoutes(deps: Deps): Hono<AuthEnv> {
   const r = new Hono<AuthEnv>()
   r.use('*', requireUser(deps))
-  r.use('*', rateLimit({ limit: 60, windowMs: 60_000, now: deps.now, key: (c) => `user:${c.get('userId')}` }))
+  r.use('*', rateLimit<AuthEnv>({ limit: 60, windowMs: 60_000, now: deps.now, key: (c) => `user:${c.get('userId')}` }))
 
   // Recebe o documento do aparelho, junta com o da conta e devolve o resultado (o aparelho aplica).
   r.post('/', async (c) => {

@@ -1,7 +1,7 @@
 import type { Context, Env, MiddlewareHandler } from 'hono'
 
 /** IP real do visitante, repassado pela Cloudflare e pelo nginx. */
-export const clientIp = (c: Context) => c.req.header('cf-connecting-ip') ?? c.req.header('x-real-ip') ?? 'desconhecido'
+export const clientIp = (c: { req: { header(name: string): string | undefined } }) => c.req.header('cf-connecting-ip') ?? c.req.header('x-real-ip') ?? 'desconhecido'
 
 /** Janela fixa por chave (IP, por padrão). Memória limpa a cada janela. */
 export function rateLimit<E extends Env = Env>(opts: {
