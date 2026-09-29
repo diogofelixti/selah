@@ -13,7 +13,7 @@
     "bibles": "tsx scripts/build-bibles.ts",
     "check:dashes": "tsx scripts/check-dashes.ts",
     "e2e": "playwright test",
-    "icons": "pwa-assets-generator --preset minimal-2023 public/icon.svg",
+    "icons": "python3 scripts/icons.py",
     "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
@@ -28,7 +28,6 @@
     "@testing-library/svelte": "^5.4.2",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^20.19.43",
-    "@vite-pwa/assets-generator": "^1.0.4",
     "fake-indexeddb": "^6.2.5",
     "fflate": "^0.8.3",
     "jsdom": "^29.1.1",
