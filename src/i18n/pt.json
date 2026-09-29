@@ -412,5 +412,31 @@
     "unsupported": "Este navegador não permite notificações.",
     "iosInstall": "No iPhone, adicione o Selah à Tela de Início (Compartilhar > Adicionar à Tela de Início) e abra por lá para ativar o lembrete.",
     "privacy": "Lembrete diário: o servidor do Selah guarda só o endereço de notificação do aparelho, a hora, o fuso horário, o idioma e as datas do último lembrete enviado e da sua última leitura (só a data, para não mandar lembrete no dia em que você já leu). Não guarda nome, e-mail nem o que você lê."
+  },
+  "account": {
+    "title": "Conta e sincronização",
+    "text": "Entre com sua conta Google para ter leituras, planos, destaques e notas em todos os seus aparelhos.",
+    "keepLocal": "Seus dados continuam neste aparelho. Entrar só acrescenta uma cópia na sua conta.",
+    "soon": "Em breve: entre com sua conta Google para ter seu progresso em todos os seus aparelhos.",
+    "unreachable": "Sem conexão com o servidor do Selah agora. A conta aparece aqui quando a conexão voltar.",
+    "signedInAs": "Conectado como {email}",
+    "synced": "Sincronizado agora",
+    "syncedAgo": "Sincronizado há {n} min",
+    "notSynced": "Ainda não sincronizado",
+    "syncing": "Sincronizando...",
+    "syncError": "Não foi possível sincronizar agora. O app tenta de novo sozinho.",
+    "syncNow": "Sincronizar agora",
+    "signOut": "Sair",
+    "signedOut": "Você saiu da conta. Os dados continuam neste aparelho.",
+    "delete": "Excluir conta",
+    "deleteConfirm1": "Excluir sua conta e a cópia dos seus dados no servidor do Selah? Os dados deste aparelho continuam.",
+    "deleteConfirm2": "Tem certeza? Isso não pode ser desfeito.",
+    "deleted": "Conta excluída. Os dados deste aparelho continuam.",
+    "deleteError": "Não foi possível excluir a conta agora. Tente de novo com internet.",
+    "loginError": "Não foi possível entrar. Tente de novo.",
+    "offline": "Sem conexão com o Google agora. Tente de novo quando estiver online.",
+    "expired": "Sua sessão expirou. Entre de novo para continuar sincronizando.",
+    "clearSignedIn": "Você está conectado à conta Google. Ao apagar os dados, o app sai da conta, e a cópia na conta continua (para apagá-la, use Excluir conta). Continuar?",
+    "privacy": "Conta e sincronização: se você entrar com a conta Google, o servidor do Selah guarda seu e-mail, o identificador da conta Google e suas leituras, planos, destaques e notas, para levá-los aos seus outros aparelhos. Não guarda nome, foto nem senha. Excluir conta apaga tudo isso."
   }
 }

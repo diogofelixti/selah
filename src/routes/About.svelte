@@ -22,6 +22,7 @@
     </section>
 
     <p class="small">{t('reminder.privacy')}</p>
+    <p class="small">{t('account.privacy')}</p>
 
     <DonateCard />
 

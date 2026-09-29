@@ -412,5 +412,31 @@
     "unsupported": "This browser does not support notifications.",
     "iosInstall": "On iPhone, add Selah to your Home Screen (Share > Add to Home Screen) and open it from there to turn on the reminder.",
     "privacy": "Daily reminder: the Selah server keeps only your device's notification address, the time, the time zone, the language and the dates of the last reminder sent and of your last reading (only the date, so no reminder is sent on a day you already read). It does not keep your name, email or what you read."
+  },
+  "account": {
+    "title": "Account and sync",
+    "text": "Sign in with your Google account to have your readings, plans, highlights and notes on all your devices.",
+    "keepLocal": "Your data stays on this device. Signing in only adds a copy to your account.",
+    "soon": "Coming soon: sign in with your Google account to have your progress on all your devices.",
+    "unreachable": "No connection to the Selah server right now. Your account shows up here when the connection is back.",
+    "signedInAs": "Signed in as {email}",
+    "synced": "Synced just now",
+    "syncedAgo": "Synced {n} min ago",
+    "notSynced": "Not synced yet",
+    "syncing": "Syncing...",
+    "syncError": "Could not sync right now. The app will try again on its own.",
+    "syncNow": "Sync now",
+    "signOut": "Sign out",
+    "signedOut": "You signed out. Your data stays on this device.",
+    "delete": "Delete account",
+    "deleteConfirm1": "Delete your account and the copy of your data on the Selah server? The data on this device stays.",
+    "deleteConfirm2": "Are you sure? This cannot be undone.",
+    "deleted": "Account deleted. The data on this device stays.",
+    "deleteError": "Could not delete the account right now. Try again with internet.",
+    "loginError": "Could not sign in. Try again.",
+    "offline": "No connection to Google right now. Try again when you are online.",
+    "expired": "Your session expired. Sign in again to keep syncing.",
+    "clearSignedIn": "You are signed in with Google. Erasing the data signs you out, and the copy in your account stays (to erase it, use Delete account). Continue?",
+    "privacy": "Account and sync: if you sign in with Google, the Selah server keeps your email, your Google account ID and your readings, plans, highlights and notes, to bring them to your other devices. It does not keep your name, photo or password. Deleting the account erases all of it."
   }
 }

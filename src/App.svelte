@@ -9,6 +9,7 @@
   import { resolveLanguage } from './lib/i18n/lang'
   import { localDayKey } from './lib/progress/progress'
   import { disableReminder, refreshReminder, reportReadToday } from './lib/reminder'
+  import { account, loadAccountConfig, restoreSession, syncNow } from './lib/sync/account.svelte'
   import { rememberTheme, resolveTheme } from './lib/theme'
   import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
@@ -29,7 +30,26 @@
 
   onMount(() => {
     initPwa()
+    restoreSession()
     void initApp()
+    void loadAccountConfig()
+  })
+
+  // Com conta: sincroniza ao abrir, 3 s depois de cada mudança e ao voltar ao app ou à internet.
+  let syncTimer: ReturnType<typeof setTimeout> | undefined
+  $effect(() => {
+    void app.changes
+    void resumeTick
+    if (!app.ready || !account.token) return
+    clearTimeout(syncTimer)
+    syncTimer = setTimeout(() => void syncNow(), 3000)
+    return () => clearTimeout(syncTimer)
+  })
+  let syncedOnOpen = false
+  $effect(() => {
+    if (!app.ready || !account.token || syncedOnOpen) return
+    syncedOnOpen = true
+    void syncNow()
   })
 
   $effect(() => {

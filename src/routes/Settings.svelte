@@ -1,7 +1,9 @@
 <script lang="ts">
   import { ArrowLeft, ChevronRight, Download, Minus, Plus, Trash2, Upload } from '@lucide/svelte'
   import { app, clearData, replaceData, snapshot, updateSettings } from '../lib/app.svelte'
+  import AccountCard from '../components/AccountCard.svelte'
   import DonateCard from '../components/DonateCard.svelte'
+  import { account, signOut } from '../lib/sync/account.svelte'
   import ReminderCard from '../components/ReminderCard.svelte'
   import { t } from '../lib/i18n/i18n.svelte'
   import type { LanguageSetting } from '../lib/i18n/lang'
@@ -53,6 +55,11 @@
 
   async function erase() {
     if (!confirm(t('settings.clearConfirm1')) || !confirm(t('settings.clearConfirm2'))) return
+    // Com conta, sai primeiro: senão a próxima sincronização traria tudo de volta. A cópia na conta fica.
+    if (account.token) {
+      if (!confirm(t('account.clearSignedIn'))) return
+      await signOut()
+    }
     message = (await clearData())
       ? { kind: 'ok', key: 'settings.clearDone' }
       : { kind: 'error', key: 'common.saveError' }
@@ -66,6 +73,8 @@
   </header>
 
   <div class="stack">
+    <AccountCard />
+
     <fieldset class="card">
       <legend>{t('settings.language')}</legend>
       {#each LANGUAGES as lang (lang.value)}

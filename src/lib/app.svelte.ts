@@ -196,6 +196,20 @@ export async function clearData(): Promise<boolean> {
   return !app.saveError
 }
 
+/**
+ * Aplica o resultado de uma sincronização (tudo menos os ajustes). Não conta como mudança local,
+ * senão cada sincronização dispararia outra.
+ */
+export async function applySyncResult(data: Pick<AppData, 'readings' | 'marks' | 'state'>, meta: SyncMeta): Promise<boolean> {
+  await save(() => store().applySync(data, meta), () => {
+    app.readings = data.readings
+    app.marks = data.marks
+    app.state = data.state
+    app.syncMeta = meta
+  })
+  return !app.saveError
+}
+
 export function snapshot(): AppData {
   return {
     readings: $state.snapshot(app.readings),
