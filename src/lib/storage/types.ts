@@ -21,10 +21,25 @@ export interface AppState {
   activePlan: { id: PlanId; startedAt: number } | null
 }
 
+export const MARK_COLORS = ['gold', 'green', 'blue'] as const
+export type MarkColor = (typeof MARK_COLORS)[number]
+export const NOTE_MAX = 1000
+
+/** Destaque e/ou nota de um versículo. Sem cor e sem nota, a marcação deixa de existir. */
+export interface VerseMark {
+  ref: string
+  color: MarkColor | null
+  note: string
+  updatedAt: number
+}
+
+export const isEmptyMark = (m: VerseMark) => m.color === null && m.note.trim() === ''
+
 export interface AppData {
   readings: Reading[]
   settings: Settings
   state: AppState
+  marks: VerseMark[]
 }
 
 export const DEFAULT_SETTINGS: Settings = { language: 'auto', theme: 'auto', fontSize: 2 }
@@ -44,6 +59,9 @@ export interface Repository {
   saveSettings(settings: Settings): Promise<void>
   getState(): Promise<AppState>
   saveState(state: AppState): Promise<void>
+  getMarks(): Promise<VerseMark[]>
+  /** Grava várias marcações de uma vez (ou todas, ou nenhuma); as vazias são apagadas. */
+  saveMarks(marks: readonly VerseMark[]): Promise<void>
   replaceAll(data: AppData): Promise<void>
   clearAll(): Promise<void>
 }

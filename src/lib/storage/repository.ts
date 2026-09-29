@@ -1,10 +1,13 @@
 import { openDB, type DBSchema } from 'idb'
-import { DEFAULT_SETTINGS, DEFAULT_STATE, type AppState, type Reading, type Repository, type Settings } from './types'
+import {
+  DEFAULT_SETTINGS, DEFAULT_STATE, isEmptyMark, type AppState, type Reading, type Repository, type Settings, type VerseMark,
+} from './types'
 
 interface SelahDB extends DBSchema {
   readings: { key: number; value: Reading; indexes: { ref: string } }
   settings: { key: string; value: Settings }
   state: { key: string; value: AppState }
+  marks: { key: string; value: VerseMark }
 }
 
 const KEY = 'current'
@@ -13,6 +16,7 @@ export function createMemoryRepository(): Repository {
   let readings: Reading[] = []
   let settings: Settings = structuredClone(DEFAULT_SETTINGS)
   let state: AppState = structuredClone(DEFAULT_STATE)
+  let marks = new Map<string, VerseMark>()
   return {
     persistent: false,
     async getReadings() { return structuredClone(readings) },
@@ -31,25 +35,39 @@ export function createMemoryRepository(): Repository {
     async saveSettings(s) { settings = structuredClone(s) },
     async getState() { return structuredClone(state) },
     async saveState(s) { state = structuredClone(s) },
+    async getMarks() { return structuredClone([...marks.values()]) },
+    async saveMarks(ms) {
+      const copies = ms.map((m) => structuredClone(m))
+      for (const m of copies) {
+        if (isEmptyMark(m)) marks.delete(m.ref)
+        else marks.set(m.ref, m)
+      }
+    },
     async replaceAll(d) {
       readings = structuredClone(d.readings)
       settings = structuredClone(d.settings)
       state = structuredClone(d.state)
+      marks = new Map(structuredClone(d.marks).map((m) => [m.ref, m]))
     },
     async clearAll() {
       readings = []
       settings = structuredClone(DEFAULT_SETTINGS)
       state = structuredClone(DEFAULT_STATE)
+      marks = new Map()
     },
   }
 }
 
 export async function createIdbRepository(name = 'selah'): Promise<Repository> {
-  const db = await openDB<SelahDB>(name, 1, {
-    upgrade(db) {
-      db.createObjectStore('readings', { autoIncrement: true }).createIndex('ref', 'ref')
-      db.createObjectStore('settings')
-      db.createObjectStore('state')
+  const db = await openDB<SelahDB>(name, 2, {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 1) {
+        db.createObjectStore('readings', { autoIncrement: true }).createIndex('ref', 'ref')
+        db.createObjectStore('settings')
+        db.createObjectStore('state')
+      }
+      // Versão 2: marcações (destaques e notas). Os stores da versão 1 ficam como estão.
+      if (oldVersion < 2) db.createObjectStore('marks', { keyPath: 'ref' })
     },
   })
   return {
@@ -96,23 +114,40 @@ export async function createIdbRepository(name = 'selah'): Promise<Repository> {
     async saveSettings(s) { await db.put('settings', s, KEY) },
     async getState() { return { ...DEFAULT_STATE, ...(await db.get('state', KEY)) } },
     async saveState(s) { await db.put('state', s, KEY) },
+    async getMarks() { return db.getAll('marks') },
+    async saveMarks(ms) {
+      const tx = db.transaction('marks', 'readwrite')
+      const pending: Promise<unknown>[] = [tx.done]
+      try {
+        for (const m of ms) pending.push(isEmptyMark(m) ? tx.store.delete(m.ref) : tx.store.put(m))
+        await Promise.all(pending)
+      } catch (err) {
+        for (const p of pending) p.catch(() => {})
+        try { tx.abort() } catch { /* já abortada */ }
+        throw err
+      }
+    },
     async replaceAll(d) {
-      const tx = db.transaction(['readings', 'settings', 'state'], 'readwrite')
+      const tx = db.transaction(['readings', 'settings', 'state', 'marks'], 'readwrite')
       const readings = tx.objectStore('readings')
+      const marks = tx.objectStore('marks')
       await Promise.all([
         readings.clear(),
         ...d.readings.map((r) => readings.add(r)),
         tx.objectStore('settings').put(d.settings, KEY),
         tx.objectStore('state').put(d.state, KEY),
+        marks.clear(),
+        ...d.marks.map((m) => marks.put(m)),
         tx.done,
       ])
     },
     async clearAll() {
-      const tx = db.transaction(['readings', 'settings', 'state'], 'readwrite')
+      const tx = db.transaction(['readings', 'settings', 'state', 'marks'], 'readwrite')
       await Promise.all([
         tx.objectStore('readings').clear(),
         tx.objectStore('settings').clear(),
         tx.objectStore('state').clear(),
+        tx.objectStore('marks').clear(),
         tx.done,
       ])
     },

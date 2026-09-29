@@ -1,6 +1,7 @@
 import { createMemoryRepository, openRepository } from './storage/repository'
 import {
-  DEFAULT_SETTINGS, DEFAULT_STATE, type AppData, type AppState, type Reading, type Repository, type Settings,
+  DEFAULT_SETTINGS, DEFAULT_STATE, isEmptyMark, type AppData, type AppState, type MarkColor, type Reading, type Repository,
+  type Settings, type VerseMark,
 } from './storage/types'
 
 export const app = $state({
@@ -9,6 +10,7 @@ export const app = $state({
   /** true quando a última gravação no aparelho falhou (espaço cheio, banco fechado pelo sistema). */
   saveError: false,
   readings: [] as Reading[],
+  marks: [] as VerseMark[],
   settings: { ...DEFAULT_SETTINGS } as Settings,
   state: { ...DEFAULT_STATE } as AppState,
 })
@@ -21,11 +23,12 @@ function store(): Repository {
 }
 
 async function load(r: Repository): Promise<void> {
-  const [readings, settings, state] = await Promise.all([r.getReadings(), r.getSettings(), r.getState()])
+  const [readings, settings, state, marks] = await Promise.all([r.getReadings(), r.getSettings(), r.getState(), r.getMarks()])
   repo = r
   app.readings = readings
   app.settings = settings
   app.state = state
+  app.marks = marks
   app.persistent = r.persistent
 }
 
@@ -97,6 +100,27 @@ export async function unmarkMany(refs: readonly string[]): Promise<void> {
   })
 }
 
+/** Aplica cor e/ou nota a versículos. Sem cor e sem nota, a marcação é apagada. */
+export async function setMarks(refs: readonly string[], patch: { color?: MarkColor | null; note?: string }): Promise<void> {
+  const keys = refs.map((ref) => `mark:${ref}`)
+  await guarded(keys, async (free) => {
+    const now = Date.now()
+    const byRef = new Map(app.marks.map((m) => [m.ref, $state.snapshot(m)]))
+    const next: VerseMark[] = free.map((key) => {
+      const ref = key.slice('mark:'.length)
+      const current = byRef.get(ref) ?? { ref, color: null, note: '', updatedAt: now }
+      return { ...current, ...patch, note: (patch.note ?? current.note).trim(), updatedAt: now }
+    })
+    await save(
+      () => store().saveMarks(next),
+      () => {
+        const changed = new Set(next.map((m) => m.ref))
+        app.marks = [...app.marks.filter((m) => !changed.has(m.ref)), ...next.filter((m) => !isEmptyMark(m))]
+      },
+    )
+  })
+}
+
 // $state.snapshot: o IndexedDB não consegue clonar os proxies reativos do Svelte.
 export async function updateSettings(patch: Partial<Settings>): Promise<void> {
   const next = { ...$state.snapshot(app.settings), ...patch }
@@ -114,6 +138,7 @@ export async function replaceData(data: AppData): Promise<boolean> {
     app.readings = data.readings
     app.settings = data.settings
     app.state = data.state
+    app.marks = data.marks
   })
   return !app.saveError
 }
@@ -123,6 +148,7 @@ export async function clearData(): Promise<boolean> {
     app.readings = []
     app.settings = { ...DEFAULT_SETTINGS }
     app.state = { ...DEFAULT_STATE }
+    app.marks = []
   })
   return !app.saveError
 }
@@ -132,5 +158,6 @@ export function snapshot(): AppData {
     readings: $state.snapshot(app.readings),
     settings: $state.snapshot(app.settings),
     state: $state.snapshot(app.state),
+    marks: $state.snapshot(app.marks),
   }
 }

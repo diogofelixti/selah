@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { app, initApp, markMany, markRead, unmarkMany, updateSettings } from './app.svelte'
+import { app, initApp, markMany, markRead, setMarks, unmarkMany, updateSettings } from './app.svelte'
 import { createMemoryRepository } from './storage/repository'
 import type { Repository } from './storage/types'
 
@@ -65,5 +65,27 @@ describe('toques repetidos', () => {
     await initApp(async () => createMemoryRepository())
     await Promise.all([markMany(['RUT.1', 'RUT.2']), markMany(['RUT.1', 'RUT.2'])])
     expect(app.readings.map((r) => r.ref).sort()).toEqual(['RUT.1', 'RUT.2'])
+  })
+})
+
+describe('marcações', () => {
+  it('pinta vários versículos, anota um e apaga ao zerar cor e nota', async () => {
+    await initApp(async () => createMemoryRepository())
+    await setMarks(['JHN.3.16', 'JHN.3.17'], { color: 'green' })
+    expect(app.marks.map((m) => [m.ref, m.color]).sort()).toEqual([['JHN.3.16', 'green'], ['JHN.3.17', 'green']])
+    await setMarks(['JHN.3.16'], { note: 'amor' })
+    expect(app.marks.find((m) => m.ref === 'JHN.3.16')).toMatchObject({ color: 'green', note: 'amor' })
+    await setMarks(['JHN.3.17'], { color: null })
+    expect(app.marks.map((m) => m.ref)).toEqual(['JHN.3.16'])
+    await setMarks(['JHN.3.16'], { color: null, note: '' })
+    expect(app.marks).toEqual([])
+  })
+
+  it('não muda a tela se a gravação falhar', async () => {
+    const broken: Repository = { ...createMemoryRepository(), saveMarks: fail }
+    await initApp(async () => broken)
+    await setMarks(['JHN.3.16'], { color: 'gold' })
+    expect(app.marks).toEqual([])
+    expect(app.saveError).toBe(true)
   })
 })

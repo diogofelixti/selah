@@ -30,6 +30,12 @@ export function isValidChapterRef(ref: string): boolean {
   return parsed !== null && parsed.verse === undefined && chapterRef(parsed.book, parsed.chapter) === ref
 }
 
+/** Só aceita a forma canônica de versículo ("JHN.3.16"). */
+export function isValidVerseRef(ref: string): boolean {
+  const parsed = parseRef(ref)
+  return parsed?.verse !== undefined && `${parsed.book}.${parsed.chapter}.${parsed.verse}` === ref
+}
+
 export function formatRef(ref: string, bookName: (id: string) => string): string {
   const parsed = parseRef(ref)
   if (!parsed) return ref

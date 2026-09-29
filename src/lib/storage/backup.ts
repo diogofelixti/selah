@@ -1,9 +1,13 @@
 import { getBook } from '../bible/books'
-import { isValidChapterRef } from '../bible/refs'
+import { isValidChapterRef, isValidVerseRef } from '../bible/refs'
 import { isPlanId } from '../plans/catalog'
-import { FONT_SIZES, THEMES, type AppData, type AppState, type FontSize, type Reading, type Settings, type Theme } from './types'
+import {
+  FONT_SIZES, MARK_COLORS, NOTE_MAX, THEMES, type AppData, type AppState, type FontSize, type MarkColor, type Reading, type Settings,
+  type Theme, type VerseMark,
+} from './types'
 
-export const BACKUP_VERSION = 1
+/** Versão 2 inclui as marcações. A versão 1 continua aceita na importação. */
+export const BACKUP_VERSION = 2
 
 export class BackupError extends Error {}
 
@@ -58,6 +62,21 @@ function parseState(x: unknown, now: number): AppState {
   return { lastPosition, activePlan }
 }
 
+function parseMark(x: unknown, now: number): VerseMark {
+  if (
+    !isObj(x) ||
+    typeof x.ref !== 'string' ||
+    !isValidVerseRef(x.ref) ||
+    !(x.color === null || MARK_COLORS.includes(x.color as MarkColor)) ||
+    typeof x.note !== 'string' ||
+    x.note.length > NOTE_MAX ||
+    !isTime(x.updatedAt, now)
+  ) {
+    throw new BackupError('marcação inválida')
+  }
+  return { ref: x.ref, color: x.color as MarkColor | null, note: x.note, updatedAt: x.updatedAt }
+}
+
 export function parseBackup(text: string, now = Date.now()): AppData {
   let raw: unknown
   try {
@@ -66,11 +85,13 @@ export function parseBackup(text: string, now = Date.now()): AppData {
     throw new BackupError('não é JSON')
   }
   if (!isObj(raw) || raw.app !== 'selah') throw new BackupError('não é um backup do Selah')
-  if (raw.version !== BACKUP_VERSION) throw new BackupError('versão não suportada')
+  if (raw.version !== 1 && raw.version !== BACKUP_VERSION) throw new BackupError('versão não suportada')
+  if (raw.version === 2 && !Array.isArray(raw.marks)) throw new BackupError('marcações ausentes')
   if (!Array.isArray(raw.readings)) throw new BackupError('leituras ausentes')
   return {
     readings: raw.readings.map((r) => parseReading(r, now)),
     settings: parseSettings(raw.settings),
     state: parseState(raw.state, now),
+    marks: raw.version === 2 ? (raw.marks as unknown[]).map((m) => parseMark(m, now)) : [],
   }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chapterRef, formatChapterList, formatRef, isValidChapterRef, parseRef } from './refs'
+import { chapterRef, formatChapterList, formatRef, isValidChapterRef, isValidVerseRef, parseRef } from './refs'
 
 describe('refs', () => {
   it('interpreta referências válidas', () => {
@@ -39,5 +39,14 @@ describe('formatChapterList', () => {
   it('separa livros diferentes e saltos de capítulo', () => {
     expect(formatChapterList(['GEN.50', 'EXO.1', 'EXO.2'], name, 'a')).toBe('Gênesis 50, Êxodo 1 a 2')
     expect(formatChapterList(['PSA.1', 'PSA.2', 'PSA.5'], name, 'to')).toBe('Salmos 1 to 2, Salmos 5')
+  })
+})
+
+describe('isValidVerseRef', () => {
+  it('aceita só versículo na forma canônica', () => {
+    expect(isValidVerseRef('JHN.3.16')).toBe(true)
+    expect(isValidVerseRef('JHN.3')).toBe(false)
+    expect(isValidVerseRef('JHN.3.016')).toBe(false)
+    expect(isValidVerseRef('XYZ.1.1')).toBe(false)
   })
 })

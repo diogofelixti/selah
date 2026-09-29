@@ -19,6 +19,21 @@ const implementations: [string, () => Promise<Repository>][] = [
 ]
 
 describe.each(implementations)('repositório (%s)', (_name, create) => {
+  it('salva, atualiza e apaga marcações em lote', async () => {
+    const repo = await create()
+    await repo.saveMarks([
+      { ref: 'JHN.3.16', color: 'green', note: '', updatedAt: 1 },
+      { ref: 'JHN.3.17', color: null, note: 'lembrar', updatedAt: 1 },
+    ])
+    expect((await repo.getMarks()).map((m) => m.ref).sort()).toEqual(['JHN.3.16', 'JHN.3.17'])
+    // Sem cor e sem nota, a marcação some.
+    await repo.saveMarks([
+      { ref: 'JHN.3.16', color: 'blue', note: 'nova', updatedAt: 2 },
+      { ref: 'JHN.3.17', color: null, note: '', updatedAt: 2 },
+    ])
+    expect(await repo.getMarks()).toEqual([{ ref: 'JHN.3.16', color: 'blue', note: 'nova', updatedAt: 2 }])
+  })
+
   it('grava e apaga leituras em lote', async () => {
     const repo = await create()
     await repo.addReadings([{ ref: 'RUT.1', readAt: 1 }, { ref: 'RUT.2', readAt: 1 }, { ref: 'RUT.3', readAt: 1 }])
@@ -64,13 +79,16 @@ describe.each(implementations)('repositório (%s)', (_name, create) => {
       readings: [{ ref: 'REV.22', readAt: 9 }],
       settings: { language: 'pt' as const, theme: 'aurora' as const, fontSize: 2 as const },
       state: { lastPosition: null, activePlan: null },
+      marks: [{ ref: 'REV.22.21', color: 'gold' as const, note: 'amém', updatedAt: 5 }],
     }
     await repo.replaceAll(data)
     expect(await repo.getReadings()).toEqual(data.readings)
     expect(await repo.getSettings()).toEqual(data.settings)
+    expect(await repo.getMarks()).toEqual(data.marks)
     await repo.clearAll()
     expect(await repo.getReadings()).toEqual([])
     expect(await repo.getSettings()).toEqual(DEFAULT_SETTINGS)
+    expect(await repo.getMarks()).toEqual([])
   })
 })
 
@@ -98,5 +116,25 @@ describe('openRepository', () => {
     expect(repo.persistent).toBe(false)
     await repo.addReading({ ref: 'JHN.1', readAt: 1 })
     expect(await repo.getReadings()).toHaveLength(1)
+  })
+})
+
+describe('migração do banco', () => {
+  it('abre um banco da versão 1 sem perder leituras, ajustes e estado', async () => {
+    const { openDB } = await import('idb')
+    const old = await openDB('antigo', 1, {
+      upgrade(db) {
+        db.createObjectStore('readings', { autoIncrement: true }).createIndex('ref', 'ref')
+        db.createObjectStore('settings')
+        db.createObjectStore('state')
+      },
+    })
+    await old.add('readings', { ref: 'PSA.23', readAt: 1 })
+    await old.put('settings', { language: 'en', theme: 'aurora', fontSize: 3 }, 'current')
+    old.close()
+    const repo = await createIdbRepository('antigo')
+    expect(await repo.getReadings()).toEqual([{ ref: 'PSA.23', readAt: 1 }])
+    expect((await repo.getSettings()).language).toBe('en')
+    expect(await repo.getMarks()).toEqual([])
   })
 })
