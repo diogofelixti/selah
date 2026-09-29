@@ -21,6 +21,8 @@
       <p class="small muted">{t('about.italics')}</p>
     </section>
 
+    <p class="small">{t('reminder.privacy')}</p>
+
     <DonateCard />
 
     <p class="muted small">

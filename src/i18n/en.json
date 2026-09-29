@@ -399,6 +399,18 @@
       "plan": "Today: {refs}",
       "continue": "Continue at {ref}",
       "generic": "A moment with the Word today."
-    }
+    },
+    "title": "Daily reminder",
+    "text": "One notification a day, at the time you choose. On days you have already read, it will not come.",
+    "toggle": "Remind me every day",
+    "time": "Time",
+    "enabled": "Reminder set for {time}",
+    "disabled": "Reminder turned off",
+    "timeChanged": "Reminder now at {time}",
+    "denied": "Notifications are blocked for Selah. Allow them in your browser settings and try again.",
+    "failed": "Could not turn it on right now. Try again.",
+    "unsupported": "This browser does not support notifications.",
+    "iosInstall": "On iPhone, add Selah to your Home Screen (Share > Add to Home Screen) and open it from there to turn on the reminder.",
+    "privacy": "Daily reminder: the Selah server keeps only your device's notification address, the time, the time zone and the language. It does not keep your name, email or what you read."
   }
 }

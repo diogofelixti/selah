@@ -2,6 +2,7 @@
   import { ArrowLeft, ChevronRight, Download, Minus, Plus, Trash2, Upload } from '@lucide/svelte'
   import { app, clearData, replaceData, snapshot, updateSettings } from '../lib/app.svelte'
   import DonateCard from '../components/DonateCard.svelte'
+  import ReminderCard from '../components/ReminderCard.svelte'
   import { t } from '../lib/i18n/i18n.svelte'
   import type { LanguageSetting } from '../lib/i18n/lang'
   import { localDayKey } from '../lib/progress/progress'
@@ -105,6 +106,8 @@
         <button class="icon-btn" onclick={() => changeFont(1)} disabled={app.settings.fontSize === 4} aria-label={t('reader.fontLarger')}><Plus size={18} /></button>
       </div>
     </section>
+
+    <ReminderCard />
 
     {#if pwa.offlineSupported}
       <section class="card">

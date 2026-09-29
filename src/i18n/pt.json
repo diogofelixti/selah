@@ -399,6 +399,18 @@
       "plan": "Hoje: {refs}",
       "continue": "Continue em {ref}",
       "generic": "Um momento com a Palavra hoje."
-    }
+    },
+    "title": "Lembrete diário",
+    "text": "Uma notificação por dia, na hora que você escolher. Nos dias em que você já leu, ela não chega.",
+    "toggle": "Lembrar todo dia",
+    "time": "Horário",
+    "enabled": "Lembrete ativado para {time}",
+    "disabled": "Lembrete desligado",
+    "timeChanged": "Lembrete agora às {time}",
+    "denied": "As notificações estão bloqueadas para o Selah. Libere nas configurações do navegador e tente de novo.",
+    "failed": "Não foi possível ativar agora. Tente de novo.",
+    "unsupported": "Este navegador não permite notificações.",
+    "iosInstall": "No iPhone, adicione o Selah à Tela de Início (Compartilhar > Adicionar à Tela de Início) e abra por lá para ativar o lembrete.",
+    "privacy": "Lembrete diário: o servidor do Selah guarda só o endereço de notificação do aparelho, a hora, o fuso horário e o idioma. Não guarda nome, e-mail nem o que você lê."
   }
 }

@@ -3,10 +3,12 @@
   import BottomNav from './components/BottomNav.svelte'
   import Toast from './components/Toast.svelte'
   import UpdateBanner from './components/UpdateBanner.svelte'
-  import { app, initApp } from './lib/app.svelte'
+  import { app, initApp, updateSettings } from './lib/app.svelte'
   import { TRANSLATION_BY_LANG } from './lib/bible/loader'
   import { locale, t } from './lib/i18n/i18n.svelte'
   import { resolveLanguage } from './lib/i18n/lang'
+  import { localDayKey } from './lib/progress/progress'
+  import { refreshReminder, reportReadToday } from './lib/reminder'
   import { rememberTheme, resolveTheme } from './lib/theme'
   import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
@@ -38,6 +40,27 @@
 
   $effect(() => {
     if (app.ready) ensureOffline(TRANSLATION_BY_LANG[locale.lang])
+  })
+
+  // Lembrete ligado: ao abrir, confirma a inscrição e atualiza fuso e idioma no servidor (uma vez por abertura).
+  let reminderChecked = false
+  $effect(() => {
+    if (!app.ready || reminderChecked || !app.settings.reminder.enabled) return
+    reminderChecked = true
+    const { time } = app.settings.reminder
+    void refreshReminder(time, locale.lang).then((ok) => {
+      // Permissão retirada nas configurações do aparelho: o lembrete aparece desligado.
+      if (!ok) void updateSettings({ reminder: { enabled: false, time } })
+    })
+  })
+
+  // Leu hoje com o lembrete ligado: o servidor não manda o lembrete de hoje (só a data vai).
+  $effect(() => {
+    if (!app.ready || !app.settings.reminder.enabled) return
+    const today = localDayKey(Date.now())
+    if (app.readings.some((r) => localDayKey(r.readAt) === today)) {
+      void reportReadToday(today, app.settings.reminder.time, locale.lang)
+    }
   })
 
   let prefersDark = $state(matchMedia('(prefers-color-scheme: dark)').matches)
