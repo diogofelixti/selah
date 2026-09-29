@@ -2,7 +2,6 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { VitePWA } from 'vite-plugin-pwa'
-import { BIBLE_CACHE } from './src/lib/bible/cache-name'
 
 export default defineConfig({
   plugins: [
@@ -28,19 +27,14 @@ export default defineConfig({
           { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
+      // Service worker próprio (src/sw.ts): cache offline e notificações do lembrete.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,woff2,svg,png,ico}'],
         // Bíblias entram pelo cache em tempo de execução; fontes de alfabetos que o app não usa ficam de fora.
         globIgnores: ['bibles/**', '**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
-        navigateFallback: 'index.html',
-        clientsClaim: true,
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/bibles/'),
-            handler: 'CacheFirst',
-            options: { cacheName: BIBLE_CACHE },
-          },
-        ],
       },
     }),
   ],
