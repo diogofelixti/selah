@@ -1,0 +1,40 @@
+# Selah no frodo: API + Postgres exclusivo.
+# Rodar a partir de /srv/selah (lá ficam este arquivo, o .env e a pasta server/):
+#   docker compose up -d --build
+name: selah
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: selah
+      POSTGRES_USER: selah
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina no .env}
+    volumes:
+      - selah-db:/var/lib/postgresql/data
+    # Sem porta publicada: só a API enxerga o banco, pela rede interna do compose.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U selah -d selah']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://selah:${POSTGRES_PASSWORD}@db:5432/selah
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:?defina no .env}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:?defina no .env}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:?defina no .env}
+      TZ: UTC
+    # Só o nginx do próprio servidor acessa a API.
+    ports:
+      - '127.0.0.1:8787:8787'
+
+volumes:
+  selah-db:
