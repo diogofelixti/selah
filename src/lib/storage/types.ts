@@ -10,10 +10,20 @@ export type Theme = (typeof THEMES)[number]
 export const FONT_SIZES = [1, 2, 3, 4] as const
 export type FontSize = (typeof FONT_SIZES)[number]
 
+/** Lembrete diário: ligado neste aparelho e hora local "HH:MM". */
+export interface ReminderSetting {
+  enabled: boolean
+  time: string
+}
+
+export const DEFAULT_REMINDER: ReminderSetting = { enabled: false, time: '07:00' }
+export const isReminderTime = (x: unknown): x is string => typeof x === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(x)
+
 export interface Settings {
   language: LanguageSetting
   theme: Theme
   fontSize: FontSize
+  reminder: ReminderSetting
 }
 
 export interface AppState {
@@ -42,7 +52,7 @@ export interface AppData {
   marks: VerseMark[]
 }
 
-export const DEFAULT_SETTINGS: Settings = { language: 'auto', theme: 'auto', fontSize: 2 }
+export const DEFAULT_SETTINGS: Settings = { language: 'auto', theme: 'auto', fontSize: 2, reminder: DEFAULT_REMINDER }
 export const DEFAULT_STATE: AppState = { lastPosition: null, activePlan: null }
 
 export interface Repository {

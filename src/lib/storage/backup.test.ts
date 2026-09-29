@@ -4,7 +4,7 @@ import type { AppData } from './types'
 
 const data: AppData = {
   readings: [{ ref: 'JHN.3', readAt: 1700000000000 }],
-  settings: { language: 'pt', theme: 'aurora', fontSize: 2 },
+  settings: { language: 'pt', theme: 'aurora', fontSize: 2, reminder: { enabled: false, time: '21:30' } },
   state: { lastPosition: { book: 'JHN', chapter: 3 }, activePlan: { id: 'gospels-30', startedAt: 1690000000000 } },
   marks: [
     { ref: 'JHN.3.16', color: 'gold', note: 'meu versículo', updatedAt: 1700000000000 },
@@ -21,6 +21,22 @@ const withChange = (change: (raw: Record<string, any>) => void) => {
 describe('backup', () => {
   it('ida e volta preserva os dados', () => {
     expect(parseBackup(serializeBackup(data))).toEqual(data)
+  })
+
+  it('lembrete: backup antigo sem o campo recebe o padrão; importar nunca liga sozinho', () => {
+    const old = parseBackup(withChange((r) => { delete r.settings.reminder }))
+    expect(old.settings.reminder).toEqual({ enabled: false, time: '07:00' })
+    const on = parseBackup(withChange((r) => { r.settings.reminder = { enabled: true, time: '06:15' } }))
+    // A hora vem do backup; ligar depende da permissão deste aparelho.
+    expect(on.settings.reminder).toEqual({ enabled: false, time: '06:15' })
+  })
+
+  it.each([
+    ['hora fora do formato', { enabled: false, time: '7:5' }],
+    ['hora inexistente', { enabled: false, time: '25:00' }],
+    ['sem booleano', { enabled: 'sim', time: '07:00' }],
+  ])('recusa lembrete com %s', (_label, reminder) => {
+    expect(() => parseBackup(withChange((r) => { r.settings.reminder = reminder }))).toThrow(BackupError)
   })
 
   it('grava cabeçalho com app, versão e data', () => {

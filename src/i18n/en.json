@@ -392,5 +392,13 @@
     "contact": "Questions, suggestions or another way to help? Talk to us.",
     "whatsapp": "Chat on WhatsApp",
     "copyShort": "Copy"
+  },
+  "reminder": {
+    "notification": {
+      "title": "Time to read",
+      "plan": "Today: {refs}",
+      "continue": "Continue at {ref}",
+      "generic": "A moment with the Word today."
+    }
   }
 }

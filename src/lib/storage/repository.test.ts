@@ -66,9 +66,9 @@ describe.each(implementations)('repositório (%s)', (_name, create) => {
 
   it('salva ajustes e estado', async () => {
     const repo = await create()
-    await repo.saveSettings({ language: 'en', theme: 'aurora', fontSize: 3 })
+    await repo.saveSettings({ language: 'en', theme: 'aurora', fontSize: 3, reminder: { enabled: true, time: '06:00' } })
     await repo.saveState({ lastPosition: { book: 'JHN', chapter: 3 }, activePlan: { id: 'nt-90', startedAt: 5 } })
-    expect(await repo.getSettings()).toEqual({ language: 'en', theme: 'aurora', fontSize: 3 })
+    expect(await repo.getSettings()).toEqual({ language: 'en', theme: 'aurora', fontSize: 3, reminder: { enabled: true, time: '06:00' } })
     expect(await repo.getState()).toEqual({ lastPosition: { book: 'JHN', chapter: 3 }, activePlan: { id: 'nt-90', startedAt: 5 } })
   })
 
@@ -77,7 +77,7 @@ describe.each(implementations)('repositório (%s)', (_name, create) => {
     await repo.addReading({ ref: 'GEN.1', readAt: 1 })
     const data = {
       readings: [{ ref: 'REV.22', readAt: 9 }],
-      settings: { language: 'pt' as const, theme: 'aurora' as const, fontSize: 2 as const },
+      settings: { language: 'pt' as const, theme: 'aurora' as const, fontSize: 2 as const, reminder: { enabled: false, time: '07:00' } },
       state: { lastPosition: null, activePlan: null },
       marks: [{ ref: 'REV.22.21', color: 'gold' as const, note: 'amém', updatedAt: 5 }],
     }
@@ -135,6 +135,8 @@ describe('migração do banco', () => {
     const repo = await createIdbRepository('antigo')
     expect(await repo.getReadings()).toEqual([{ ref: 'PSA.23', readAt: 1 }])
     expect((await repo.getSettings()).language).toBe('en')
+    // Ajustes gravados antes do lembrete recebem o padrão.
+    expect((await repo.getSettings()).reminder).toEqual({ enabled: false, time: '07:00' })
     expect(await repo.getMarks()).toEqual([])
   })
 })

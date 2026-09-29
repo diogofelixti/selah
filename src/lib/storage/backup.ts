@@ -2,7 +2,7 @@ import { getBook } from '../bible/books'
 import { isValidChapterRef, isValidVerseRef } from '../bible/refs'
 import { isPlanId } from '../plans/catalog'
 import {
-  FONT_SIZES, MARK_COLORS, NOTE_MAX, THEMES, type AppData, type AppState, type FontSize, type MarkColor, type Reading, type Settings,
+  DEFAULT_REMINDER, FONT_SIZES, MARK_COLORS, NOTE_MAX, THEMES, isReminderTime, type AppData, type ReminderSetting, type AppState, type FontSize, type MarkColor, type Reading, type Settings,
   type Theme, type VerseMark, isEmptyMark,
 } from './types'
 
@@ -39,7 +39,14 @@ function parseSettings(x: unknown): Settings {
   if (language !== 'auto' && language !== 'pt' && language !== 'en') throw new BackupError('idioma inválido')
   if (!THEMES.includes(theme as Theme)) throw new BackupError('tema inválido')
   if (!FONT_SIZES.includes(fontSize as FontSize)) throw new BackupError('tamanho de letra inválido')
-  return { language, theme: theme as Theme, fontSize: fontSize as FontSize }
+  return { language, theme: theme as Theme, fontSize: fontSize as FontSize, reminder: parseReminder(x.reminder) }
+}
+
+/** Backups antigos não têm lembrete. Importar nunca liga o lembrete: depende da permissão deste aparelho. */
+function parseReminder(x: unknown): ReminderSetting {
+  if (x === undefined) return DEFAULT_REMINDER
+  if (!isObj(x) || typeof x.enabled !== 'boolean' || !isReminderTime(x.time)) throw new BackupError('lembrete inválido')
+  return { enabled: false, time: x.time }
 }
 
 function parseState(x: unknown, now: number): AppState {

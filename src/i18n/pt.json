@@ -392,5 +392,13 @@
     "contact": "Dúvidas, sugestões ou outra forma de ajudar? Fale com a gente.",
     "whatsapp": "Falar no WhatsApp",
     "copyShort": "Copiar"
+  },
+  "reminder": {
+    "notification": {
+      "title": "Hora da leitura",
+      "plan": "Hoje: {refs}",
+      "continue": "Continue em {ref}",
+      "generic": "Um momento com a Palavra hoje."
+    }
   }
 }
