@@ -221,7 +221,21 @@
 
 <style>
   .home { gap: var(--space-5); }
-  .head { display: flex; justify-content: space-between; align-items: center; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+  /* Ilustração dos temas ilustrados entre a saudação e o botão; encolhe antes de encostar no texto. */
+  .head::after {
+    content: '';
+    order: 1;
+    display: var(--illus-display, none);
+    flex: 0 1 128px;
+    min-width: 0;
+    height: 48px;
+    background: var(--illus-color);
+    -webkit-mask: var(--illus-home) no-repeat center / contain;
+    mask: var(--illus-home) no-repeat center / contain;
+    pointer-events: none;
+  }
+  .head > .round { order: 2; }
   .greeting { font-size: 0.875rem; }
   .brand { font-family: var(--font-display); font-size: 1.875rem; font-weight: 500; line-height: 1.1; }
   .round {

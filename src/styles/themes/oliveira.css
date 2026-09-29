@@ -18,6 +18,13 @@
   --mark-blue: #213a45;
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 
+  /* Ilustrações: ramo de oliveira e oliveira, no verde do destaque. */
+  --illus-display: block;
+  --illus-color: #9ea866;
+  --illus-head: url('../../assets/illustrations/olive-branch.svg');
+  --illus-home: url('../../assets/illustrations/olive-branch.svg');
+  --illus-empty: url('../../assets/illustrations/olive-tree.svg');
+
   /* Nomes da v1, mantidos para as telas que ainda os usam. */
   --accent-strong: var(--accent-text);
   --progress: var(--accent);

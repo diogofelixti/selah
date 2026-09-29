@@ -3,6 +3,7 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   background: var(--bg);
+  background-image: var(--texture, none);
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 1rem;
@@ -23,6 +24,30 @@ h2 { font-family: var(--font-display); font-size: 1.1875rem; font-weight: 500; }
 }
 main.with-nav { padding-bottom: calc(var(--nav-offset) + env(safe-area-inset-bottom)); }
 .page-head { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
+
+/*
+ * Ilustrações dos temas Pergaminho e Oliveira: decoração pintada com a cor do tema (máscara),
+ * só em cabeçalhos e estados vazios. O leitor não usa essas classes.
+ */
+.page-head::after,
+.empty::before {
+  content: '';
+  display: var(--illus-display, none);
+  background: var(--illus-color);
+  -webkit-mask: var(--illus-head) no-repeat left center / contain;
+  mask: var(--illus-head) no-repeat left center / contain;
+  pointer-events: none;
+}
+.page-head::after { width: 112px; height: 36px; }
+.empty::before {
+  -webkit-mask-image: var(--illus-empty);
+  mask-image: var(--illus-empty);
+  -webkit-mask-position: center;
+  mask-position: center;
+  width: 120px;
+  height: 80px;
+  margin: 0 auto var(--space-3);
+}
 .muted { color: var(--text-2); }
 .stack { display: grid; gap: var(--space-4); }
 .card {
