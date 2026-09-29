@@ -16,17 +16,17 @@ Complemento das specs anteriores. Data: 2026-09-29.
 |---|---|---|---|
 | `abraham` | Abraão | Gênesis 12 a 25 | 14 |
 | `joseph` | José | Gênesis 37 a 50 | 14 |
-| `moses` | Moisés | Êxodo 1 a 20 | 20 |
+| `moses` | Moisés | Êxodo 1 a 20, 24 e 32 a 34; Números 11 a 14, 16, 17, 20, 21 e 27; Deuteronômio 31 e 34 | 35 |
 | `ruth` | Rute | Rute 1 a 4 | 4 |
-| `samuel` | Samuel | 1 Samuel 1 a 16 | 16 |
+| `samuel` | Samuel | 1 Samuel 1 a 16, 19 e 25 | 18 |
 | `david` | Davi | 1 Samuel 16 a 31, 2 Samuel 1 a 24, 1 Reis 1 e 2 | 42 |
 | `elijah` | Elias | 1 Reis 17, 18, 19 e 21; 2 Reis 1 e 2 | 6 |
 | `esther` | Ester | Ester 1 a 10 | 10 |
 | `daniel` | Daniel | Daniel 1 a 12 | 12 |
 | `paul-story` | Paulo | Atos 9, 11 e 13 a 28 | 18 |
 
-- **Moisés:** do nascimento até os Dez Mandamentos. A peregrinação no deserto fica para um plano futuro.
-- **Samuel e Davi:** os dois planos compartilham 1 Samuel 16, a unção de Davi.
+- **Moisés:** a vida inteira, do nascimento à morte no monte Nebo, só com os capítulos em que a história dele avança (sem as leis e as listas). Pedido do dono em 2026-09-29.
+- **Samuel e Davi:** Samuel vai até a morte dele (1 Samuel 25:1), pedido do dono. Os dois planos compartilham 1 Samuel 16, 19 e 25.
 - **Paulo:** conversão (Atos 9), chegada a Antioquia (Atos 11), viagens, prisão e Roma (Atos 13 a 28). As cartas já têm o plano próprio.
 
 ## Doação

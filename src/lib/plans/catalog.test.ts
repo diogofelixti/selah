@@ -84,9 +84,16 @@ describe('planos de personagens', () => {
   const cases: [string, string[]][] = [
     ['abraham', range('GEN', 12, 25)],
     ['joseph', range('GEN', 37, 50)],
-    ['moses', range('EXO', 1, 20)],
+    [
+      'moses',
+      [
+        ...range('EXO', 1, 20), 'EXO.24', 'EXO.32', 'EXO.33', 'EXO.34',
+        'NUM.11', 'NUM.12', 'NUM.13', 'NUM.14', 'NUM.16', 'NUM.17', 'NUM.20', 'NUM.21', 'NUM.27',
+        'DEU.31', 'DEU.34',
+      ],
+    ],
     ['ruth', chapterRefs('RUT')],
-    ['samuel', range('1SA', 1, 16)],
+    ['samuel', [...range('1SA', 1, 16), '1SA.19', '1SA.25']],
     ['david', [...range('1SA', 16, 31), ...chapterRefs('2SA'), '1KI.1', '1KI.2']],
     ['elijah', ['1KI.17', '1KI.18', '1KI.19', '1KI.21', '2KI.1', '2KI.2']],
     ['esther', chapterRefs('EST')],

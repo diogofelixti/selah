@@ -76,9 +76,19 @@ function build(): Record<PlanId, PlanDef> {
     'bible-2y': { id: 'bible-2y', days: splitEvenly(ALL_CHAPTER_REFS, 730) },
     abraham: { id: 'abraham', days: daily(chapters('GEN', 12, 25)) },
     joseph: { id: 'joseph', days: daily(chapters('GEN', 37, 50)) },
-    moses: { id: 'moses', days: daily(chapters('EXO', 1, 20)) },
+    // A vida inteira de Moisés, só nos capítulos em que a história dele avança: do Egito ao Sinai,
+    // o bezerro de ouro, o deserto e a morte no monte Nebo.
+    moses: {
+      id: 'moses',
+      days: daily([
+        ...chapters('EXO', 1, 20), 'EXO.24', 'EXO.32', 'EXO.33', 'EXO.34',
+        'NUM.11', 'NUM.12', 'NUM.13', 'NUM.14', 'NUM.16', 'NUM.17', 'NUM.20', 'NUM.21', 'NUM.27',
+        'DEU.31', 'DEU.34',
+      ]),
+    },
     ruth: { id: 'ruth', days: oneADay('RUT') },
-    samuel: { id: 'samuel', days: daily(chapters('1SA', 1, 16)) },
+    // Até a morte de Samuel (1 Samuel 25:1), com a passagem de Davi por Ramá (19).
+    samuel: { id: 'samuel', days: daily([...chapters('1SA', 1, 16), '1SA.19', '1SA.25']) },
     david: { id: 'david', days: daily([...chapters('1SA', 16, 31), ...chapterRefs('2SA'), ...chapters('1KI', 1, 2)]) },
     elijah: { id: 'elijah', days: daily(['1KI.17', '1KI.18', '1KI.19', '1KI.21', '2KI.1', '2KI.2']) },
     esther: { id: 'esther', days: oneADay('EST') },
