@@ -11,13 +11,24 @@ export const PLAN_IDS = [
   'psalms-30',
   'paul-30',
   'bible-2y',
+  'abraham',
+  'joseph',
+  'moses',
+  'ruth',
+  'samuel',
+  'david',
+  'elijah',
+  'esther',
+  'daniel',
+  'paul',
 ] as const
 export type PlanId = (typeof PLAN_IDS)[number]
 
 /** Grupos da tela Planos, do mais curto e simples à Bíblia inteira. */
-export const PLAN_GROUPS: readonly { id: 'start' | 'deeper' | 'whole'; plans: readonly PlanId[] }[] = [
+export const PLAN_GROUPS: readonly { id: 'start' | 'deeper' | 'people' | 'whole'; plans: readonly PlanId[] }[] = [
   { id: 'start', plans: ['john-21', 'proverbs-31', 'psalms-30'] },
   { id: 'deeper', plans: ['gospels-30', 'paul-30', 'psalms-proverbs-31', 'nt-90'] },
+  { id: 'people', plans: ['abraham', 'joseph', 'moses', 'ruth', 'samuel', 'david', 'elijah', 'esther', 'daniel', 'paul'] },
   { id: 'whole', plans: ['bible-1y', 'bible-2y'] },
 ]
 
@@ -47,6 +58,9 @@ function build(): Record<PlanId, PlanDef> {
   const psalms = splitEvenly(chapterRefs('PSA'), 31)
   const paul = ['ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM']
   const oneADay = (book: string) => chapterRefs(book).map((ref) => [ref])
+  // Trecho de um livro, do capítulo `from` ao `to`, um capítulo por dia.
+  const chapters = (book: string, from: number, to: number) => chapterRefs(book).slice(from - 1, to)
+  const daily = (refs: string[]) => refs.map((ref) => [ref])
   return {
     'bible-1y': { id: 'bible-1y', days: splitEvenly(ALL_CHAPTER_REFS, 365) },
     'nt-90': { id: 'nt-90', days: splitEvenly(refsOf(nt), 90) },
@@ -60,6 +74,16 @@ function build(): Record<PlanId, PlanDef> {
     'psalms-30': { id: 'psalms-30', days: splitEvenly(chapterRefs('PSA'), 30) },
     'paul-30': { id: 'paul-30', days: splitEvenly(refsOf(paul), 30) },
     'bible-2y': { id: 'bible-2y', days: splitEvenly(ALL_CHAPTER_REFS, 730) },
+    abraham: { id: 'abraham', days: daily(chapters('GEN', 12, 25)) },
+    joseph: { id: 'joseph', days: daily(chapters('GEN', 37, 50)) },
+    moses: { id: 'moses', days: daily(chapters('EXO', 1, 20)) },
+    ruth: { id: 'ruth', days: oneADay('RUT') },
+    samuel: { id: 'samuel', days: daily(chapters('1SA', 1, 16)) },
+    david: { id: 'david', days: daily([...chapters('1SA', 16, 31), ...chapterRefs('2SA'), ...chapters('1KI', 1, 2)]) },
+    elijah: { id: 'elijah', days: daily(['1KI.17', '1KI.18', '1KI.19', '1KI.21', '2KI.1', '2KI.2']) },
+    esther: { id: 'esther', days: oneADay('EST') },
+    daniel: { id: 'daniel', days: oneADay('DAN') },
+    paul: { id: 'paul', days: daily(['ACT.9', ...chapters('ACT', 13, 28)]) },
   }
 }
 

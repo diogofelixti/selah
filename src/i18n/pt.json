@@ -272,6 +272,46 @@
       "bible-2y": {
         "title": "Bíblia em 2 anos",
         "desc": "A Bíblia toda com calma, em 1 ou 2 capítulos por dia."
+      },
+      "abraham": {
+        "title": "História de Abraão",
+        "desc": "O chamado, a promessa e a fé do pai de muitas nações. Gênesis 12 a 25."
+      },
+      "joseph": {
+        "title": "História de José",
+        "desc": "Dos sonhos e da traição ao perdão no Egito. Gênesis 37 a 50."
+      },
+      "moses": {
+        "title": "História de Moisés",
+        "desc": "Do cesto no rio aos Dez Mandamentos. Êxodo 1 a 20."
+      },
+      "ruth": {
+        "title": "História de Rute",
+        "desc": "Lealdade, cuidado e um recomeço em Belém. O livro de Rute."
+      },
+      "samuel": {
+        "title": "História de Samuel",
+        "desc": "A oração de Ana, o chamado no templo e o profeta que ungiu reis. 1 Samuel 1 a 16."
+      },
+      "david": {
+        "title": "História de Davi",
+        "desc": "O pastor, o gigante, o rei, a queda e o arrependimento. De 1 Samuel 16 a 1 Reis 2."
+      },
+      "elijah": {
+        "title": "História de Elias",
+        "desc": "O fogo no Carmelo, a voz mansa e o carro de fogo. 1 e 2 Reis."
+      },
+      "esther": {
+        "title": "História de Ester",
+        "desc": "Coragem no palácio para salvar o seu povo. O livro de Ester."
+      },
+      "daniel": {
+        "title": "História de Daniel",
+        "desc": "Fidelidade na Babilônia, a cova dos leões e as visões. O livro de Daniel."
+      },
+      "paul": {
+        "title": "História de Paulo",
+        "desc": "Da estrada de Damasco às viagens missionárias. Atos 9 e 13 a 28."
       }
     },
     "eyebrow": "Plano atual",
@@ -285,6 +325,7 @@
     "groups": {
       "start": "Para começar",
       "deeper": "Para aprofundar",
+      "people": "Personagens da Bíblia",
       "whole": "A Bíblia inteira"
     }
   },

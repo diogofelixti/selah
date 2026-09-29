@@ -272,6 +272,46 @@
       "bible-2y": {
         "title": "Bible in 2 years",
         "desc": "The whole Bible at a gentle pace, 1 or 2 chapters a day."
+      },
+      "abraham": {
+        "title": "The story of Abraham",
+        "desc": "The call, the promise and the faith of the father of many nations. Genesis 12 to 25."
+      },
+      "joseph": {
+        "title": "The story of Joseph",
+        "desc": "From dreams and betrayal to forgiveness in Egypt. Genesis 37 to 50."
+      },
+      "moses": {
+        "title": "The story of Moses",
+        "desc": "From the basket on the river to the Ten Commandments. Exodus 1 to 20."
+      },
+      "ruth": {
+        "title": "The story of Ruth",
+        "desc": "Loyalty, care and a new beginning in Bethlehem. The book of Ruth."
+      },
+      "samuel": {
+        "title": "The story of Samuel",
+        "desc": "Hannah's prayer, the call in the temple and the prophet who anointed kings. 1 Samuel 1 to 16."
+      },
+      "david": {
+        "title": "The story of David",
+        "desc": "The shepherd, the giant, the king, the fall and repentance. From 1 Samuel 16 to 1 Kings 2."
+      },
+      "elijah": {
+        "title": "The story of Elijah",
+        "desc": "Fire on Mount Carmel, the gentle whisper and the chariot of fire. 1 and 2 Kings."
+      },
+      "esther": {
+        "title": "The story of Esther",
+        "desc": "Courage in the palace to save her people. The book of Esther."
+      },
+      "daniel": {
+        "title": "The story of Daniel",
+        "desc": "Faithfulness in Babylon, the lions' den and the visions. The book of Daniel."
+      },
+      "paul": {
+        "title": "The story of Paul",
+        "desc": "From the road to Damascus to the missionary journeys. Acts 9 and 13 to 28."
       }
     },
     "eyebrow": "Current plan",
@@ -285,6 +325,7 @@
     "groups": {
       "start": "Getting started",
       "deeper": "Going deeper",
+      "people": "People of the Bible",
       "whole": "The whole Bible"
     }
   },

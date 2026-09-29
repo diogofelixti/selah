@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALL_CHAPTER_REFS, getBook } from '../bible/books'
-import { chapterRefs } from '../bible/books'
+import { ALL_CHAPTER_REFS, chapterRefs, getBook } from '../bible/books'
 import { readFileSync } from 'node:fs'
 import { PLANS, PLAN_GROUPS, PLAN_IDS, isPlanId, planContains, splitEvenly } from './catalog'
 
@@ -77,6 +76,35 @@ describe('PLANS', () => {
     expect(plan.days).toHaveLength(730)
     expect(plan.days.flat()).toEqual(ALL_CHAPTER_REFS)
     expect(sizes(plan.days).every((n) => n === 1 || n === 2)).toBe(true)
+  })
+})
+
+describe('planos de personagens', () => {
+  const range = (book: string, from: number, to: number) => chapterRefs(book).slice(from - 1, to)
+  const cases: [string, string[]][] = [
+    ['abraham', range('GEN', 12, 25)],
+    ['joseph', range('GEN', 37, 50)],
+    ['moses', range('EXO', 1, 20)],
+    ['ruth', chapterRefs('RUT')],
+    ['samuel', range('1SA', 1, 16)],
+    ['david', [...range('1SA', 16, 31), ...chapterRefs('2SA'), '1KI.1', '1KI.2']],
+    ['elijah', ['1KI.17', '1KI.18', '1KI.19', '1KI.21', '2KI.1', '2KI.2']],
+    ['esther', chapterRefs('EST')],
+    ['daniel', chapterRefs('DAN')],
+    ['paul', ['ACT.9', ...range('ACT', 13, 28)]],
+  ]
+
+  it.each(cases)('%s: um capítulo por dia, na ordem da história', (id, refs) => {
+    expect(PLANS[id as keyof typeof PLANS].days).toEqual(refs.map((r) => [r]))
+  })
+
+  it('Davi tem 42 dias', () => {
+    expect(PLANS.david.days).toHaveLength(42)
+  })
+
+  it('o grupo de personagens vem antes da Bíblia inteira, na ordem da Bíblia', () => {
+    expect(PLAN_GROUPS.map((g) => g.id)).toEqual(['start', 'deeper', 'people', 'whole'])
+    expect(PLAN_GROUPS.find((g) => g.id === 'people')!.plans).toEqual(cases.map(([id]) => id))
   })
 })
 
