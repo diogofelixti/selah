@@ -117,3 +117,24 @@ test.describe('iPhone fora da Tela de Início', () => {
     await expect(toggle(page)).toBeDisabled()
   })
 })
+
+test('apagar os dados com o lembrete ligado cancela a inscrição no servidor', async ({ page }) => {
+  page.on('dialog', (d) => d.accept())
+  await fakePush(page, 'granted')
+  const calls = await fakeApi(page)
+  await page.goto('/#/ajustes')
+  await toggle(page).check()
+  await expect(page.getByText('Lembrete ativado para 07:00')).toBeVisible()
+  await page.getByRole('button', { name: 'Apagar dados' }).click()
+  await expect.poll(() => calls.find((c) => c.method === 'DELETE')?.body).toEqual({ endpoint: 'https://fcm.googleapis.com/fcm/send/teste' })
+  await expect(toggle(page)).not.toBeChecked()
+})
+
+test('inscrição que ficou no aparelho com o lembrete desligado é cancelada ao abrir o app', async ({ page }) => {
+  await fakePush(page, 'granted')
+  // Simula um desligamento que falhou sem internet: a inscrição continuou no aparelho.
+  await page.addInitScript(() => localStorage.setItem('fake-sub', '1'))
+  const calls = await fakeApi(page)
+  await page.goto('/')
+  await expect.poll(() => calls.find((c) => c.method === 'DELETE')?.body).toEqual({ endpoint: 'https://fcm.googleapis.com/fcm/send/teste' })
+})

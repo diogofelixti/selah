@@ -8,7 +8,7 @@
   import { locale, t } from './lib/i18n/i18n.svelte'
   import { resolveLanguage } from './lib/i18n/lang'
   import { localDayKey } from './lib/progress/progress'
-  import { refreshReminder, reportReadToday } from './lib/reminder'
+  import { disableReminder, refreshReminder, reportReadToday } from './lib/reminder'
   import { rememberTheme, resolveTheme } from './lib/theme'
   import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
@@ -54,8 +54,23 @@
     })
   })
 
+  // Lembrete desligado (pela tela, ao apagar os dados, ao importar backup ou com permissão retirada):
+  // se o aparelho ainda tem inscrição de push, cancela. Se falhar sem internet, tenta na próxima abertura.
+  $effect(() => {
+    if (app.ready && !app.settings.reminder.enabled) void disableReminder()
+  })
+
+  // Volta ao app ou volta a internet: tenta de novo o aviso de "já leu hoje" que possa ter falhado.
+  let resumeTick = $state(0)
+  $effect(() => {
+    const bump = () => resumeTick++
+    window.addEventListener('online', bump)
+    return () => window.removeEventListener('online', bump)
+  })
+
   // Leu hoje com o lembrete ligado: o servidor não manda o lembrete de hoje (só a data vai).
   $effect(() => {
+    void resumeTick
     if (!app.ready || !app.settings.reminder.enabled) return
     const today = localDayKey(Date.now())
     if (app.readings.some((r) => localDayKey(r.readAt) === today)) {
@@ -86,7 +101,10 @@
   const route = $derived(router.route)
 
   function onVisibility() {
-    if (document.visibilityState === 'visible') onResume()
+    if (document.visibilityState === 'visible') {
+      onResume()
+      resumeTick++
+    }
   }
 
   $effect(() => {

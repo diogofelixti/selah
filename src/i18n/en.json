@@ -411,6 +411,6 @@
     "failed": "Could not turn it on right now. Try again.",
     "unsupported": "This browser does not support notifications.",
     "iosInstall": "On iPhone, add Selah to your Home Screen (Share > Add to Home Screen) and open it from there to turn on the reminder.",
-    "privacy": "Daily reminder: the Selah server keeps only your device's notification address, the time, the time zone and the language. It does not keep your name, email or what you read."
+    "privacy": "Daily reminder: the Selah server keeps only your device's notification address, the time, the time zone, the language and the dates of the last reminder sent and of your last reading (only the date, so no reminder is sent on a day you already read). It does not keep your name, email or what you read."
   }
 }

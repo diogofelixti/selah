@@ -41,7 +41,6 @@ self.addEventListener('push', (event) => {
       await self.registration.showNotification(note.title, {
         body: note.body,
         icon: '/pwa-192x192.png',
-        badge: '/pwa-64x64.png',
         tag: 'selah-lembrete',
         lang: lang === 'pt' ? 'pt-BR' : 'en',
         data: { url: note.url },
@@ -59,8 +58,11 @@ self.addEventListener('notificationclick', (event) => {
       const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
       const open = windows.find((w) => new URL(w.url).origin === self.location.origin)
       if (open) {
-        await open.navigate(url).catch(() => null)
-        await open.focus()
+        // Foco primeiro (alguns navegadores só aceitam logo após o toque); se não der para navegar
+        // nessa janela (não controlada pelo service worker), abre uma nova no lugar certo.
+        const focused = await open.focus().catch(() => open)
+        const moved = await focused.navigate(url).catch(() => null)
+        if (!moved) await self.clients.openWindow(url)
       } else {
         await self.clients.openWindow(url)
       }

@@ -411,6 +411,6 @@
     "failed": "Não foi possível ativar agora. Tente de novo.",
     "unsupported": "Este navegador não permite notificações.",
     "iosInstall": "No iPhone, adicione o Selah à Tela de Início (Compartilhar > Adicionar à Tela de Início) e abra por lá para ativar o lembrete.",
-    "privacy": "Lembrete diário: o servidor do Selah guarda só o endereço de notificação do aparelho, a hora, o fuso horário e o idioma. Não guarda nome, e-mail nem o que você lê."
+    "privacy": "Lembrete diário: o servidor do Selah guarda só o endereço de notificação do aparelho, a hora, o fuso horário, o idioma e as datas do último lembrete enviado e da sua última leitura (só a data, para não mandar lembrete no dia em que você já leu). Não guarda nome, e-mail nem o que você lê."
   }
 }

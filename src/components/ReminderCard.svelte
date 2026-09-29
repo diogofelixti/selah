@@ -43,9 +43,14 @@
     if (!reminder.enabled) return void updateSettings({ reminder: { enabled: false, time } })
     busy = true
     try {
-      if ((await enableReminder(time, locale.lang)) === 'ok') {
+      const result = await enableReminder(time, locale.lang)
+      if (result === 'ok') {
         await updateSettings({ reminder: { enabled: true, time } })
         showToast(t('reminder.timeChanged', { time }))
+      } else if (result === 'denied') {
+        // Permissão retirada com o app aberto: o lembrete não funciona mais neste aparelho.
+        await updateSettings({ reminder: { enabled: false, time } })
+        message = t('reminder.denied')
       } else {
         // O servidor continua com a hora antiga: a tela volta para ela.
         input.value = reminder.time

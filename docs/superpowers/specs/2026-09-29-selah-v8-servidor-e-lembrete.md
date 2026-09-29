@@ -51,7 +51,7 @@ Complemento das specs anteriores. Data: 2026-09-29. Parte da proposta `2026-09-2
 - **Testes do servidor:** Vitest contra um Postgres de verdade, num container Docker iniciado pelos testes.
 - **Desenvolvimento local:**
   - O Vite (dev e preview) repassa `/api` para `localhost:8787`.
-  - `npm run server:dev` sobe o banco e a API.
+  - `npm run server:up` sobe o banco e a API (e `server:down` derruba).
 
 ## Lembrete diário
 

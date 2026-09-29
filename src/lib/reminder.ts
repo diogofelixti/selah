@@ -97,9 +97,11 @@ export async function reportReadToday(day: string, time: string, lang: Lang): Pr
     const sub = await subscription(false)
     if (!sub) return
     const res = await api('/reminders/done', 'POST', { endpoint: sub.endpoint, date: day })
+    if (res.ok) return
     // O servidor não conhece este aparelho (banco novo, inscrição apagada): registra de novo e repete.
-    if (res.status === 404 && (await register(sub, time, lang))) await api('/reminders/done', 'POST', { endpoint: sub.endpoint, date: day })
-    else if (!res.ok) reportedDay = null
+    const retried =
+      res.status === 404 && (await register(sub, time, lang)) && (await api('/reminders/done', 'POST', { endpoint: sub.endpoint, date: day })).ok
+    if (!retried) reportedDay = null
   } catch {
     reportedDay = null
   }
