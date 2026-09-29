@@ -32,3 +32,17 @@ describe('loader', () => {
     expect(fetchFn).toHaveBeenCalledTimes(3)
   })
 })
+
+describe('limite de tempo', () => {
+  it('o carregamento padrão desiste de livros que demoram demais', async () => {
+    const spy = vi.fn(() => Promise.resolve(new Response(JSON.stringify(JHN), { status: 200 })))
+    vi.stubGlobal('fetch', spy)
+    try {
+      await createBibleLoader().loadBook('BSB', 'JHN')
+      const init = (spy.mock.calls[0] as unknown[])[1] as RequestInit | undefined
+      expect(init?.signal).toBeInstanceOf(AbortSignal)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+})

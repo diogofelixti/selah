@@ -37,6 +37,8 @@ describe('backup', () => {
     ['marcação em livro inexistente', withChange((r) => { r.marks = [{ ref: 'XYZ.1.1', color: 'gold', note: '', updatedAt: 1 }] })],
     ['nota longa demais', withChange((r) => { r.marks = [{ ref: 'JHN.3.16', color: null, note: 'x'.repeat(1001), updatedAt: 1 }] })],
     ['versão 2 sem marks', withChange((r) => { delete r.marks })],
+    ['marcação repetida', withChange((r) => { r.marks = [r.marks[0], r.marks[0]] })],
+    ['marcação vazia', withChange((r) => { r.marks = [{ ref: 'JHN.3.16', color: null, note: '', updatedAt: 1 }] })],
     ['livro inexistente', withChange((r) => { r.readings = [{ ref: 'XYZ.1', readAt: 1 }] })],
     ['capítulo 0', withChange((r) => { r.readings = [{ ref: 'JHN.0', readAt: 1 }] })],
     ['referência de versículo', withChange((r) => { r.readings = [{ ref: 'JHN.3.16', readAt: 1 }] })],

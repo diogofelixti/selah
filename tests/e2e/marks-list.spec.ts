@@ -70,3 +70,23 @@ test('backup exportado e importado mantém as marcações', async ({ page }) => 
   await expect(page.locator('.marks li')).toHaveCount(1)
   await expect(page.locator('.marks li').first()).toContainText('guardar')
 })
+
+test.describe('sem internet', () => {
+  test.use({ serviceWorkers: 'block' })
+
+  test('avisa quando o texto do versículo marcado não pode ser carregado', async ({ page }) => {
+    page.on('dialog', (d) => d.accept())
+    const backup = {
+      app: 'selah', version: 2, exportedAt: '2026-09-28T00:00:00.000Z',
+      readings: [], settings: { language: 'pt', theme: 'auto', fontSize: 2 }, state: { lastPosition: null, activePlan: null },
+      marks: [{ ref: 'JHN.3.16', color: 'gold', note: 'guardar', updatedAt: 1 }],
+    }
+    await page.goto('/#/ajustes')
+    await page.locator('input[type=file]').setInputFiles({ name: 'b.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) })
+    await expect(page.getByText('Progresso importado.')).toBeVisible()
+    await page.route('**/bibles/BLIVRE/JHN.json', (route) => route.abort())
+    await page.goto('/#/marcacoes')
+    await expect(page.locator('.marks li').first()).toContainText('guardar')
+    await expect(page.getByText('Texto indisponível sem internet.')).toBeVisible()
+  })
+})

@@ -70,3 +70,22 @@ test('anotar só aparece com um versículo selecionado', async ({ page }) => {
   await page.locator('#v2').click()
   await expect(page.getByRole('button', { name: 'Anotar' })).toHaveCount(0)
 })
+
+test.describe('celular de 360px', () => {
+  test.use({ viewport: { width: 360, height: 780 } })
+
+  test('botões da barra de seleção com 44px e cores numa linha só', async ({ page }) => {
+    // Com Compartilhar (como no Android), a barra tem o maior número de botões.
+    await page.addInitScript(() => Object.defineProperty(navigator, 'share', { value: () => Promise.resolve() }))
+    await page.goto('/#/ler/JHN/3')
+    await page.locator('#v1').click()
+    const bar = page.getByRole('toolbar', { name: 'Ações dos versículos selecionados' })
+    for (const name of ['Copiar', 'Compartilhar', 'Destacar', 'Anotar', 'Cancelar']) {
+      const box = (await bar.getByRole('button', { name, exact: true }).boundingBox())!
+      expect(box.width, name).toBeGreaterThanOrEqual(44)
+    }
+    await bar.getByRole('button', { name: 'Destacar' }).click()
+    const clear = (await page.getByRole('button', { name: 'Tirar destaque' }).boundingBox())!
+    expect(clear.height).toBeLessThanOrEqual(50)
+  })
+})

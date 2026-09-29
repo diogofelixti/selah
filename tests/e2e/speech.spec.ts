@@ -95,7 +95,7 @@ test.describe('com síntese de voz', () => {
     await page.goto('/#/ler/JHN/3')
     await page.getByRole('button', { name: 'Ouvir capítulo' }).click()
     await expect(page.locator('.verse.speaking')).toHaveCount(1)
-    await page.getByRole('button', { name: 'Parar' }).click()
+    await page.getByRole('button', { name: 'Parar', exact: true }).click()
     await expect(page.locator('.verse.speaking')).toHaveCount(0)
     await expect(page.getByText(/Lendo versículo/)).toHaveCount(0)
   })
@@ -110,6 +110,15 @@ test.describe('com síntese de voz', () => {
     await page.waitForTimeout(800)
     expect((await spoken(page)).length).toBe(count)
     await expect(page.locator('.verse.speaking')).toHaveCount(0)
+  })
+
+  test('o botão de fone vira Parar leitura enquanto lê', async ({ page }) => {
+    await page.goto('/#/ler/JHN/3')
+    await page.getByRole('button', { name: 'Ouvir capítulo' }).click()
+    await expect(page.locator('#v1')).toHaveClass(/speaking/)
+    await page.getByRole('button', { name: 'Parar leitura' }).click()
+    await expect(page.locator('.verse.speaking')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Ouvir capítulo' })).toBeVisible()
   })
 
   test('com versículos selecionados, começa do menor deles', async ({ page }) => {

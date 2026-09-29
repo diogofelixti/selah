@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte'
   import { t } from '../lib/i18n/i18n.svelte'
   import { NOTE_MAX } from '../lib/storage/types'
 
@@ -15,7 +16,8 @@
   let note = $state('')
 
   $effect(() => {
-    note = initial
+    // Mudanças em `initial` depois de aberto (outra aba, por exemplo) não fecham nem apagam o rascunho.
+    note = untrack(() => initial)
     dialog.showModal()
     return () => dialog.close()
   })

@@ -166,7 +166,8 @@
     "rate": "Speed {rate}×",
     "reading": "Reading verse {n}",
     "paused": "Paused at verse {n}",
-    "toolbar": "Read aloud"
+    "toolbar": "Read aloud",
+    "stopListening": "Stop reading"
   },
   "search": {
     "title": "Search the Bible",
@@ -198,12 +199,13 @@
     "cancel": "Cancel",
     "openNote": "View note on {ref}",
     "colors": "Highlight colors",
-    "title": "My highlights",
+    "title": "Highlights and notes",
     "empty": "Select a verse in the reader and use Highlight or Note. Your highlights and notes show up here.",
     "filterAll": "All",
     "filterNotes": "With note",
-    "count": "{n} highlights",
-    "countOne": "1 highlight"
+    "count": "{n} marked verses",
+    "countOne": "1 marked verse",
+    "textMissing": "Text unavailable offline."
   },
   "reader": {
     "markRead": "Mark as read",
@@ -280,11 +282,11 @@
     "dataHint": "Your progress is saved only on this device. Export a file to keep a copy or move it to another device.",
     "export": "Export progress",
     "import": "Import progress",
-    "importConfirm": "This replaces all progress on this device. Continue?",
+    "importConfirm": "This replaces all progress, highlights and notes on this device. Continue?",
     "importDone": "Progress imported.",
     "importError": "This file is not a valid Selah backup.",
     "clear": "Erase data",
-    "clearConfirm1": "Erase all progress, plans and settings on this device?",
+    "clearConfirm1": "Erase all progress, plans, highlights, notes and settings on this device?",
     "clearConfirm2": "Are you sure? This cannot be undone.",
     "clearDone": "Data erased.",
     "about": "About Selah"

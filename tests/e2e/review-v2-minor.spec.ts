@@ -29,6 +29,8 @@ test('cancelar o Limpar não apaga nada no aparelho', async ({ page }) => {
 test('a tela inicial mostra o dia do plano com dois livros', async ({ page }) => {
   await page.goto('/#/planos')
   await page.getByRole('article').filter({ hasText: 'Salmos e Provérbios em 31 dias' }).getByRole('button', { name: 'Começar' }).click()
+  // Espera o plano aparecer (gravado) antes de sair da tela.
+  await expect(page.getByText(/Dia 1 de \d+/).first()).toBeVisible()
   await page.goto('/')
   await expect(page.getByText('Hoje: Provérbios 1, Salmos 1 a 5 · 0 de 6 lidos')).toBeVisible()
 })

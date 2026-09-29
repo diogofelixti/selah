@@ -3,7 +3,7 @@ import { isValidChapterRef, isValidVerseRef } from '../bible/refs'
 import { isPlanId } from '../plans/catalog'
 import {
   FONT_SIZES, MARK_COLORS, NOTE_MAX, THEMES, type AppData, type AppState, type FontSize, type MarkColor, type Reading, type Settings,
-  type Theme, type VerseMark,
+  type Theme, type VerseMark, isEmptyMark,
 } from './types'
 
 /** Versão 2 inclui as marcações. A versão 1 continua aceita na importação. */
@@ -74,7 +74,15 @@ function parseMark(x: unknown, now: number): VerseMark {
   ) {
     throw new BackupError('marcação inválida')
   }
-  return { ref: x.ref, color: x.color as MarkColor | null, note: x.note, updatedAt: x.updatedAt }
+  const mark = { ref: x.ref, color: x.color as MarkColor | null, note: x.note, updatedAt: x.updatedAt }
+  if (isEmptyMark(mark)) throw new BackupError('marcação vazia')
+  return mark
+}
+
+function parseMarks(list: unknown[], now: number): VerseMark[] {
+  const marks = list.map((m) => parseMark(m, now))
+  if (new Set(marks.map((m) => m.ref)).size !== marks.length) throw new BackupError('marcação repetida')
+  return marks
 }
 
 export function parseBackup(text: string, now = Date.now()): AppData {
@@ -92,6 +100,6 @@ export function parseBackup(text: string, now = Date.now()): AppData {
     readings: raw.readings.map((r) => parseReading(r, now)),
     settings: parseSettings(raw.settings),
     state: parseState(raw.state, now),
-    marks: raw.version === 2 ? (raw.marks as unknown[]).map((m) => parseMark(m, now)) : [],
+    marks: raw.version === 2 ? parseMarks(raw.marks as unknown[], now) : [],
   }
 }

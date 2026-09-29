@@ -38,6 +38,8 @@ describe.each(['aurora', 'noite'])('contraste do tema %s', (theme) => {
   it('texto legível sobre as cores de destaque (4,5:1)', () => {
     for (const color of ['mark-gold', 'mark-green', 'mark-blue']) {
       expect(ratio(token('text'), token(color)), color).toBeGreaterThanOrEqual(4.5)
+      // O número do versículo (texto secundário) também fica sobre o destaque.
+      expect(ratio(token('text-2'), token(color)), `text-2 em ${color}`).toBeGreaterThanOrEqual(4.5)
     }
   })
 

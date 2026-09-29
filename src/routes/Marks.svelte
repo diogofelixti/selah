@@ -9,7 +9,8 @@
 
   type Filter = 'all' | 'notes' | MarkColor
   let filter = $state<Filter>('all')
-  let texts = $state<Record<string, string>>({})
+  // undefined: carregando; null: não foi possível carregar.
+  let texts = $state<Record<string, string | null>>({})
 
   const bookOrder = new Map(BOOKS.map((b, i) => [b.id, i]))
   const bookName = (id: string) => t(`books.${id}`)
@@ -35,13 +36,13 @@
     const refs = sorted.map((m) => m.ref)
     let cancelled = false
     void (async () => {
-      const next: Record<string, string> = {}
+      const next: Record<string, string | null> = {}
       for (const ref of refs) {
         const p = parseRef(ref)!
         try {
           next[ref] = await bible.getVerse(tr, p.book, p.chapter, p.verse!)
         } catch {
-          next[ref] = ''
+          next[ref] = null
         }
       }
       if (!cancelled) texts = next
@@ -88,7 +89,11 @@
               {#if m.color}<span class="dot" data-color={m.color} aria-hidden="true"></span>{/if}
               <span class="ref">{formatRef(m.ref, bookName)}</span>
             </span>
-            <span class="text" data-color={m.color ?? undefined}>{(texts[m.ref] ?? '').replace(/\[([^\]]+)\]/g, '$1')}</span>
+            {#if texts[m.ref] === null}
+              <span class="muted missing">{t('marks.textMissing')}</span>
+            {:else}
+              <span class="text" data-color={m.color ?? undefined}>{(texts[m.ref] ?? '').replace(/\[([^\]]+)\]/g, '$1')}</span>
+            {/if}
             {#if m.note}
               <span class="note"><StickyNote size={16} aria-hidden="true" />{m.note}</span>
             {/if}
@@ -106,6 +111,7 @@
   .marks a { display: grid; gap: var(--space-2); }
   .head { display: flex; align-items: center; gap: var(--space-2); }
   .ref { font-weight: 700; font-size: 0.875rem; color: var(--accent-text); }
+  .missing { font-size: 0.875rem; }
   .text { font-family: var(--font-read); line-height: 1.55; border-radius: 4px; }
   .text[data-color='gold'] { background: var(--mark-gold); }
   .text[data-color='green'] { background: var(--mark-green); }

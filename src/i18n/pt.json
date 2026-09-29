@@ -166,7 +166,8 @@
     "rate": "Velocidade {rate}×",
     "reading": "Lendo versículo {n}",
     "paused": "Pausado no versículo {n}",
-    "toolbar": "Leitura em voz alta"
+    "toolbar": "Leitura em voz alta",
+    "stopListening": "Parar leitura"
   },
   "search": {
     "title": "Buscar na Bíblia",
@@ -203,7 +204,8 @@
     "filterAll": "Todas",
     "filterNotes": "Com nota",
     "count": "{n} marcações",
-    "countOne": "1 marcação"
+    "countOne": "1 marcação",
+    "textMissing": "Texto indisponível sem internet."
   },
   "reader": {
     "markRead": "Marcar como lido",
@@ -280,11 +282,11 @@
     "dataHint": "Seu progresso fica salvo só neste aparelho. Exporte um arquivo para guardar uma cópia ou levar para outro aparelho.",
     "export": "Exportar progresso",
     "import": "Importar progresso",
-    "importConfirm": "Isso vai substituir todo o progresso deste aparelho. Continuar?",
+    "importConfirm": "Isso vai substituir todo o progresso, os destaques e as notas deste aparelho. Continuar?",
     "importDone": "Progresso importado.",
     "importError": "Este arquivo não é um backup válido do Selah.",
     "clear": "Apagar dados",
-    "clearConfirm1": "Apagar todo o progresso, planos e ajustes deste aparelho?",
+    "clearConfirm1": "Apagar todo o progresso, planos, destaques, notas e ajustes deste aparelho?",
     "clearConfirm2": "Tem certeza? Isso não pode ser desfeito.",
     "clearDone": "Dados apagados.",
     "about": "Sobre o Selah"

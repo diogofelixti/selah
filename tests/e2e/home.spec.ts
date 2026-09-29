@@ -29,6 +29,8 @@ test('atalho do Controle e plano de hoje', async ({ page }) => {
   page.on('dialog', (d) => d.accept())
   await page.goto('/#/planos')
   await page.getByRole('article').filter({ hasText: 'Evangelhos em 30 dias' }).getByRole('button', { name: 'Começar' }).click()
+  // Espera o plano aparecer (gravado) antes de sair da tela.
+  await expect(page.getByText(/Dia 1 de \d+/).first()).toBeVisible()
   await page.goto('/')
   await expect(page.getByText('Hoje: Mateus 1 a 3 · 0 de 3 lidos')).toBeVisible()
   await page.getByRole('link', { name: /Marcar leitura/ }).click()

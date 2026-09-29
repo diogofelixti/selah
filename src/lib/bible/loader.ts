@@ -19,7 +19,10 @@ export class BibleLoadError extends Error {
 
 type FetchFn = (url: string) => Promise<Response>
 
-export function createBibleLoader(fetchFn: FetchFn = (url) => fetch(url)) {
+/** Um livro que não chega em 20 s conta como falha (conexão ruim), e pode ser tentado de novo. */
+const LOAD_TIMEOUT_MS = 20_000
+
+export function createBibleLoader(fetchFn: FetchFn = (url) => fetch(url, { signal: AbortSignal.timeout(LOAD_TIMEOUT_MS) })) {
   const cache = new Map<string, Promise<BookText>>()
 
   function loadBook(tr: TranslationId, book: string): Promise<BookText> {

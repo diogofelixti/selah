@@ -245,7 +245,11 @@
   <a class="where" href={`#/livro/${book}`}>{t(`books.${book}`)} {chapter}</a>
   <div class="font">
     {#if canSpeak}
-      <button class="icon-btn" onclick={listen} aria-label={t('speech.listen')}><Headphones size={20} /></button>
+      {#if speech.status === 'idle'}
+        <button class="icon-btn" onclick={listen} aria-label={t('speech.listen')}><Headphones size={20} /></button>
+      {:else}
+        <button class="icon-btn listening" onclick={() => speaker?.stop()} aria-label={t('speech.stopListening')}><Headphones size={20} /></button>
+      {/if}
     {/if}
     <button class="icon-btn" onclick={() => changeFont(-1)} disabled={app.settings.fontSize === 1} aria-label={t('reader.fontSmaller')}>
       <Minus size={18} />
@@ -406,6 +410,9 @@
     margin: 0 auto;
     z-index: 2;
   }
+  /* Os botões mantêm 44px; quem encolhe é o texto da contagem. */
+  .selection-bar > button { flex-shrink: 0; }
+  .listening { background: var(--flash); color: var(--accent-text); }
   .count { flex-grow: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .filled { background: var(--text); color: var(--bg); }
   .verse[data-mark='gold'] { background: var(--mark-gold); }
@@ -444,7 +451,9 @@
     margin: 0 auto;
     z-index: 2;
   }
-  .swatch { width: 44px; height: 44px; border-radius: 999px; border: 2px solid var(--border-strong); cursor: pointer; }
+  .colors { gap: var(--space-2); }
+  .colors .pill { padding: 0 var(--space-3); white-space: nowrap; flex-shrink: 0; }
+  .swatch { flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; border: 2px solid var(--border-strong); cursor: pointer; }
   .swatch[data-color='gold'] { background: var(--mark-gold); }
   .swatch[data-color='green'] { background: var(--mark-green); }
   .swatch[data-color='blue'] { background: var(--mark-blue); }
