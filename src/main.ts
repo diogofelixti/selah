@@ -9,5 +9,9 @@ import './styles/themes/pergaminho.css'
 import './styles/themes/oliveira.css'
 import './styles/global.css'
 import App from './App.svelte'
+import { listenInstall } from './lib/install.svelte'
+
+// Cedo: o convite de instalação do navegador pode chegar antes de a tela de Ajustes abrir.
+listenInstall()
 
 mount(App, { target: document.getElementById('app')! })

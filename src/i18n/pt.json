@@ -438,5 +438,17 @@
     "expired": "Sua sessão expirou. Entre de novo para continuar sincronizando.",
     "clearSignedIn": "Você está conectado à conta Google. Ao apagar os dados, o app sai da conta, e a cópia na conta continua (para apagá-la, use Excluir conta). Continuar?",
     "privacy": "Conta e sincronização: se você entrar com a conta Google, o servidor do Selah guarda seu e-mail, o identificador da conta Google, suas leituras, planos, destaques, notas e o último capítulo aberto (para levá-los aos seus outros aparelhos), além das datas de criação da conta e de uso das sessões. Não guarda nome, foto nem senha. Excluir conta apaga tudo isso. Enquanto você não entra, a tela de Ajustes carrega o botão oficial do Google, que faz um pedido aos servidores do Google."
+  },
+  "install": {
+    "title": "Instalar o app",
+    "text": "Com o Selah instalado, ele abre pelo ícone da lamparina, em tela cheia, e funciona sem internet.",
+    "button": "Instalar o app",
+    "done": "Selah instalado. Procure o ícone da lamparina na tela inicial.",
+    "ios1": "No Safari, toque em Compartilhar (o quadrado com a seta para cima).",
+    "ios2": "Role a lista e toque em Adicionar à Tela de Início.",
+    "ios3": "Toque em Adicionar. O Selah aparece na tela de início.",
+    "android1": "No Chrome, toque nos três pontinhos ⋮ no canto de cima.",
+    "android2": "Toque em Instalar app (ou Adicionar à tela inicial) e confirme.",
+    "xiaomi": "Celular Xiaomi, Redmi ou Poco: se o ícone não aparecer, libere a permissão Atalhos na tela inicial do Chrome em Configurações > Apps > Gerenciar apps > Chrome > Outras permissões."
   }
 }

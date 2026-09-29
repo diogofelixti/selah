@@ -3,6 +3,7 @@
   import { app, clearData, replaceData, snapshot, updateSettings } from '../lib/app.svelte'
   import AccountCard from '../components/AccountCard.svelte'
   import DonateCard from '../components/DonateCard.svelte'
+  import InstallCard from '../components/InstallCard.svelte'
   import { account, signOut } from '../lib/sync/account.svelte'
   import ReminderCard from '../components/ReminderCard.svelte'
   import { t } from '../lib/i18n/i18n.svelte'
@@ -73,6 +74,8 @@
   </header>
 
   <div class="stack">
+    <InstallCard />
+
     <AccountCard />
 
     <fieldset class="card">

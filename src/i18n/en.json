@@ -438,5 +438,17 @@
     "expired": "Your session expired. Sign in again to keep syncing.",
     "clearSignedIn": "You are signed in with Google. Erasing the data signs you out, and the copy in your account stays (to erase it, use Delete account). Continue?",
     "privacy": "Account and sync: if you sign in with Google, the Selah server keeps your email, your Google account ID, your readings, plans, highlights, notes and the last chapter you opened (to bring them to your other devices), plus the dates the account was created and the sessions were used. It does not keep your name, photo or password. Deleting the account erases all of it. While you are signed out, the Settings screen loads Google's official sign-in button, which makes a request to Google's servers."
+  },
+  "install": {
+    "title": "Install the app",
+    "text": "With Selah installed, it opens from the lamp icon, full screen, and works offline.",
+    "button": "Install the app",
+    "done": "Selah installed. Look for the lamp icon on your home screen.",
+    "ios1": "In Safari, tap Share (the square with the arrow pointing up).",
+    "ios2": "Scroll down and tap Add to Home Screen.",
+    "ios3": "Tap Add. Selah appears on your home screen.",
+    "android1": "In Chrome, tap the three dots ⋮ at the top.",
+    "android2": "Tap Install app (or Add to Home screen) and confirm.",
+    "xiaomi": "Xiaomi, Redmi or Poco phone: if the icon does not appear, allow Chrome's Home screen shortcuts permission in Settings > Apps > Manage apps > Chrome > Other permissions."
   }
 }
