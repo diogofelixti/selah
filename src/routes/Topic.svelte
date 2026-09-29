@@ -2,6 +2,7 @@
   import { ArrowLeft } from '@lucide/svelte'
   import CopyButton from '../components/CopyButton.svelte'
   import TopicIcon from '../components/TopicIcon.svelte'
+  import VerseText from '../components/VerseText.svelte'
   import { formatSelection } from '../lib/bible/copy'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
   import { formatRef, parseRef } from '../lib/bible/refs'
@@ -73,7 +74,7 @@
       {#each topic.refs as ref (ref)}
         <li class="card verse">
           <a class="verse-link" href={hrefFor(ref)}>
-            <blockquote>{texts[ref] ?? ''}</blockquote>
+            <blockquote><VerseText text={texts[ref] ?? ''} /></blockquote>
             <span class="ref">{formatRef(ref, bookName)}</span>
           </a>
           <CopyButton text={() => copyFor(ref)} disabled={!texts[ref]} />

@@ -35,3 +35,13 @@ test('temas novos aparecem e abrem com os versículos', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Paz' })).toBeVisible()
   await expect(page.getByRole('link', { name: /Isaías 26:3/ }).locator('blockquote')).not.toBeEmpty()
 })
+
+test('palavras implícitas aparecem em itálico, sem colchetes, e a lista tem 16 temas', async ({ page }) => {
+  await page.goto('/#/temas')
+  await expect(page.locator('a[href^="#/temas/"]')).toHaveCount(16)
+  await page.goto('/#/temas/fe')
+  const card = page.getByRole('link', { name: /Hebreus 11:6/ }).locator('blockquote')
+  await expect(card).toContainText('agradar a Deus')
+  await expect(card).not.toContainText('[')
+  await expect(card.locator('em')).toHaveText('a Deus')
+})

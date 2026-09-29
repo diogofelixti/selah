@@ -3,7 +3,7 @@
     "id": "ansiedade", "icon": "wind",
     "title": { "pt": "Ansiedade", "en": "Anxiety" },
     "intro": { "pt": "Quando a mente não descansa, Deus convida você a entregar a Ele o que pesa no coração.", "en": "When your mind won't rest, God invites you to hand Him what weighs on your heart." },
-    "refs": ["PHP.4.6", "PHP.4.7", "1PE.5.7", "MAT.6.34", "JHN.14.27", "PSA.94.19", "ISA.41.10", "MAT.11.28"]
+    "refs": ["PHP.4.6", "PHP.4.7", "1PE.5.7", "MAT.6.34", "JHN.14.27", "PSA.94.19", "ISA.41.10", "PSA.55.22"]
   },
   {
     "id": "dor", "icon": "heart-crack",
@@ -63,7 +63,7 @@
     "id": "paz", "icon": "leaf",
     "title": { "pt": "Paz", "en": "Peace" },
     "intro": { "pt": "A paz de Deus não depende das circunstâncias. Ela guarda o coração mesmo quando tudo ao redor se agita.", "en": "God's peace does not depend on circumstances. It guards your heart even when everything around you is shaken." },
-    "refs": ["JHN.16.33", "ISA.26.3", "ROM.5.1", "COL.3.15", "NUM.6.24", "NUM.6.26", "PSA.4.8", "2TH.3.16"]
+    "refs": ["JHN.16.33", "ISA.26.3", "ROM.5.1", "COL.3.15", "PSA.29.11", "NUM.6.26", "PSA.4.8", "2TH.3.16"]
   },
   {
     "id": "fe", "icon": "anchor",
@@ -74,13 +74,13 @@
   {
     "id": "solidao", "icon": "moon",
     "title": { "pt": "Solidão", "en": "Loneliness" },
-    "intro": { "pt": "Quando parece que ninguém vê você, Deus vê. Ele promete estar presente em todos os dias.", "en": "When it feels like no one sees you, God does. He promises to be with you every day." },
-    "refs": ["PSA.68.6", "MAT.28.20", "PSA.27.10", "HEB.13.5", "JHN.14.18", "PSA.73.23", "ISA.49.15", "PSA.139.7"]
+    "intro": { "pt": "Quando parece que ninguém vê você, Deus vê. Ele promete estar presente todos os dias.", "en": "When it feels like no one sees you, God does. He promises to be with you every day." },
+    "refs": ["PSA.68.6", "MAT.28.20", "DEU.31.8", "HEB.13.5", "JHN.14.18", "PSA.73.23", "ISA.49.15", "PSA.139.7"]
   },
   {
     "id": "familia", "icon": "house",
     "title": { "pt": "Família", "en": "Family" },
-    "intro": { "pt": "Paciência, perdão e amor no dia a dia. A Bíblia fala da casa como lugar de cuidado.", "en": "Patience, forgiveness and love in everyday life. The Bible speaks of home as a place of care." },
+    "intro": { "pt": "Paciência, cuidado e amor no dia a dia. A Bíblia fala da casa como lugar de cuidado.", "en": "Patience, care and love in everyday life. The Bible speaks of home as a place of care." },
     "refs": ["JOS.24.15", "RUT.1.16", "PRO.22.6", "EPH.4.2", "PRO.17.17", "EPH.6.4", "1CO.16.14", "1PE.3.8"]
   },
   {
@@ -92,7 +92,7 @@
   {
     "id": "cansaco", "icon": "feather",
     "title": { "pt": "Cansaço", "en": "Weariness" },
-    "intro": { "pt": "Quando as forças acabam, Jesus chama para perto e oferece descanso para a alma.", "en": "When your strength runs out, Jesus calls you close and offers rest for your soul." },
-    "refs": ["MAT.11.29", "MAT.11.30", "GAL.6.9", "PSA.23.2", "2CO.4.16", "JER.31.25", "ISA.40.28", "EXO.33.14"]
+    "intro": { "pt": "Quando o corpo e a alma pesam, Jesus chama para perto e oferece descanso.", "en": "When body and soul feel heavy, Jesus calls you close and offers rest." },
+    "refs": ["MAT.11.28", "MAT.11.29", "MAT.11.30", "GAL.6.9", "PSA.23.2", "2CO.4.16", "JER.31.25", "EXO.33.14"]
   }
 ]

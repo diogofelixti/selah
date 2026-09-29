@@ -38,6 +38,17 @@ describe('conteúdo editorial', () => {
     expect(refs.filter((r, i) => refs.indexOf(r) !== i)).toEqual([])
   })
 
+  it('introduções não começam com as mesmas palavras', () => {
+    for (const lang of ['pt', 'en'] as const) {
+      const starts = TOPICS.map((t) => t.intro[lang].split(/\s+/).slice(0, 4).join(' ').toLowerCase())
+      expect(starts.filter((s, i) => starts.indexOf(s) !== i), lang).toEqual([])
+    }
+  })
+
+  it('Cansaço abre com o convite aos cansados (Mateus 11:28)', () => {
+    expect(TOPICS.find((t) => t.id === 'cansaco')!.refs[0]).toBe('MAT.11.28')
+  })
+
   it('tem de 10 a 15 dicas nos dois idiomas', () => {
     expect(TIPS.length).toBeGreaterThanOrEqual(10)
     expect(TIPS.length).toBeLessThanOrEqual(15)

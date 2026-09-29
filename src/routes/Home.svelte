@@ -1,6 +1,7 @@
 <script lang="ts">
   import { BookOpen, Image as ImageIcon, Menu, SquareCheckBig } from '@lucide/svelte'
   import CopyButton from '../components/CopyButton.svelte'
+  import VerseText from '../components/VerseText.svelte'
   import { app } from '../lib/app.svelte'
   import { formatSelection, selectionParts } from '../lib/bible/copy'
   import { shareVerseImage } from '../lib/share-image'
@@ -186,7 +187,7 @@
         </span>
       </div>
       <a class="verse-link" href={verseLink}>
-        <blockquote>{verseText ?? ''}</blockquote>
+        <blockquote><VerseText text={verseText ?? ''} /></blockquote>
         <p class="muted small">{formatRef(verseRef, bookName)}</p>
       </a>
     </section>
