@@ -82,7 +82,9 @@
 <svelte:document onvisibilitychange={onVisibility} />
 
 {#if app.ready}
-  {#if !app.persistent}
+  {#if app.blocked}
+    <p class="banner" role="status">{t('common.storageBlocked')}</p>
+  {:else if !app.persistent}
     <p class="banner" role="status">{t('common.notPersistent')}</p>
   {/if}
   {#if app.saveError}

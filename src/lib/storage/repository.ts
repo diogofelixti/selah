@@ -1,4 +1,4 @@
-import { openDB, type DBSchema } from 'idb'
+import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import {
   DEFAULT_SETTINGS, DEFAULT_STATE, isEmptyMark, type AppState, type Reading, type Repository, type Settings, type VerseMark,
 } from './types'
@@ -11,6 +11,9 @@ interface SelahDB extends DBSchema {
 }
 
 const KEY = 'current'
+
+/** Outra janela com versão antiga do app segura o banco e impede a atualização. */
+export class StorageBlockedError extends Error {}
 
 export function createMemoryRepository(): Repository {
   let readings: Reading[] = []
@@ -58,8 +61,24 @@ export function createMemoryRepository(): Repository {
   }
 }
 
-export async function createIdbRepository(name = 'selah'): Promise<Repository> {
-  const db = await openDB<SelahDB>(name, 2, {
+export async function createIdbRepository(
+  name = 'selah',
+  opts: { onVersionChange?: () => void } = {},
+): Promise<Repository> {
+  let opened: IDBPDatabase<SelahDB> | null = null
+  let gaveUp = false
+  const db = await new Promise<IDBPDatabase<SelahDB>>((resolve, reject) => {
+    openDB<SelahDB>(name, 2, {
+      // Uma janela antiga não fecha a conexão: em vez de esperar para sempre (tela em branco), desiste.
+      blocked() {
+        gaveUp = true
+        reject(new StorageBlockedError())
+      },
+      // Uma versão mais nova do app pediu o banco: libera e deixa a página recarregar com o código novo.
+      blocking() {
+        opened?.close()
+        opts.onVersionChange?.()
+      },
     upgrade(db, oldVersion) {
       if (oldVersion < 1) {
         db.createObjectStore('readings', { autoIncrement: true }).createIndex('ref', 'ref')
@@ -69,7 +88,16 @@ export async function createIdbRepository(name = 'selah'): Promise<Repository> {
       // Versão 2: marcações (destaques e notas). Os stores da versão 1 ficam como estão.
       if (oldVersion < 2) db.createObjectStore('marks', { keyPath: 'ref' })
     },
+    }).then(
+      (d) => {
+        // Se já desistimos (bloqueado), a conexão que abriu depois não é usada.
+        if (gaveUp) d.close()
+        else resolve(d)
+      },
+      reject,
+    )
   })
+  opened = db
   return {
     persistent: true,
     async getReadings() { return db.getAll('readings') },
@@ -155,11 +183,13 @@ export async function createIdbRepository(name = 'selah'): Promise<Repository> {
 }
 
 /** IndexedDB quando disponível; senão memória, e o app avisa que nada será salvo. */
-export async function openRepository(): Promise<Repository> {
+export async function openRepository(opts: { onVersionChange?: () => void } = {}): Promise<Repository> {
   try {
     if (typeof indexedDB === 'undefined') throw new Error('IndexedDB indisponível')
-    return await createIdbRepository()
-  } catch {
-    return createMemoryRepository()
+    return await createIdbRepository('selah', opts)
+  } catch (err) {
+    const memory = createMemoryRepository()
+    if (err instanceof StorageBlockedError) memory.blocked = true
+    return memory
   }
 }

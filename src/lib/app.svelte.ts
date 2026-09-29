@@ -7,6 +7,8 @@ import {
 export const app = $state({
   ready: false,
   persistent: true,
+  /** Outra janela com versão antiga do app segura o banco. */
+  blocked: false,
   /** true quando a última gravação no aparelho falhou (espaço cheio, banco fechado pelo sistema). */
   saveError: false,
   readings: [] as Reading[],
@@ -30,9 +32,12 @@ async function load(r: Repository): Promise<void> {
   app.state = state
   app.marks = marks
   app.persistent = r.persistent
+  app.blocked = r.blocked ?? false
 }
 
-export async function initApp(open: () => Promise<Repository> = openRepository): Promise<void> {
+const openDefault = () => openRepository({ onVersionChange: () => location.reload() })
+
+export async function initApp(open: () => Promise<Repository> = openDefault): Promise<void> {
   try {
     await load(await open())
   } catch {

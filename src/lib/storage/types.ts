@@ -48,6 +48,8 @@ export const DEFAULT_STATE: AppState = { lastPosition: null, activePlan: null }
 export interface Repository {
   /** false quando os dados só vivem na memória e somem ao fechar o app. */
   persistent: boolean
+  /** true quando outra janela com versão antiga do app segura o banco. */
+  blocked?: boolean
   getReadings(): Promise<Reading[]>
   addReading(reading: Reading): Promise<void>
   removeReadingsFor(ref: string): Promise<void>

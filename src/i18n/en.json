@@ -13,7 +13,8 @@
     "retry": "Try again",
     "loading": "Loading",
     "back": "Back",
-    "to": "to"
+    "to": "to",
+    "storageBlocked": "Selah is open in another window with an older version. Close the other Selah windows and open the app again to save your progress."
   },
   "home": {
     "greeting": {

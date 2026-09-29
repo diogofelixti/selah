@@ -13,7 +13,8 @@
     "retry": "Tentar de novo",
     "loading": "Carregando",
     "back": "Voltar",
-    "to": "a"
+    "to": "a",
+    "storageBlocked": "O Selah está aberto em outra janela com uma versão antiga. Feche as outras janelas do Selah e abra o app de novo para salvar seu progresso."
   },
   "home": {
     "greeting": {

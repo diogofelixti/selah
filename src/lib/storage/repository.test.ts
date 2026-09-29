@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { createIdbRepository, createMemoryRepository, openRepository } from './repository'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { StorageBlockedError, createIdbRepository, createMemoryRepository, openRepository } from './repository'
 import { DEFAULT_SETTINGS, DEFAULT_STATE, type Repository } from './types'
 
 const realIndexedDB = globalThis.indexedDB
@@ -136,5 +136,41 @@ describe('migração do banco', () => {
     expect(await repo.getReadings()).toEqual([{ ref: 'PSA.23', readAt: 1 }])
     expect((await repo.getSettings()).language).toBe('en')
     expect(await repo.getMarks()).toEqual([])
+  })
+})
+
+describe('outra janela com versão antiga aberta', () => {
+  async function holdOldVersion(name: string) {
+    const { openDB } = await import('idb')
+    return openDB(name, 1, {
+      upgrade(db) {
+        db.createObjectStore('readings', { autoIncrement: true }).createIndex('ref', 'ref')
+        db.createObjectStore('settings')
+        db.createObjectStore('state')
+      },
+    })
+  }
+
+  it('abrir falha logo com StorageBlockedError em vez de travar', async () => {
+    const old = await holdOldVersion('bloqueado')
+    await expect(createIdbRepository('bloqueado')).rejects.toBeInstanceOf(StorageBlockedError)
+    old.close()
+  })
+
+  it('openRepository cai para memória e informa o bloqueio', async () => {
+    const old = await holdOldVersion('selah')
+    const repo = await openRepository()
+    expect(repo.persistent).toBe(false)
+    expect(repo.blocked).toBe(true)
+    old.close()
+  })
+
+  it('a versão atual libera o banco quando uma versão mais nova pede', async () => {
+    const onVersionChange = vi.fn()
+    await createIdbRepository('futuro', { onVersionChange })
+    const { openDB } = await import('idb')
+    const newer = await openDB('futuro', 3)
+    expect(onVersionChange).toHaveBeenCalledOnce()
+    newer.close()
   })
 })
