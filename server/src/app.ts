@@ -24,8 +24,13 @@ export function createApp(deps: Deps): Hono {
   })
 
   // Um só limite por IP para todas as rotas; a saúde fica fora (checagens do Docker).
+  // A sincronização tem limite próprio, mais folgado por IP (família no mesmo Wi-Fi) e por conta (sync.ts).
   const limiter = rateLimit({ limit: 30, windowMs: 60_000, now: deps.now })
-  app.use('*', (c, next) => (c.req.path === '/api/health' ? next() : limiter(c, next)))
+  const syncIpLimiter = rateLimit({ limit: 120, windowMs: 60_000, now: deps.now })
+  app.use('*', (c, next) => {
+    if (c.req.path === '/api/health') return next()
+    return c.req.path === '/api/sync' ? syncIpLimiter(c, next) : limiter(c, next)
+  })
   app.get('/push/key', (c) => c.json({ key: deps.vapidPublicKey }))
   app.route('/reminders', reminderRoutes(deps))
   app.route('/auth', authRoutes(deps))

@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { bodyLimit } from 'hono/body-limit'
 import type { Deps } from './app.js'
 import { requireUser, type AuthEnv } from './auth.js'
 import { rateLimit } from './rate-limit.js'
@@ -13,9 +14,11 @@ export function syncRoutes(deps: Deps): Hono<AuthEnv> {
   r.use('*', rateLimit<AuthEnv>({ limit: 60, windowMs: 60_000, now: deps.now, key: (c) => `user:${c.get('userId')}` }))
 
   // Recebe o documento do aparelho, junta com o da conta e devolve o resultado (o aparelho aplica).
+  // Corta o corpo grande enquanto chega (em bytes), sem ler tudo antes.
+  r.use('*', bodyLimit({ maxSize: MAX_BODY, onError: (c) => c.json({ error: 'too_large' }, 413) }))
+
   r.post('/', async (c) => {
     const text = await c.req.text()
-    if (text.length > MAX_BODY) return c.json({ error: 'too_large' }, 413)
     let incoming: SyncDoc
     try {
       incoming = parseSyncDoc(JSON.parse(text), deps.now().getTime())

@@ -5,6 +5,7 @@ import { loadConfig } from './config.js'
 import { connect } from './db.js'
 import { googleVerifier, testVerifier, type VerifyGoogle } from './google.js'
 import { migrate } from './migrate.js'
+import { purgeSessions } from './auth.js'
 import { makeSend } from './push.js'
 import { runDue } from './scheduler.js'
 
@@ -43,8 +44,14 @@ const timer = setInterval(async () => {
   }
 }, 60_000)
 
+// Sessões paradas há mais de 180 dias: limpeza de hora em hora.
+const purgeTimer = setInterval(() => {
+  purgeSessions(sql, new Date()).catch((err) => console.error('limpeza de sessões', err))
+}, 3_600_000)
+
 async function shutdown() {
   clearInterval(timer)
+  clearInterval(purgeTimer)
   server.close()
   await sql.end({ timeout: 5 })
   process.exit(0)

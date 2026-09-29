@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import { createApp } from '../src/app.js'
+import { purgeSessions } from '../src/auth.js'
 import { freshDb } from './db.js'
 
 const sql = await freshDb()
@@ -95,6 +96,15 @@ describe('excluir conta', () => {
     const { token } = await login('g-5', 'eva@gmail.com')
     expect((await call('DELETE', '/account', { token })).status).toBe(204)
     expect(await sql`select 1 from users where google_sub = 'g-5'`).toHaveLength(0)
+    expect((await call('GET', '/account', { token })).status).toBe(401)
+  })
+})
+
+describe('limpeza de sessões', () => {
+  it('apaga as sessões paradas há mais de 180 dias', async () => {
+    const { token } = await login('g-6', 'fe@gmail.com')
+    const old = new Date('2028-06-01T00:00:00Z')
+    expect(await purgeSessions(sql, old)).toBeGreaterThan(0)
     expect((await call('GET', '/account', { token })).status).toBe(401)
   })
 })

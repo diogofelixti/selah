@@ -26,6 +26,13 @@ export function requireUser(deps: Deps): MiddlewareHandler<AuthEnv> {
   }
 }
 
+/** Apaga as sessões paradas há mais que o prazo (roda de hora em hora no main). Devolve quantas. */
+export async function purgeSessions(sql: Deps['sql'], now: Date): Promise<number> {
+  const oldest = new Date(now.getTime() - SESSION_DAYS * 86_400_000)
+  const rows = await sql`delete from sessions where last_used_at <= ${oldest} returning 1`
+  return rows.length
+}
+
 export function authRoutes(deps: Deps): Hono {
   const { sql } = deps
   const r = new Hono()

@@ -9,145 +9,169 @@ export interface SyncMark {
   updatedAt: number
 }
 
+type Plan = { id: string; startedAt: number }
+type Position = { book: string; chapter: number }
+
 export interface SyncDoc {
   v: 1
   /** Leituras [capítulo, quando], em ordem e sem repetição. */
   readings: [string, number][]
-  /** Capítulo desmarcado em T: apaga as leituras dele feitas até T, em todos os aparelhos. */
-  cleared: Record<string, number>
+  /**
+   * Leituras desmarcadas, pela identidade "CAP@quando" (ver readingId). Apaga só as leituras que o aparelho
+   * viu ao desmarcar: uma leitura nova do mesmo capítulo, feita depois em outro aparelho, continua.
+   */
+  removed: string[]
   /** Destaques e notas por versículo. Marca vazia (sem cor e sem nota) é uma remoção com data. */
   marks: Record<string, SyncMark>
-  activePlan: { value: { id: string; startedAt: number } | null; at: number }
-  lastPosition: { value: { book: string; chapter: number } | null; at: number }
+  activePlan: { value: Plan | null; at: number }
+  lastPosition: { value: Position | null; at: number }
 }
 
 export class InvalidDoc extends Error {}
 
+export const readingId = (ref: string, readAt: number) => `${ref}@${readAt}`
+
 export const emptyDoc = (): SyncDoc => ({
   v: 1,
   readings: [],
-  cleared: {},
+  removed: [],
   marks: {},
   activePlan: { value: null, at: 0 },
   lastPosition: { value: null, at: 0 },
 })
 
-/** Desempate estável: a mesma escolha qualquer que seja a ordem dos lados. */
-const later = <T extends { at?: number; updatedAt?: number }>(x: T, y: T, time: (v: T) => number): T => {
-  const tx = time(x)
-  const ty = time(y)
-  if (tx !== ty) return tx > ty ? x : y
-  return JSON.stringify(x) >= JSON.stringify(y) ? x : y
+// Comparações canônicas: nunca dependem da ordem das chaves (o Postgres reordena o jsonb).
+const markKey = (m: SyncMark) => `${m.color ?? ''}|${m.note}`
+const planKey = (p: Plan | null) => (p ? `${p.id}|${p.startedAt}` : '')
+const positionKey = (p: Position | null) => (p ? `${p.book}|${p.chapter}` : '')
+
+/** Mais recente vence; empate: valor preenchido vence o vazio, e entre dois valores a chave maior. */
+function pick<V>(x: { value: V; at: number }, y: { value: V; at: number }, key: (v: V) => string) {
+  if (x.at !== y.at) return x.at > y.at ? x : y
+  return key(x.value) >= key(y.value) ? x : y
 }
 
-const sortedKeys = <V>(obj: Record<string, V>): Record<string, V> =>
-  Object.fromEntries(Object.keys(obj).sort().map((k) => [k, obj[k]]))
+const cleanMark = (m: SyncMark): SyncMark => ({ color: m.color, note: m.note, updatedAt: m.updatedAt })
+const cleanPlan = (p: Plan | null): Plan | null => (p ? { id: p.id, startedAt: p.startedAt } : null)
+const cleanPosition = (p: Position | null): Position | null => (p ? { book: p.book, chapter: p.chapter } : null)
 
 /** Junta dois documentos. Comutativa, associativa e idempotente: todos os aparelhos convergem. */
 export function mergeSync(a: SyncDoc, b: SyncDoc): SyncDoc {
-  const cleared: Record<string, number> = { ...a.cleared }
-  for (const [ref, t] of Object.entries(b.cleared)) cleared[ref] = Math.max(cleared[ref] ?? -Infinity, t)
+  const removed = [...new Set([...a.removed, ...b.removed])].sort()
+  const gone = new Set(removed)
 
   const seen = new Set<string>()
   const readings: [string, number][] = []
   for (const [ref, readAt] of [...a.readings, ...b.readings]) {
-    const key = `${ref}@${readAt}`
-    if (seen.has(key) || readAt <= (cleared[ref] ?? -Infinity)) continue
-    seen.add(key)
+    const id = readingId(ref, readAt)
+    if (seen.has(id) || gone.has(id)) continue
+    seen.add(id)
     readings.push([ref, readAt])
   }
   readings.sort((x, y) => (x[0] === y[0] ? x[1] - y[1] : x[0] < y[0] ? -1 : 1))
 
-  const marks: Record<string, SyncMark> = { ...a.marks }
-  for (const [ref, mark] of Object.entries(b.marks)) {
-    marks[ref] = marks[ref] ? later(marks[ref], mark, (m) => m.updatedAt) : mark
+  const marks: Record<string, SyncMark> = {}
+  for (const ref of [...new Set([...Object.keys(a.marks), ...Object.keys(b.marks)])].sort()) {
+    const x = a.marks[ref]
+    const y = b.marks[ref]
+    const winner = !x ? y : !y ? x : x.updatedAt !== y.updatedAt ? (x.updatedAt > y.updatedAt ? x : y) : markKey(x) >= markKey(y) ? x : y
+    marks[ref] = cleanMark(winner)
   }
 
+  const plan = pick(a.activePlan, b.activePlan, planKey)
+  const position = pick(a.lastPosition, b.lastPosition, positionKey)
   return {
     v: 1,
     readings,
-    cleared: sortedKeys(cleared),
-    marks: sortedKeys(marks),
-    activePlan: later(a.activePlan, b.activePlan, (p) => p.at),
-    lastPosition: later(a.lastPosition, b.lastPosition, (p) => p.at),
+    removed,
+    marks,
+    activePlan: { value: cleanPlan(plan.value), at: plan.at },
+    lastPosition: { value: cleanPosition(position.value), at: position.at },
   }
 }
 
 const MIN_TIME = Date.UTC(2020, 0, 1)
+const DAY = 86_400_000
 const CHAPTER = /^[1-3A-Z][A-Z0-9]{2}\.\d{1,3}$/
 const VERSE = /^[1-3A-Z][A-Z0-9]{2}\.\d{1,3}\.\d{1,3}$/
-const LIMITS = { readings: 50_000, cleared: 5_000, marks: 10_000, note: 1000 }
+const LIMITS = { readings: 50_000, removed: 100_000, marks: 50_000, note: 1000 }
+
+/**
+ * Datas estranhas (backup antigo, relógio adiantado, frações) são ajustadas em vez de recusar o documento:
+ * antes de 2020 vira 2020; mais de um dia no futuro vira "agora". null quando nem é número.
+ */
+export function clampTime(t: unknown, now: number): number | null {
+  if (typeof t !== 'number' || !Number.isFinite(t)) return null
+  const r = Math.round(t)
+  if (r < MIN_TIME) return MIN_TIME
+  if (r > now + DAY) return now
+  return r
+}
 
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x)
 
-/** Valida um documento vindo de fora (corpo do pedido) e devolve só os campos conhecidos, já normalizado. */
+/**
+ * Valida um documento vindo de fora. Estrutura errada recusa o documento (InvalidDoc); um item com problema
+ * é ajustado ou descartado, para um dado estranho não travar a sincronização para sempre.
+ */
 export function parseSyncDoc(x: unknown, now: number): SyncDoc {
   const fail = (why: string): never => {
     throw new InvalidDoc(why)
   }
-  const time = (t: unknown, what: string): number =>
-    typeof t === 'number' && Number.isInteger(t) && t >= MIN_TIME && t <= now + 86_400_000 ? t : fail(`${what}: data inválida`)
-  const timeOrZero = (t: unknown, what: string): number => (t === 0 ? 0 : time(t, what))
+  if (!isObj(x) || x.v !== 1) return fail('documento inválido')
+  if (!Array.isArray(x.readings) || x.readings.length > LIMITS.readings) fail('leituras inválidas')
+  if (!Array.isArray(x.removed) || x.removed.length > LIMITS.removed) fail('remoções inválidas')
+  if (!isObj(x.marks) || Object.keys(x.marks).length > LIMITS.marks) fail('marcas inválidas')
+  if (!isObj(x.activePlan) || !isObj(x.lastPosition)) fail('plano ou posição inválidos')
 
-  if (!isObj(x) || x.v !== 1) fail('documento inválido')
-  const d = x as Record<string, unknown>
-
-  if (!Array.isArray(d.readings) || d.readings.length > LIMITS.readings) fail('leituras inválidas')
-  const readings = (d.readings as unknown[]).map((r): [string, number] => {
+  const readings: [string, number][] = []
+  for (const r of x.readings as unknown[]) {
     const pair = Array.isArray(r) ? (r as unknown[]) : []
-    const ref = pair[0]
-    if (pair.length !== 2 || typeof ref !== 'string' || !CHAPTER.test(ref)) fail('leitura inválida')
-    return [ref as string, time(pair[1], 'leitura')]
-  })
-
-  if (!isObj(d.cleared) || Object.keys(d.cleared).length > LIMITS.cleared) fail('desmarcações inválidas')
-  const cleared: Record<string, number> = {}
-  for (const [ref, t] of Object.entries(d.cleared as Record<string, unknown>)) {
-    if (!CHAPTER.test(ref)) fail('desmarcação inválida')
-    cleared[ref] = time(t, 'desmarcação')
+    const time = clampTime(pair[1], now)
+    if (typeof pair[0] === 'string' && CHAPTER.test(pair[0]) && time !== null) readings.push([pair[0], time])
   }
 
-  if (!isObj(d.marks) || Object.keys(d.marks).length > LIMITS.marks) fail('marcas inválidas')
+  const removed: string[] = []
+  for (const id of x.removed as unknown[]) {
+    const m = typeof id === 'string' ? /^([^@]+)@(\d+)$/.exec(id) : null
+    const time = m ? clampTime(Number(m[2]), now) : null
+    if (m && CHAPTER.test(m[1]) && time !== null) removed.push(readingId(m[1], time))
+  }
+
   const marks: Record<string, SyncMark> = {}
-  for (const [ref, m] of Object.entries(d.marks as Record<string, unknown>)) {
-    if (!VERSE.test(ref) || !isObj(m)) fail('marca inválida')
-    const { color, note } = m as Record<string, unknown>
-    if (color !== null && color !== 'gold' && color !== 'green' && color !== 'blue') fail('cor inválida')
-    if (typeof note !== 'string' || note.length > LIMITS.note) fail('nota inválida')
-    marks[ref] = { color: color as MarkColor | null, note: note as string, updatedAt: time((m as Record<string, unknown>).updatedAt, 'marca') }
+  for (const [ref, m] of Object.entries(x.marks as Record<string, unknown>)) {
+    if (!VERSE.test(ref) || !isObj(m)) continue
+    const { color, note } = m
+    const updatedAt = clampTime(m.updatedAt, now)
+    if (color !== null && color !== 'gold' && color !== 'green' && color !== 'blue') continue
+    if (typeof note !== 'string' || note.length > LIMITS.note || updatedAt === null) continue
+    marks[ref] = { color: color as MarkColor | null, note, updatedAt }
   }
 
-  const plan = d.activePlan
-  if (!isObj(plan)) fail('plano inválido')
-  const p = plan as Record<string, unknown>
-  let planValue: SyncDoc['activePlan']['value'] = null
-  if (p.value !== null) {
-    const v = p.value
-    if (!isObj(v) || typeof v.id !== 'string' || !/^[a-z0-9-]{1,40}$/.test(v.id)) fail('plano inválido')
-    planValue = { id: (v as Record<string, unknown>).id as string, startedAt: time((v as Record<string, unknown>).startedAt, 'plano') }
-  }
+  const at = (t: unknown) => (t === 0 ? 0 : (clampTime(t, now) ?? 0))
 
-  const pos = d.lastPosition
-  if (!isObj(pos)) fail('posição inválida')
-  const q = pos as Record<string, unknown>
-  let posValue: SyncDoc['lastPosition']['value'] = null
-  if (q.value !== null) {
-    const v = q.value
-    const chapter = isObj(v) ? v.chapter : undefined
-    if (!isObj(v) || typeof v.book !== 'string' || !/^[1-3A-Z][A-Z0-9]{2}$/.test(v.book) || typeof chapter !== 'number' || !Number.isInteger(chapter) || chapter < 1 || chapter > 150) {
-      fail('posição inválida')
-    }
-    posValue = { book: (v as Record<string, unknown>).book as string, chapter: chapter as number }
-  }
+  const p = x.activePlan as Record<string, unknown>
+  const pv = p.value
+  const startedAt = isObj(pv) ? clampTime(pv.startedAt, now) : null
+  const plan: Plan | null =
+    isObj(pv) && typeof pv.id === 'string' && /^[a-z0-9-]{1,40}$/.test(pv.id) && startedAt !== null ? { id: pv.id, startedAt } : null
+
+  const q = x.lastPosition as Record<string, unknown>
+  const qv = q.value
+  const position: Position | null =
+    isObj(qv) && typeof qv.book === 'string' && /^[1-3A-Z][A-Z0-9]{2}$/.test(qv.book) &&
+    typeof qv.chapter === 'number' && Number.isInteger(qv.chapter) && qv.chapter >= 1 && qv.chapter <= 150
+      ? { book: qv.book, chapter: qv.chapter }
+      : null
 
   const parsed: SyncDoc = {
     v: 1,
     readings,
-    cleared,
+    removed,
     marks,
-    activePlan: { value: planValue, at: timeOrZero(p.at, 'plano') },
-    lastPosition: { value: posValue, at: timeOrZero(q.at, 'posição') },
+    activePlan: { value: plan, at: at(p.at) },
+    lastPosition: { value: position, at: at(q.at) },
   }
-  // Normaliza (ordem, repetições, leituras já desmarcadas) com a própria junção.
+  // Normaliza (ordem, repetições, leituras já removidas) com a própria junção.
   return mergeSync(parsed, emptyDoc())
 }

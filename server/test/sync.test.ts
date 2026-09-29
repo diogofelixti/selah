@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createApp } from '../src/app.js'
-import { emptyDoc, type SyncDoc } from '../src/sync-doc.js'
+import { emptyDoc, readingId, type SyncDoc } from '../src/sync-doc.js'
 import { freshDb } from './db.js'
 
 const sql = await freshDb()
@@ -13,12 +13,12 @@ const verifyGoogle = async (credential: string) => {
 const app = createApp({ sql, now: () => now, vapidPublicKey: 'k', googleClientId: 'id', verifyGoogle })
 
 let ip = 0
-const call = (method: string, path: string, opts: { body?: unknown; raw?: string; token?: string } = {}) =>
+const call = (method: string, path: string, opts: { body?: unknown; raw?: string; token?: string; ip?: string } = {}) =>
   app.request(`/api${path}`, {
     method,
     headers: {
       'content-type': 'application/json',
-      'cf-connecting-ip': `10.2.${Math.floor(++ip / 250)}.${ip % 250}`,
+      'cf-connecting-ip': opts.ip ?? `10.2.${Math.floor(++ip / 250)}.${ip % 250}`,
       ...(opts.token ? { authorization: `Bearer ${opts.token}` } : {}),
     },
     body: opts.raw ?? (opts.body === undefined ? undefined : JSON.stringify(opts.body)),
@@ -35,7 +35,7 @@ describe('POST /sync', () => {
     const r1 = await sync(phone, doc({ readings: [['JHN.1', T]], marks: { 'JHN.3.16': { color: 'gold', note: '', updatedAt: T } } }))
     expect(r1.status).toBe(200)
     expect((await r1.json()).readings).toEqual([['JHN.1', T]])
-    const r2 = await sync(laptop, doc({ readings: [['GEN.1', T + 1]], cleared: { 'JHN.1': T + 2 } }))
+    const r2 = await sync(laptop, doc({ readings: [['GEN.1', T + 1]], removed: [readingId('JHN.1', T)] }))
     const merged = (await r2.json()) as SyncDoc
     expect(merged.readings).toEqual([['GEN.1', T + 1]])
     expect(merged.marks['JHN.3.16'].color).toBe('gold')
@@ -53,7 +53,7 @@ describe('POST /sync', () => {
   it('sem sessão: 401; documento inválido: 400; grande demais: 413', async () => {
     expect((await call('POST', '/sync', { body: emptyDoc() })).status).toBe(401)
     const token = await login('u4')
-    const bad = await sync(token, doc({ readings: [['XX', T]] }))
+    const bad = await call('POST', '/sync', { body: { ...emptyDoc(), readings: {} }, token })
     expect(bad.status).toBe(400)
     expect(await bad.json()).toEqual({ error: 'invalid_doc' })
     expect((await call('POST', '/sync', { raw: '{nada', token })).status).toBe(400)
@@ -81,5 +81,22 @@ describe('POST /sync', () => {
     await call('DELETE', '/account', { token })
     expect(await sql`select 1 from sync_docs d join users u on u.id = d.user_id where u.google_sub = 'u7'`).toHaveLength(0)
     expect((await sql`select count(*)::int as n from sync_docs`)[0].n).toBeGreaterThan(0)
+  })
+  it('uma família no mesmo IP sincroniza à vontade (o limite da sincronização é por conta)', async () => {
+    const a = await login('u8')
+    const b = await login('u9')
+    const statuses: number[] = []
+    for (let i = 0; i < 20; i++) {
+      statuses.push((await call('POST', '/sync', { body: emptyDoc(), token: a, ip: '198.51.100.7' })).status)
+      statuses.push((await call('POST', '/sync', { body: emptyDoc(), token: b, ip: '198.51.100.7' })).status)
+    }
+    expect(statuses.every((s) => s === 200)).toBe(true)
+  })
+
+  it('sem sessão, o mesmo IP continua limitado', async () => {
+    const statuses: number[] = []
+    for (let i = 0; i < 125; i++) statuses.push((await call('POST', '/sync', { body: emptyDoc(), ip: '198.51.100.8' })).status)
+    expect(statuses.slice(0, 120).every((s) => s === 401)).toBe(true)
+    expect(statuses.at(-1)).toBe(429)
   })
 })
