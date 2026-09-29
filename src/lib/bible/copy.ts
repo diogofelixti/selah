@@ -28,7 +28,9 @@ type SelectionOpts = {
 }
 
 /** Corpo (com números quando há vários versículos) e referência da seleção. null sem versículos com texto. */
-export function selectionParts(opts: SelectionOpts): { body: string; reference: string; verses: number[] } | null {
+export function selectionParts(
+  opts: SelectionOpts,
+): { body: string; imageBody: string; reference: string; verses: number[] } | null {
   const verses = [...new Set(opts.verses)].filter((v) => opts.texts[v - 1]).sort((a, b) => a - b)
   if (verses.length === 0) return null
   const reference = `${opts.bookName(opts.book)} ${opts.chapter}:${ranges(verses)}`
@@ -36,7 +38,10 @@ export function selectionParts(opts: SelectionOpts): { body: string; reference: 
     verses.length === 1
       ? stripBrackets(opts.texts[verses[0] - 1])
       : verses.map((v) => `${v} ${stripBrackets(opts.texts[v - 1])}`).join(' ')
-  return { body, reference, verses }
+  // Na imagem, o número fica preso à primeira palavra (espaço não separável) e não sobra sozinho no fim da linha.
+  const imageBody =
+    verses.length === 1 ? body : verses.map((v) => `${v} ${stripBrackets(opts.texts[v - 1])}`).join(' ')
+  return { body, imageBody, reference, verses }
 }
 
 /** Texto para copiar ou compartilhar: versículos em ordem, referência e sigla da tradução no fim. */

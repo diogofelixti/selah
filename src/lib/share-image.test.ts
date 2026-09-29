@@ -27,8 +27,17 @@ describe('shareOrDownload', () => {
     expect(await shareOrDownload(blob, 'a.png')).toBe('cancelled')
   })
 
-  it('outros erros sobem para quem chamou', async () => {
+  it('recusa do navegador (NotAllowedError) cai para o download', async () => {
     Object.defineProperty(navigator, 'share', { value: () => Promise.reject(new DOMException('x', 'NotAllowedError')), configurable: true })
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+    URL.createObjectURL = vi.fn(() => 'blob:x')
+    URL.revokeObjectURL = vi.fn()
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    expect(await shareOrDownload(blob, 'a.png')).toBe('downloaded')
+  })
+
+  it('outros erros sobem para quem chamou', async () => {
+    Object.defineProperty(navigator, 'share', { value: () => Promise.reject(new DOMException('x', 'DataError')), configurable: true })
     Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
     await expect(shareOrDownload(blob, 'a.png')).rejects.toThrow()
   })

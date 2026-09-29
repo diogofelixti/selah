@@ -32,8 +32,15 @@ describe('formatSelection', () => {
 
 describe('selectionParts', () => {
   it('separa corpo e referência, sem aspas e sem colchetes', () => {
-    expect(selectionParts({ ...base, verses: [2] })).toEqual({ body: 'dois que três', reference: 'João 3:2', verses: [2] })
-    expect(selectionParts({ ...base, verses: [3, 1] })).toEqual({ body: '1 um 3 quatro', reference: 'João 3:1, 3', verses: [1, 3] })
+    expect(selectionParts({ ...base, verses: [2] })).toMatchObject({ body: 'dois que três', reference: 'João 3:2', verses: [2] })
+    expect(selectionParts({ ...base, verses: [3, 1] })).toMatchObject({ body: '1 um 3 quatro', reference: 'João 3:1, 3', verses: [1, 3] })
     expect(selectionParts({ ...base, verses: [5] })).toBeNull()
+  })
+})
+
+describe('texto da imagem', () => {
+  it('o número do versículo fica colado na primeira palavra (não quebra de linha sozinho)', () => {
+    expect(selectionParts({ ...base, verses: [1, 3] })!.imageBody).toBe('1\u00a0um 3\u00a0quatro')
+    expect(selectionParts({ ...base, verses: [2] })!.imageBody).toBe('dois que três')
   })
 })

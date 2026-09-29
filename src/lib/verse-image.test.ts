@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { imageFilename, layoutVerseImage, type Measure } from './verse-image'
+import { fitReference, imageFilename, layoutVerseImage, type Measure } from './verse-image'
 
 // Medida falsa: cada caractere ocupa metade do tamanho da fonte.
 const measure: Measure = (text, size) => text.length * size * 0.5
@@ -28,6 +28,11 @@ describe('layoutVerseImage', () => {
     expect(layoutVerseImage('palavra '.repeat(1000), measure, { width: 900, maxHeight: 700 })).toBeNull()
   })
 
+  it('diminui a fonte quando uma palavra não cabe na largura', () => {
+    const word = 'x'.repeat(30) // 30 letras: 960 px em 64 px, 900 px em 60 px
+    expect(layoutVerseImage(word, measure, { width: 900, maxHeight: 2000 })?.fontSize).toBe(60)
+  })
+
   it('palavra mais larga que a linha fica sozinha sem travar', () => {
     const r = layoutVerseImage('a supercalifragilisticexpialidocious b', measure, { width: 200, maxHeight: 2000, maxSize: 20, minSize: 20 })!
     expect(r.lines).toEqual(['a', 'supercalifragilisticexpialidocious', 'b'])
@@ -40,5 +45,19 @@ describe('imageFilename', () => {
     expect(imageFilename('JHN', 3, [16], name)).toBe('selah-joao-3-16.png')
     expect(imageFilename('JHN', 3, [18, 16, 17], name)).toBe('selah-joao-3-16-18.png')
     expect(imageFilename('1CO', 13, [4, 7], name)).toBe('selah-1-corintios-13-4-7.png')
+  })
+})
+
+describe('fitReference', () => {
+  it('usa 40 px quando cabe e diminui para referências longas', () => {
+    expect(fitReference('João 3:16 · BLIVRE', measure)).toBe(40)
+    const long = '1 Chronicles 1:1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25 · BSB' // 66 letras
+    const size = fitReference(long, measure)!
+    expect(size).toBeLessThan(40)
+    expect(measure(long, size)).toBeLessThanOrEqual(900)
+  })
+
+  it('devolve null quando nem o menor tamanho cabe', () => {
+    expect(fitReference('9, '.repeat(200), measure)).toBeNull()
   })
 })

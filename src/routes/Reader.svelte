@@ -13,8 +13,8 @@
   import { chapterRef } from '../lib/bible/refs'
   import type { BookText } from '../lib/bible/types'
   import { copyText } from '../lib/clipboard'
-  import { shareOrDownload } from '../lib/share-image'
-  import { fitsVerseImage, imageFilename, renderVerseImage } from '../lib/verse-image'
+  import { shareVerseImage } from '../lib/share-image'
+  import { fitsVerseImage, imageFilename } from '../lib/verse-image'
   import { showToast } from '../lib/toast.svelte'
   import { ui } from '../lib/ui.svelte'
   import { locale, t } from '../lib/i18n/i18n.svelte'
@@ -235,13 +235,21 @@
     return selectionParts({ book, chapter, verses: selected, texts: verses, bookName: (id) => t(`books.${id}`) })
   }
 
+  function imageReference(reference: string) {
+    return `${reference} · ${TRANSLATION_BY_LANG[locale.lang]}`
+  }
+
+  // Cada abertura das opções ganha um número; resposta de uma abertura antiga é descartada.
+  let fitsToken = 0
   async function toggleShare() {
     colorsOpen = false
     shareOpen = !shareOpen
     if (!shareOpen) return
+    const token = ++fitsToken
     imageFits = null
     const p = parts()
-    imageFits = p ? await fitsVerseImage(p.body) : false
+    const fits = p ? await fitsVerseImage(p.imageBody, imageReference(p.reference)).catch(() => false) : false
+    if (token === fitsToken) imageFits = fits
   }
 
   async function shareText() {
@@ -257,26 +265,27 @@
     }
   }
 
+  // Enquanto desenha e compartilha, um segundo toque não começa outra imagem.
+  let imageBusy = $state(false)
   async function shareImage() {
     const p = parts()
-    if (!p) return
-    const css = getComputedStyle(document.documentElement)
-    const color = (name: string) => css.getPropertyValue(name).trim()
-    const blob = await renderVerseImage({
-      text: p.body,
-      reference: `${p.reference} · ${TRANSLATION_BY_LANG[locale.lang]}`,
-      colors: { bg: color('--bg'), text: color('--text'), accent: color('--accent-text') },
-    })
-    if (!blob) return showToast(t('image.tooLong'))
+    if (!p || imageBusy) return
+    imageBusy = true
     try {
-      const result = await shareOrDownload(blob, imageFilename(book, chapter, p.verses, (id) => t(`books.${id}`)))
-      if (result === 'downloaded') showToast(t('image.saved'))
-      if (result !== 'cancelled') {
+      const result = await shareVerseImage({
+        text: p.imageBody,
+        reference: imageReference(p.reference),
+        filename: imageFilename(book, chapter, p.verses, (id) => t(`books.${id}`)),
+      })
+      if (result === 'tooLong') showToast(t('image.tooLong'))
+      else if (result === 'failed') showToast(t('copy.shareFailed'))
+      else if (result === 'downloaded') showToast(t('image.saved'))
+      if (result === 'shared' || result === 'downloaded') {
         shareOpen = false
         selected = []
       }
-    } catch {
-      showToast(t('copy.shareFailed'))
+    } finally {
+      imageBusy = false
     }
   }
 
@@ -401,7 +410,7 @@
 {#if selected.length > 0 && shareOpen}
   <div class="colors share-options" role="group" aria-label={t('image.options')}>
     <button class="pill" onclick={shareText}><Type size={18} aria-hidden="true" />{t('image.text')}</button>
-    <button class="pill" onclick={shareImage} disabled={imageFits !== true}><ImageIcon size={18} aria-hidden="true" />{t('image.image')}</button>
+    <button class="pill" onclick={shareImage} disabled={imageFits !== true || imageBusy}><ImageIcon size={18} aria-hidden="true" />{t('image.image')}</button>
     {#if imageFits === false}
       <p class="hint muted">{t('image.tooLong')}</p>
     {/if}

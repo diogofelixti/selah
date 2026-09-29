@@ -2,10 +2,10 @@
   import { BookOpen, Image as ImageIcon, Menu, SquareCheckBig } from '@lucide/svelte'
   import CopyButton from '../components/CopyButton.svelte'
   import { app } from '../lib/app.svelte'
-  import { formatSelection } from '../lib/bible/copy'
-  import { shareOrDownload } from '../lib/share-image'
+  import { formatSelection, selectionParts } from '../lib/bible/copy'
+  import { shareVerseImage } from '../lib/share-image'
   import { showToast } from '../lib/toast.svelte'
-  import { imageFilename, renderVerseImage } from '../lib/verse-image'
+  import { imageFilename } from '../lib/verse-image'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
   import { formatChapterList, formatRef, parseRef } from '../lib/bible/refs'
   import { tipOfTheDay, verseOfTheDay } from '../lib/daily/daily'
@@ -85,21 +85,26 @@
     return formatSelection({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts, bookName, translation: TRANSLATION_BY_LANG[locale.lang] })
   }
 
-  async function shareVerseImage() {
+  // Enquanto desenha e compartilha, um segundo toque não começa outra imagem.
+  let imageBusy = $state(false)
+  async function shareImage() {
     const p = parseRef(verseRef)!
-    const css = getComputedStyle(document.documentElement)
-    const color = (name: string) => css.getPropertyValue(name).trim()
-    const blob = await renderVerseImage({
-      text: (verseText ?? '').replace(/\[([^\]]+)\]/g, '$1'),
-      reference: `${formatRef(verseRef, bookName)} · ${TRANSLATION_BY_LANG[locale.lang]}`,
-      colors: { bg: color('--bg'), text: color('--text'), accent: color('--accent-text') },
-    })
-    if (!blob) return showToast(t('image.tooLong'))
+    const texts: string[] = []
+    texts[p.verse! - 1] = verseText ?? ''
+    const parts = selectionParts({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts, bookName })
+    if (!parts || imageBusy) return
+    imageBusy = true
     try {
-      const result = await shareOrDownload(blob, imageFilename(p.book, p.chapter, [p.verse!], bookName))
-      if (result === 'downloaded') showToast(t('image.saved'))
-    } catch {
-      showToast(t('copy.shareFailed'))
+      const result = await shareVerseImage({
+        text: parts.imageBody,
+        reference: `${parts.reference} · ${TRANSLATION_BY_LANG[locale.lang]}`,
+        filename: imageFilename(p.book, p.chapter, parts.verses, bookName),
+      })
+      if (result === 'tooLong') showToast(t('image.tooLong'))
+      else if (result === 'failed') showToast(t('copy.shareFailed'))
+      else if (result === 'downloaded') showToast(t('image.saved'))
+    } finally {
+      imageBusy = false
     }
   }
 
@@ -176,7 +181,7 @@
       <div class="verse-head">
         <p class="eyebrow">{t('home.verseOfDay')}</p>
         <span class="verse-actions">
-          <button class="icon-btn" onclick={shareVerseImage} disabled={!verseText} aria-label={t('image.shareVerse')}><ImageIcon size={18} aria-hidden="true" /></button>
+          <button class="icon-btn" onclick={shareImage} disabled={!verseText || imageBusy} aria-label={t('image.shareVerse')}><ImageIcon size={18} aria-hidden="true" /></button>
           <CopyButton text={verseCopy} disabled={!verseText} />
         </span>
       </div>

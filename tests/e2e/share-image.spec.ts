@@ -66,3 +66,25 @@ test('compartilha o PNG quando o aparelho aceita arquivos', async ({ page }) => 
   await page.getByRole('button', { name: 'Imagem' }).click()
   await expect.poll(() => page.evaluate(() => (window as unknown as { __shared?: unknown }).__shared)).toEqual({ name: 'selah-joao-3-16-17.png', type: 'image/png' })
 })
+
+test('dois toques seguidos compartilham uma imagem só', async ({ page }) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __shares: number }
+    w.__shares = 0
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+    Object.defineProperty(navigator, 'share', {
+      value: () => {
+        w.__shares++
+        return new Promise((r) => setTimeout(r, 500))
+      },
+      configurable: true,
+    })
+  })
+  await page.goto('/')
+  await expect(page.locator('.verse-card blockquote')).not.toBeEmpty()
+  // Dois cliques no mesmo instante, antes de a tela atualizar o botão.
+  await page.getByRole('button', { name: 'Compartilhar imagem' }).evaluate((b: HTMLButtonElement) => (b.click(), b.click()))
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __shares: number }).__shares)).toBe(1)
+  await page.waitForTimeout(1500)
+  expect(await page.evaluate(() => (window as unknown as { __shares: number }).__shares)).toBe(1)
+})
