@@ -42,6 +42,9 @@ async function fakeApi(page: Page, opts: { clientId?: string | null; remote?: Sy
     get stored() {
       return stored
     },
+    set stored(doc: SyncDoc) {
+      stored = doc
+    },
   }
 }
 
@@ -108,4 +111,21 @@ test('apagar os dados com conta sai da conta antes, e nada volta da conta', asyn
   await expect(page.getByText('0 de 1.189 capítulos')).toBeVisible()
   await page.waitForTimeout(4000)
   await expect(page.getByText('0 de 1.189 capítulos')).toBeVisible()
+})
+
+test('com o leitor aberto, a posição que veio de outro aparelho não é sobrescrita', async ({ page }) => {
+  const api = await fakeApi(page)
+  await page.goto('/#/ajustes')
+  await page.getByRole('button', { name: 'Entrar com o Google' }).click()
+  await expect(page.getByText('Sincronizado agora')).toBeVisible()
+  await page.goto('/#/ler/JHN/3')
+  await expect(page.locator('#v16')).toBeVisible()
+  await expect.poll(() => api.stored.lastPosition.value?.book, { timeout: 10_000 }).toBe('JHN')
+
+  // Outro aparelho abriu Gênesis 1 depois.
+  api.stored = { ...api.stored, lastPosition: { value: { book: 'GEN', chapter: 1 }, at: Date.now() + 1000 } }
+  // Voltar ao app dispara a sincronização.
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+  await page.waitForTimeout(8000)
+  expect(api.stored.lastPosition.value).toEqual({ book: 'GEN', chapter: 1 })
 })

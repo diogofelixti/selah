@@ -4,7 +4,7 @@
     Square, StickyNote, Type, X,
   } from '@lucide/svelte'
   import NoteDialog from '../components/NoteDialog.svelte'
-  import { tick } from 'svelte'
+  import { tick, untrack } from 'svelte'
   import { app, markRead, setMarks, unmarkRead, updateSettings, updateState } from '../lib/app.svelte'
   import { nextChapter, prevChapter } from '../lib/bible/books'
   import { formatSelection, selectionParts } from '../lib/bible/copy'
@@ -79,9 +79,14 @@
     void load()
   })
 
+  // Grava a posição quando o capítulo na tela muda. Uma posição que chega de outro aparelho (sincronização)
+  // não dispara nova gravação, senão os aparelhos com o leitor aberto ficariam trocando a posição.
   $effect(() => {
-    const pos = app.state.lastPosition
-    if (pos?.book !== book || pos?.chapter !== chapter) void updateState({ lastPosition: { book, chapter } })
+    const here = { book, chapter }
+    untrack(() => {
+      const pos = app.state.lastPosition
+      if (pos?.book !== here.book || pos?.chapter !== here.chapter) void updateState({ lastPosition: here })
+    })
   })
 
   // Marcações deste capítulo, por número do versículo.
