@@ -19,19 +19,30 @@ function ranges(verses: number[]): string {
   return parts.join(', ')
 }
 
-/** Texto para copiar ou compartilhar: versículos em ordem, referência e sigla da tradução no fim. */
-export function formatSelection(opts: {
+type SelectionOpts = {
   book: string
   chapter: number
   verses: readonly number[]
   texts: readonly string[]
   bookName: (id: string) => string
-  translation: string
-}): string {
+}
+
+/** Corpo (com números quando há vários versículos) e referência da seleção. null sem versículos com texto. */
+export function selectionParts(opts: SelectionOpts): { body: string; reference: string; verses: number[] } | null {
   const verses = [...new Set(opts.verses)].filter((v) => opts.texts[v - 1]).sort((a, b) => a - b)
-  if (verses.length === 0) return ''
-  const ref = `${opts.bookName(opts.book)} ${opts.chapter}:${ranges(verses)} (${opts.translation})`
-  if (verses.length === 1) return `“${stripBrackets(opts.texts[verses[0] - 1])}” ${ref}`
-  const body = verses.map((v) => `${v} ${stripBrackets(opts.texts[v - 1])}`).join(' ')
-  return `${body} ${ref}`
+  if (verses.length === 0) return null
+  const reference = `${opts.bookName(opts.book)} ${opts.chapter}:${ranges(verses)}`
+  const body =
+    verses.length === 1
+      ? stripBrackets(opts.texts[verses[0] - 1])
+      : verses.map((v) => `${v} ${stripBrackets(opts.texts[v - 1])}`).join(' ')
+  return { body, reference, verses }
+}
+
+/** Texto para copiar ou compartilhar: versículos em ordem, referência e sigla da tradução no fim. */
+export function formatSelection(opts: SelectionOpts & { translation: string }): string {
+  const parts = selectionParts(opts)
+  if (!parts) return ''
+  const ref = `${parts.reference} (${opts.translation})`
+  return parts.verses.length === 1 ? `“${parts.body}” ${ref}` : `${parts.body} ${ref}`
 }

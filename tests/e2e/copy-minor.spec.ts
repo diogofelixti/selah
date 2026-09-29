@@ -49,8 +49,10 @@ test('erro ao compartilhar mostra aviso, e cancelar não mostra', async ({ page 
   await page.goto('/#/ler/JHN/3')
   await page.locator('#v16').click()
   await page.getByRole('button', { name: 'Compartilhar' }).click()
+  await page.getByRole('button', { name: 'Texto' }).click()
   await expect(page.getByText('Não foi possível compartilhar')).toHaveCount(0)
   await page.getByRole('button', { name: 'Compartilhar' }).click()
+  await page.getByRole('button', { name: 'Texto' }).click()
   await expect(page.getByText('Não foi possível compartilhar')).toBeVisible()
 })
 

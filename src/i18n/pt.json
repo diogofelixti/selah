@@ -207,6 +207,14 @@
     "countOne": "1 marcação",
     "textMissing": "Texto indisponível sem internet."
   },
+  "image": {
+    "options": "Compartilhar como",
+    "text": "Texto",
+    "image": "Imagem",
+    "tooLong": "Trecho longo demais para imagem. Selecione menos versículos.",
+    "saved": "Imagem salva",
+    "shareVerse": "Compartilhar imagem"
+  },
   "reader": {
     "markRead": "Marcar como lido",
     "read": "Lido ✓",

@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { BookOpen, Menu, SquareCheckBig } from '@lucide/svelte'
+  import { BookOpen, Image as ImageIcon, Menu, SquareCheckBig } from '@lucide/svelte'
   import CopyButton from '../components/CopyButton.svelte'
   import { app } from '../lib/app.svelte'
   import { formatSelection } from '../lib/bible/copy'
+  import { shareOrDownload } from '../lib/share-image'
+  import { showToast } from '../lib/toast.svelte'
+  import { imageFilename, renderVerseImage } from '../lib/verse-image'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
   import { formatChapterList, formatRef, parseRef } from '../lib/bible/refs'
   import { tipOfTheDay, verseOfTheDay } from '../lib/daily/daily'
@@ -82,6 +85,24 @@
     return formatSelection({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts, bookName, translation: TRANSLATION_BY_LANG[locale.lang] })
   }
 
+  async function shareVerseImage() {
+    const p = parseRef(verseRef)!
+    const css = getComputedStyle(document.documentElement)
+    const color = (name: string) => css.getPropertyValue(name).trim()
+    const blob = await renderVerseImage({
+      text: (verseText ?? '').replace(/\[([^\]]+)\]/g, '$1'),
+      reference: `${formatRef(verseRef, bookName)} · ${TRANSLATION_BY_LANG[locale.lang]}`,
+      colors: { bg: color('--bg'), text: color('--text'), accent: color('--accent-text') },
+    })
+    if (!blob) return showToast(t('image.tooLong'))
+    try {
+      const result = await shareOrDownload(blob, imageFilename(p.book, p.chapter, [p.verse!], bookName))
+      if (result === 'downloaded') showToast(t('image.saved'))
+    } catch {
+      showToast(t('copy.shareFailed'))
+    }
+  }
+
   const verseLink = $derived.by(() => {
     const p = parseRef(verseRef)!
     return `#/ler/${p.book}/${p.chapter}/${p.verse}`
@@ -154,7 +175,10 @@
     <section class="card verse-card">
       <div class="verse-head">
         <p class="eyebrow">{t('home.verseOfDay')}</p>
-        <CopyButton text={verseCopy} disabled={!verseText} />
+        <span class="verse-actions">
+          <button class="icon-btn" onclick={shareVerseImage} disabled={!verseText} aria-label={t('image.shareVerse')}><ImageIcon size={18} aria-hidden="true" /></button>
+          <CopyButton text={verseCopy} disabled={!verseText} />
+        </span>
       </div>
       <a class="verse-link" href={verseLink}>
         <blockquote>{verseText ?? ''}</blockquote>
@@ -254,6 +278,7 @@
   .retry { justify-self: start; }
   .verse-head { display: flex; justify-content: space-between; align-items: center; margin: -8px -8px 0 0; }
   .verse-link { display: grid; gap: var(--space-3); }
+  .verse-actions { display: flex; color: var(--text-2); }
   .plan-card { display: grid; gap: var(--space-3); }
   .plan-title { font-family: var(--font-display); font-size: 1.1875rem; }
   .plan-pct { font-size: 0.8125rem; font-weight: 700; color: var(--accent-text); }

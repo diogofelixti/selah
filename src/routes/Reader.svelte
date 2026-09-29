@@ -1,17 +1,20 @@
 <script lang="ts">
   import {
-    ArrowLeft, ChevronLeft, ChevronRight, Copy, Headphones, Highlighter, Minus, NotebookPen, Pause, Play, Plus, Share2, Square, StickyNote, X,
+    ArrowLeft, ChevronLeft, ChevronRight, Copy, Headphones, Highlighter, Image as ImageIcon, Minus, NotebookPen, Pause, Play, Plus, Share2,
+    Square, StickyNote, Type, X,
   } from '@lucide/svelte'
   import NoteDialog from '../components/NoteDialog.svelte'
   import { tick } from 'svelte'
   import { app, markRead, setMarks, unmarkRead, updateSettings, updateState } from '../lib/app.svelte'
   import { nextChapter, prevChapter } from '../lib/bible/books'
-  import { formatSelection } from '../lib/bible/copy'
+  import { formatSelection, selectionParts } from '../lib/bible/copy'
   import { splitImplied } from '../lib/bible/format'
   import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
   import { chapterRef } from '../lib/bible/refs'
   import type { BookText } from '../lib/bible/types'
   import { copyText } from '../lib/clipboard'
+  import { shareOrDownload } from '../lib/share-image'
+  import { fitsVerseImage, imageFilename, renderVerseImage } from '../lib/verse-image'
   import { showToast } from '../lib/toast.svelte'
   import { ui } from '../lib/ui.svelte'
   import { locale, t } from '../lib/i18n/i18n.svelte'
@@ -33,6 +36,9 @@
   // Só um versículo por vez entra na ordem do Tab; as setas andam entre eles.
   let focusVerse = $state(1)
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+  let shareOpen = $state(false)
+  // null: ainda calculando; false: não cabe na imagem.
+  let imageFits = $state<boolean | null>(null)
 
   const ref = $derived(chapterRef(book, chapter))
   const activePlan = $derived(
@@ -93,7 +99,9 @@
   })
 
   function onKey(e: KeyboardEvent) {
-    if (e.key === 'Escape' && colorsOpen) colorsOpen = false
+    if (e.key !== 'Escape') return
+    colorsOpen = false
+    shareOpen = false
   }
   let noteVerse = $state<number | null>(null)
   const verseRef = (n: number) => `${book}.${chapter}.${n}`
@@ -216,13 +224,59 @@
     if (ok) selected = []
   }
 
-  async function shareSelection() {
+  // Mudou a seleção: as opções abertas (e o "cabe na imagem") deixam de valer.
+  $effect(() => {
+    void selected.join()
+    shareOpen = false
+    if (selected.length === 0) colorsOpen = false
+  })
+
+  function parts() {
+    return selectionParts({ book, chapter, verses: selected, texts: verses, bookName: (id) => t(`books.${id}`) })
+  }
+
+  async function toggleShare() {
+    colorsOpen = false
+    shareOpen = !shareOpen
+    if (!shareOpen) return
+    imageFits = null
+    const p = parts()
+    imageFits = p ? await fitsVerseImage(p.body) : false
+  }
+
+  async function shareText() {
+    shareOpen = false
+    // Sem compartilhamento nativo, "Texto" copia.
+    if (!canShare) return copySelection()
     try {
       await navigator.share({ text: selectionText() })
       selected = []
     } catch (err) {
       // Cancelar é normal e fica em silêncio; qualquer outro erro vira aviso.
       if (!(err instanceof DOMException && err.name === 'AbortError')) showToast(t('copy.shareFailed'))
+    }
+  }
+
+  async function shareImage() {
+    const p = parts()
+    if (!p) return
+    const css = getComputedStyle(document.documentElement)
+    const color = (name: string) => css.getPropertyValue(name).trim()
+    const blob = await renderVerseImage({
+      text: p.body,
+      reference: `${p.reference} · ${TRANSLATION_BY_LANG[locale.lang]}`,
+      colors: { bg: color('--bg'), text: color('--text'), accent: color('--accent-text') },
+    })
+    if (!blob) return showToast(t('image.tooLong'))
+    try {
+      const result = await shareOrDownload(blob, imageFilename(book, chapter, p.verses, (id) => t(`books.${id}`)))
+      if (result === 'downloaded') showToast(t('image.saved'))
+      if (result !== 'cancelled') {
+        shareOpen = false
+        selected = []
+      }
+    } catch {
+      showToast(t('copy.shareFailed'))
     }
   }
 
@@ -344,6 +398,16 @@
   </div>
 {/if}
 
+{#if selected.length > 0 && shareOpen}
+  <div class="colors share-options" role="group" aria-label={t('image.options')}>
+    <button class="pill" onclick={shareText}><Type size={18} aria-hidden="true" />{t('image.text')}</button>
+    <button class="pill" onclick={shareImage} disabled={imageFits !== true}><ImageIcon size={18} aria-hidden="true" />{t('image.image')}</button>
+    {#if imageFits === false}
+      <p class="hint muted">{t('image.tooLong')}</p>
+    {/if}
+  </div>
+{/if}
+
 {#if selected.length > 0 && colorsOpen}
   <div class="colors" role="group" aria-label={t('marks.colors')}>
     {#each MARK_COLORS as color (color)}
@@ -357,16 +421,14 @@
   <div class="selection-bar" role="toolbar" aria-label={t('copy.toolbar')}>
     <span class="count" aria-live="polite">{selected.length === 1 ? t('copy.countOne') : t('copy.countMany', { n: selected.length })}</span>
     <button class="icon-btn filled" onclick={copySelection} aria-label={t('copy.copy')}><Copy size={18} /></button>
-    <button class="icon-btn" onclick={() => (colorsOpen = !colorsOpen)} aria-expanded={colorsOpen} aria-label={t('marks.highlight')}>
+    <button class="icon-btn" onclick={() => ((shareOpen = false), (colorsOpen = !colorsOpen))} aria-expanded={colorsOpen} aria-label={t('marks.highlight')}>
       <Highlighter size={20} />
     </button>
     {#if selected.length === 1}
       <button class="icon-btn" onclick={() => openNote(selected[0])} aria-label={t('marks.note')}><NotebookPen size={20} /></button>
     {/if}
-    {#if canShare}
-      <button class="icon-btn" onclick={shareSelection} aria-label={t('copy.share')}><Share2 size={20} /></button>
-    {/if}
-    <button class="icon-btn" onclick={() => ((selected = []), (colorsOpen = false))} aria-label={t('copy.cancel')}><X size={20} /></button>
+    <button class="icon-btn" onclick={toggleShare} aria-expanded={shareOpen} aria-label={t('copy.share')}><Share2 size={20} /></button>
+    <button class="icon-btn" onclick={() => ((selected = []), (colorsOpen = false), (shareOpen = false))} aria-label={t('copy.cancel')}><X size={20} /></button>
   </div>
 {/if}
 
@@ -461,6 +523,10 @@
     z-index: 2;
   }
   .colors { gap: var(--space-2); }
+  .share-options { flex-wrap: wrap; }
+  .share-options .pill { flex-grow: 1; }
+  .share-options .pill:disabled { opacity: 0.45; cursor: default; }
+  .hint { flex-basis: 100%; font-size: 0.8125rem; margin: 0; }
   .colors .pill { padding: 0 var(--space-3); white-space: nowrap; flex-shrink: 0; }
   .swatch { flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; border: 2px solid var(--border-strong); cursor: pointer; }
   .swatch[aria-pressed='true'] { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent-text); }

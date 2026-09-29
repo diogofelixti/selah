@@ -51,17 +51,10 @@ export function imageFilename(book: string, chapter: number, verses: number[], b
 }
 
 const SIZE = { width: 1080, height: 1350 }
+const TEXT_AREA = { width: 900, maxHeight: 900 }
+const family = '"Lora Variable", Georgia, serif'
 
-/**
- * Desenha a imagem do versículo (1080 × 1350) com as cores do tema e devolve um PNG.
- * null quando o texto não cabe nem no menor tamanho de fonte.
- */
-export async function renderVerseImage(opts: {
-  text: string
-  reference: string
-  colors: { bg: string; text: string; accent: string }
-}): Promise<Blob | null> {
-  const family = '"Lora Variable", Georgia, serif'
+async function prepare() {
   // A imagem só sai com a fonte do app se ela já estiver carregada.
   await Promise.all([document.fonts.load(`64px ${family}`), document.fonts.load(`600 40px ${family}`)])
   const canvas = document.createElement('canvas')
@@ -73,7 +66,28 @@ export async function renderVerseImage(opts: {
     ctx.font = `${size}px ${family}`
     return ctx.measureText(text).width
   }
-  const layout = layoutVerseImage(opts.text, measure, { width: 900, maxHeight: 900 })
+  return { canvas, ctx, measure }
+}
+
+/** true se o texto cabe na imagem em algum tamanho de fonte permitido. */
+export async function fitsVerseImage(text: string): Promise<boolean> {
+  const prepared = await prepare()
+  return !!prepared && layoutVerseImage(text, prepared.measure, TEXT_AREA) !== null
+}
+
+/**
+ * Desenha a imagem do versículo (1080 × 1350) com as cores do tema e devolve um PNG.
+ * null quando o texto não cabe nem no menor tamanho de fonte.
+ */
+export async function renderVerseImage(opts: {
+  text: string
+  reference: string
+  colors: { bg: string; text: string; accent: string }
+}): Promise<Blob | null> {
+  const prepared = await prepare()
+  if (!prepared) return null
+  const { canvas, ctx, measure } = prepared
+  const layout = layoutVerseImage(opts.text, measure, TEXT_AREA)
   if (!layout) return null
 
   ctx.fillStyle = opts.colors.bg

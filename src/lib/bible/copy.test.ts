@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatSelection } from './copy'
+import { formatSelection, selectionParts } from './copy'
 
 const texts = ['um', 'dois [que] três', 'quatro', 'cinco', '', 'seis']
 const base = { book: 'JHN', chapter: 3, texts, bookName: () => 'João', translation: 'BLIVRE' }
@@ -27,5 +27,13 @@ describe('formatSelection', () => {
 
   it('não usa travessão nem meia risca', () => {
     expect(formatSelection({ ...base, verses: [1, 2, 3, 4, 6] })).not.toMatch(/[–—]/)
+  })
+})
+
+describe('selectionParts', () => {
+  it('separa corpo e referência, sem aspas e sem colchetes', () => {
+    expect(selectionParts({ ...base, verses: [2] })).toEqual({ body: 'dois que três', reference: 'João 3:2', verses: [2] })
+    expect(selectionParts({ ...base, verses: [3, 1] })).toEqual({ body: '1 um 3 quatro', reference: 'João 3:1, 3', verses: [1, 3] })
+    expect(selectionParts({ ...base, verses: [5] })).toBeNull()
   })
 })

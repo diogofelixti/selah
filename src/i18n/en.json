@@ -207,6 +207,14 @@
     "countOne": "1 marked verse",
     "textMissing": "Text unavailable offline."
   },
+  "image": {
+    "options": "Share as",
+    "text": "Text",
+    "image": "Image",
+    "tooLong": "Too long for an image. Select fewer verses.",
+    "saved": "Image saved",
+    "shareVerse": "Share as image"
+  },
   "reader": {
     "markRead": "Mark as read",
     "read": "Read ✓",
