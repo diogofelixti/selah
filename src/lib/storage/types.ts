@@ -4,7 +4,7 @@ import type { Reading } from '../progress/progress'
 
 export type { Reading }
 
-export const THEMES = ['auto', 'aurora', 'noite'] as const
+export const THEMES = ['auto', 'aurora', 'noite', 'pergaminho', 'oliveira'] as const
 export type Theme = (typeof THEMES)[number]
 
 export const FONT_SIZES = [1, 2, 3, 4] as const

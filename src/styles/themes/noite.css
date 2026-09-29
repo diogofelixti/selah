@@ -1,4 +1,4 @@
-:root[data-theme='noite'] {
+[data-theme='noite'] {
   color-scheme: dark;
   --bg: #12161f;
   --surface: #1b2130;

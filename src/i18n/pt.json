@@ -278,9 +278,10 @@
     "themes": {
       "auto": "Automático (tema do aparelho)",
       "aurora": "Aurora (claro)",
-      "noite": "Noite (escuro)"
+      "noite": "Noite (escuro)",
+      "pergaminho": "Pergaminho (claro, ilustrado)",
+      "oliveira": "Oliveira (escuro, ilustrado)"
     },
-    "moreThemes": "Mais temas em breve",
     "fontSize": "Tamanho da letra",
     "fontSizeValue": "{n} de 4",
     "offline": "Uso sem internet",

@@ -1,0 +1,25 @@
+[data-theme='oliveira'] {
+  color-scheme: dark;
+  --bg: #1b1f16;
+  --surface: #242a1d;
+  --surface-2: #2e3525;
+  --track: #353d2b;
+  --border: #353d2b;
+  --border-strong: #75805f;
+  --text: #eef0e2;
+  --text-2: #adb39b;
+  --accent: #b5c17a;
+  --accent-text: #bcc784;
+  --on-accent: #1b1f16;
+  --nt: #8fb8b0;
+  --flash: #3a4127;
+  --mark-gold: #45401c;
+  --mark-green: #2c4526;
+  --mark-blue: #213a45;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Nomes da v1, mantidos para as telas que ainda os usam. */
+  --accent-strong: var(--accent-text);
+  --progress: var(--accent);
+  --progress-track: var(--track);
+}

@@ -19,7 +19,7 @@ const ratio = (a: string, b: string) => {
   return (hi + 0.05) / (lo + 0.05)
 }
 
-describe.each(['aurora', 'noite'])('contraste do tema %s', (theme) => {
+describe.each(['aurora', 'noite', 'pergaminho', 'oliveira'])('contraste do tema %s', (theme) => {
   const token = tokensOf(theme)
 
   it('texto passa em AA (4,5:1)', () => {

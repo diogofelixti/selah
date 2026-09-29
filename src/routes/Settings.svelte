@@ -85,10 +85,15 @@
       {#each THEMES as theme (theme)}
         <label class="option">
           <input type="radio" name="theme" value={theme} checked={app.settings.theme === theme} onchange={() => updateSettings({ theme })} />
-          {t(`settings.themes.${theme}`)}
+          <span class="theme-name">{t(`settings.themes.${theme}`)}</span>
+          <!-- Amostra com os tokens do próprio tema: fundo, destaque e texto. -->
+          <span class="previews" aria-hidden="true">
+            {#each theme === 'auto' ? ['aurora', 'noite'] : [theme] as preview (preview)}
+              <span class="swatch" data-theme={preview}><span class="dot accent"></span><span class="dot ink"></span></span>
+            {/each}
+          </span>
         </label>
       {/each}
-      <p class="muted small">{t('settings.moreThemes')}</p>
     </fieldset>
 
     <section class="card row">
@@ -140,6 +145,16 @@
   legend { font-family: var(--font-display); font-size: 1.0625rem; padding: 0 var(--space-1); }
   .option { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; }
   .option input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .theme-name { flex: 1; }
+  .previews { display: flex; gap: var(--space-1); }
+  .swatch {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    width: 44px; height: 28px; border-radius: var(--radius-s);
+    background: var(--bg); border: 1px solid var(--border-strong);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.accent { background: var(--accent); }
+  .dot.ink { background: var(--text); }
   .row { display: flex; justify-content: space-between; align-items: center; }
   .stepper { display: flex; align-items: center; gap: var(--space-1); }
   .data { display: grid; gap: var(--space-2); }

@@ -1,4 +1,4 @@
-:root[data-theme='aurora'] {
+[data-theme='aurora'] {
   color-scheme: light;
   --bg: #f7f2ea;
   --surface: #fffdf9;

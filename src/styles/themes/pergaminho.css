@@ -1,0 +1,25 @@
+[data-theme='pergaminho'] {
+  color-scheme: light;
+  --bg: #f1e7d0;
+  --surface: #f8f1e0;
+  --surface-2: #eadcbf;
+  --track: #e4d3b1;
+  --border: #dccaa5;
+  --border-strong: #8f7a55;
+  --text: #2b2116;
+  --text-2: #62523c;
+  --accent: #8c3b1c;
+  --accent-text: #83371a;
+  --on-accent: #fbf5e6;
+  --nt: #3f6b6b;
+  --flash: #efd9a8;
+  --mark-gold: #ecd697;
+  --mark-green: #d6e2c2;
+  --mark-blue: #d3e0e4;
+  --shadow: 0 8px 24px rgba(60, 40, 15, 0.1);
+
+  /* Nomes da v1, mantidos para as telas que ainda os usam. */
+  --accent-strong: var(--accent-text);
+  --progress: var(--accent);
+  --progress-track: var(--track);
+}

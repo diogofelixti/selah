@@ -278,9 +278,10 @@
     "themes": {
       "auto": "Automatic (device theme)",
       "aurora": "Aurora (light)",
-      "noite": "Night (dark)"
+      "noite": "Night (dark)",
+      "pergaminho": "Parchment (light, illustrated)",
+      "oliveira": "Olive (dark, illustrated)"
     },
-    "moreThemes": "More themes coming soon",
     "fontSize": "Text size",
     "fontSizeValue": "{n} of 4",
     "offline": "Offline use",
