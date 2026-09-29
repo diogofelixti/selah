@@ -381,5 +381,14 @@
     "available": "A new version is available.",
     "reload": "Update",
     "dismiss": "Close"
+  },
+  "donate": {
+    "title": "Support Selah",
+    "text": "Selah is free and ad-free. If it helps you, consider supporting it with a donation via Pix. Pix is a Brazilian instant payment method.",
+    "pix": "Pix key (CNPJ)",
+    "copy": "Copy Pix key",
+    "copied": "Pix key copied",
+    "contact": "Questions, suggestions or another way to help? Talk to us.",
+    "whatsapp": "Chat on WhatsApp"
   }
 }

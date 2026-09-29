@@ -381,5 +381,14 @@
     "available": "Nova versão disponível.",
     "reload": "Atualizar",
     "dismiss": "Fechar"
+  },
+  "donate": {
+    "title": "Apoie o Selah",
+    "text": "O Selah é gratuito e sem anúncios. Se ele ajuda você, considere apoiar com uma doação via Pix.",
+    "pix": "Chave Pix (CNPJ)",
+    "copy": "Copiar chave Pix",
+    "copied": "Chave Pix copiada",
+    "contact": "Dúvidas, sugestões ou outra forma de ajudar? Fale com a gente.",
+    "whatsapp": "Falar no WhatsApp"
   }
 }

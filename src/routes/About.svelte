@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ArrowLeft } from '@lucide/svelte'
+  import DonateCard from '../components/DonateCard.svelte'
   import { t } from '../lib/i18n/i18n.svelte'
 </script>
 
@@ -19,6 +20,8 @@
       <p class="small">{t('about.bsb')}</p>
       <p class="small muted">{t('about.italics')}</p>
     </section>
+
+    <DonateCard />
 
     <p class="muted small">
       <a href="https://selatech.com.br" target="_blank" rel="noopener">{t('about.madeBy')}</a>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ArrowLeft, ChevronRight, Download, Minus, Plus, Trash2, Upload } from '@lucide/svelte'
   import { app, clearData, replaceData, snapshot, updateSettings } from '../lib/app.svelte'
+  import DonateCard from '../components/DonateCard.svelte'
   import { t } from '../lib/i18n/i18n.svelte'
   import type { LanguageSetting } from '../lib/i18n/lang'
   import { localDayKey } from '../lib/progress/progress'
@@ -132,6 +133,8 @@
       <span>{t('marks.title')}</span>
       <ChevronRight size={20} aria-hidden="true" />
     </a>
+
+    <DonateCard />
 
     <a class="card row link" href="#/sobre">
       <span>{t('settings.about')}</span>
