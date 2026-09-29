@@ -51,6 +51,9 @@ export function onResume(): void {
 }
 
 export function applyUpdate(): void {
+  // O registerSW só recarrega quando acha que a versão nova veio desta aba. Na primeira visita seguida de
+  // atualização (ou versão achada por outra aba) ele não recarrega; a troca de controle cobre esses casos.
+  navigator.serviceWorker?.addEventListener('controllerchange', () => window.location.reload(), { once: true })
   void updateSW?.(true)
 }
 
