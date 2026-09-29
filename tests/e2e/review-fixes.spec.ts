@@ -23,6 +23,8 @@ test('durante um plano, tocar e segurar um capítulo lido antes não apaga o his
   page.on('dialog', (dialog) => dialog.accept())
   await page.goto('/#/ler/JHN/3')
   await page.getByRole('button', { name: 'Marcar como lido' }).click()
+  // Espera a gravação terminar antes de sair da página.
+  await expect(page.getByRole('button', { name: 'Lido ✓' })).toBeVisible()
   await page.goto('/#/planos')
   await page.getByRole('article').filter({ hasText: 'Evangelhos em 30 dias' }).getByRole('button', { name: 'Começar' }).click()
   await page.goto('/#/livro/JHN')

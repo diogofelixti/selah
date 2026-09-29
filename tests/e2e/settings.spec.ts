@@ -25,6 +25,8 @@ test('troca o idioma para inglês e de volta', async ({ page }) => {
 test('exporta o progresso', async ({ page }) => {
   await page.goto('/#/ler/JHN/1')
   await page.getByRole('button', { name: 'Marcar como lido' }).click()
+  // Espera a gravação terminar antes de sair da página.
+  await expect(page.getByRole('button', { name: 'Lido ✓' })).toBeVisible()
   await page.goto('/#/ajustes')
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Exportar progresso' }).click()
@@ -48,6 +50,8 @@ test('apaga os dados depois de duas confirmações', async ({ page }) => {
   page.on('dialog', (dialog) => dialog.accept())
   await page.goto('/#/ler/RUT/1')
   await page.getByRole('button', { name: 'Marcar como lido' }).click()
+  // Espera a gravação terminar antes de sair da página.
+  await expect(page.getByRole('button', { name: 'Lido ✓' })).toBeVisible()
   await page.goto('/#/ajustes')
   await page.getByRole('button', { name: 'Apagar dados' }).click()
   await expect(page.getByText('Dados apagados.')).toBeVisible()

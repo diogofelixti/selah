@@ -42,6 +42,8 @@ test('capítulo lido antes do plano precisa ser marcado de novo para o plano', a
   page.on('dialog', (dialog) => dialog.accept())
   await page.goto('/#/ler/MRK/1')
   await page.getByRole('button', { name: 'Marcar como lido' }).click()
+  // Espera a gravação terminar antes de sair da página.
+  await expect(page.getByRole('button', { name: 'Lido ✓' })).toBeVisible()
   await page.goto('/#/planos')
   await page.getByRole('article').filter({ hasText: 'Novo Testamento em 90 dias' }).getByRole('button', { name: 'Começar' }).click()
   await page.goto('/#/ler/MRK/1')

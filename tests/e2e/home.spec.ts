@@ -19,6 +19,8 @@ test('mostra progresso, semana, versículo, dica e começa pelo Evangelho de Jo�
 test('conta o dia de leitura e mostra onde continuar', async ({ page }) => {
   await page.goto('/#/ler/JHN/1')
   await page.getByRole('button', { name: 'Marcar como lido' }).click()
+  // Espera a gravação terminar antes de sair da página.
+  await expect(page.getByRole('button', { name: 'Lido ✓' })).toBeVisible()
   await page.goto('/')
   await expect(page.locator('.week [data-today="true"][data-read="true"]')).toHaveCount(1)
   await expect(page.getByText('Leitura em 1 dos últimos 7 dias')).toBeAttached()
