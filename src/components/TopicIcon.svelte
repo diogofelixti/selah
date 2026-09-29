@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { Bird, Flower2, Heart, HeartCrack, Mountain, Shield, Sparkles, Sun, Sunrise, Wind } from '@lucide/svelte'
+  import {
+    Anchor, Bird, Compass, Feather, Flower2, Heart, HeartCrack, House, Leaf, Moon, Mountain, Shield, Sparkles, Sun, Sunrise, Wind,
+  } from '@lucide/svelte'
   import type { TopicIcon } from '../lib/topics/topics'
 
   let { name, size = 24 }: { name: TopicIcon; size?: number } = $props()
@@ -15,6 +17,12 @@
     sparkles: Sparkles,
     bird: Bird,
     mountain: Mountain,
+    leaf: Leaf,
+    anchor: Anchor,
+    moon: Moon,
+    house: House,
+    compass: Compass,
+    feather: Feather,
   }
 
   const Icon = $derived(ICONS[name])

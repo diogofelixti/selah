@@ -25,3 +25,13 @@ test('mostra erro e tenta de novo quando os versículos não carregam', async ({
   await page.getByRole('button', { name: 'Tentar de novo' }).click()
   await expect(page.getByRole('link', { name: /Filipenses 4:13/ }).locator('blockquote')).not.toBeEmpty()
 })
+
+test('temas novos aparecem e abrem com os versículos', async ({ page }) => {
+  await page.goto('/#/temas')
+  for (const name of ['Paz', 'Fé', 'Solidão', 'Família', 'Sabedoria para decidir', 'Cansaço']) {
+    await expect(page.getByRole('link', { name, exact: true })).toBeVisible()
+  }
+  await page.getByRole('link', { name: 'Paz', exact: true }).click()
+  await expect(page.getByRole('heading', { level: 1, name: 'Paz' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Isaías 26:3/ }).locator('blockquote')).not.toBeEmpty()
+})

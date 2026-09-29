@@ -2,7 +2,10 @@ import raw from '../../content/topics.json'
 
 export type Localized = { pt: string; en: string }
 
-export const TOPIC_ICONS = ['wind', 'heart-crack', 'flower', 'shield', 'heart', 'sun', 'sunrise', 'sparkles', 'bird', 'mountain'] as const
+export const TOPIC_ICONS = [
+  'wind', 'heart-crack', 'flower', 'shield', 'heart', 'sun', 'sunrise', 'sparkles', 'bird', 'mountain',
+  'leaf', 'anchor', 'moon', 'house', 'compass', 'feather',
+] as const
 export type TopicIcon = (typeof TOPIC_ICONS)[number]
 
 export interface Topic {

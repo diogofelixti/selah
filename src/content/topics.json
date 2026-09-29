@@ -58,5 +58,41 @@
     "title": { "pt": "Força", "en": "Strength" },
     "intro": { "pt": "Quando as forças acabam, Deus renova quem espera Nele.", "en": "When your strength runs out, God renews those who wait on Him." },
     "refs": ["PHP.4.13", "ISA.40.29", "NEH.8.10", "PSA.73.26", "EPH.6.10", "PSA.28.7"]
+  },
+  {
+    "id": "paz", "icon": "leaf",
+    "title": { "pt": "Paz", "en": "Peace" },
+    "intro": { "pt": "A paz de Deus não depende das circunstâncias. Ela guarda o coração mesmo quando tudo ao redor se agita.", "en": "God's peace does not depend on circumstances. It guards your heart even when everything around you is shaken." },
+    "refs": ["JHN.16.33", "ISA.26.3", "ROM.5.1", "COL.3.15", "NUM.6.24", "NUM.6.26", "PSA.4.8", "2TH.3.16"]
+  },
+  {
+    "id": "fe", "icon": "anchor",
+    "title": { "pt": "Fé", "en": "Faith" },
+    "intro": { "pt": "A fé não é ausência de dúvida. É confiar em Deus e dar o próximo passo, mesmo sem ver o caminho inteiro.", "en": "Faith is not the absence of doubt. It is trusting God and taking the next step, even without seeing the whole path." },
+    "refs": ["HEB.11.6", "ROM.10.17", "MRK.9.24", "2CO.5.7", "MAT.17.20", "EPH.2.8", "HEB.6.19", "MRK.11.24"]
+  },
+  {
+    "id": "solidao", "icon": "moon",
+    "title": { "pt": "Solidão", "en": "Loneliness" },
+    "intro": { "pt": "Quando parece que ninguém vê você, Deus vê. Ele promete estar presente em todos os dias.", "en": "When it feels like no one sees you, God does. He promises to be with you every day." },
+    "refs": ["PSA.68.6", "MAT.28.20", "PSA.27.10", "HEB.13.5", "JHN.14.18", "PSA.73.23", "ISA.49.15", "PSA.139.7"]
+  },
+  {
+    "id": "familia", "icon": "house",
+    "title": { "pt": "Família", "en": "Family" },
+    "intro": { "pt": "Paciência, perdão e amor no dia a dia. A Bíblia fala da casa como lugar de cuidado.", "en": "Patience, forgiveness and love in everyday life. The Bible speaks of home as a place of care." },
+    "refs": ["JOS.24.15", "RUT.1.16", "PRO.22.6", "EPH.4.2", "PRO.17.17", "EPH.6.4", "1CO.16.14", "1PE.3.8"]
+  },
+  {
+    "id": "sabedoria", "icon": "compass",
+    "title": { "pt": "Sabedoria para decidir", "en": "Wisdom for decisions" },
+    "intro": { "pt": "Diante de uma escolha difícil, peça sabedoria. Deus promete guiar quem busca a direção Dele.", "en": "Facing a hard choice, ask for wisdom. God promises to guide those who seek His direction." },
+    "refs": ["JAS.1.5", "PRO.3.5", "PRO.3.6", "PRO.4.11", "PRO.2.6", "PRO.16.9", "PRO.19.21", "ISA.30.21"]
+  },
+  {
+    "id": "cansaco", "icon": "feather",
+    "title": { "pt": "Cansaço", "en": "Weariness" },
+    "intro": { "pt": "Quando as forças acabam, Jesus chama para perto e oferece descanso para a alma.", "en": "When your strength runs out, Jesus calls you close and offers rest for your soul." },
+    "refs": ["MAT.11.29", "MAT.11.30", "GAL.6.9", "PSA.23.2", "2CO.4.16", "JER.31.25", "ISA.40.28", "EXO.33.14"]
   }
 ]

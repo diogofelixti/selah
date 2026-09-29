@@ -24,13 +24,18 @@ describe('conteúdo editorial', () => {
 
   it('temas têm id único, ícone conhecido, textos nos dois idiomas e de 6 a 10 versículos', () => {
     expect(new Set(TOPICS.map((t) => t.id)).size).toBe(TOPICS.length)
-    expect(TOPICS).toHaveLength(10)
+    expect(TOPICS).toHaveLength(16)
     for (const topic of TOPICS) {
       expect(TOPIC_ICONS).toContain(topic.icon)
       for (const text of [topic.title.pt, topic.title.en, topic.intro.pt, topic.intro.en]) expect(text.trim()).not.toBe('')
       expect(topic.refs.length).toBeGreaterThanOrEqual(6)
       expect(topic.refs.length).toBeLessThanOrEqual(10)
     }
+  })
+
+  it('um versículo não se repete entre temas', () => {
+    const refs = TOPICS.flatMap((t) => t.refs)
+    expect(refs.filter((r, i) => refs.indexOf(r) !== i)).toEqual([])
   })
 
   it('tem de 10 a 15 dicas nos dois idiomas', () => {
