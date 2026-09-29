@@ -218,7 +218,9 @@
     "languageEn": "English",
     "theme": "Tema visual",
     "themes": {
-      "aurora": "Aurora"
+      "auto": "Automático (tema do aparelho)",
+      "aurora": "Aurora (claro)",
+      "noite": "Noite (escuro)"
     },
     "moreThemes": "Mais temas em breve",
     "fontSize": "Tamanho da letra",

@@ -4,7 +4,7 @@ import type { Reading } from '../progress/progress'
 
 export type { Reading }
 
-export const THEMES = ['aurora'] as const
+export const THEMES = ['auto', 'aurora', 'noite'] as const
 export type Theme = (typeof THEMES)[number]
 
 export const FONT_SIZES = [1, 2, 3, 4] as const
@@ -27,7 +27,7 @@ export interface AppData {
   state: AppState
 }
 
-export const DEFAULT_SETTINGS: Settings = { language: 'auto', theme: 'aurora', fontSize: 2 }
+export const DEFAULT_SETTINGS: Settings = { language: 'auto', theme: 'auto', fontSize: 2 }
 export const DEFAULT_STATE: AppState = { lastPosition: null, activePlan: null }
 
 export interface Repository {

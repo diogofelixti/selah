@@ -7,6 +7,7 @@
   import { TRANSLATION_BY_LANG } from './lib/bible/loader'
   import { locale, t } from './lib/i18n/i18n.svelte'
   import { resolveLanguage } from './lib/i18n/lang'
+  import { resolveTheme } from './lib/theme'
   import { applyUpdate, dismissUpdate, ensureOffline, initPwa, onResume, pwa } from './lib/pwa.svelte'
   import type { Route } from './lib/router'
   import { router } from './lib/router.svelte'
@@ -37,8 +38,20 @@
     if (app.ready) ensureOffline(TRANSLATION_BY_LANG[locale.lang])
   })
 
+  let prefersDark = $state(matchMedia('(prefers-color-scheme: dark)').matches)
   $effect(() => {
-    document.documentElement.dataset.theme = app.settings.theme
+    const media = matchMedia('(prefers-color-scheme: dark)')
+    const onChange = () => (prefersDark = media.matches)
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  })
+
+  $effect(() => {
+    const root = document.documentElement
+    root.dataset.theme = resolveTheme(app.settings.theme, prefersDark)
+    // A barra do navegador acompanha o fundo do tema.
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim()
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg)
   })
 
   const route = $derived(router.route)

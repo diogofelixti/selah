@@ -111,7 +111,11 @@ Leitor, Ler (livros e grade), Temas, Ajustes e Sobre passam a usar os mesmos tok
 
 ### Tema escuro
 
-Fica para depois, como na spec original. Os tokens acima são o contrato: o tema "Noite" será só outro conjunto de valores, partindo das cores da direção B do canvas.
+Implementado em 2026-09-28 como tema **Noite** (`src/styles/themes/noite.css`), com as cores da direção B do canvas.
+- **Ajuste "Tema visual":** Automático (padrão, segue o modo claro ou escuro do aparelho), Aurora (claro) ou Noite (escuro).
+- **Contraste:** um teste confere o contraste AA dos dois temas.
+- **Barra do navegador:** a cor do topo do navegador acompanha o fundo do tema.
+- **Carregamento:** uma linha no `index.html` evita o clarão de tela clara antes de o app carregar.
 
 ## 7. Fora deste escopo
 

@@ -1,0 +1,22 @@
+:root[data-theme='noite'] {
+  color-scheme: dark;
+  --bg: #12161f;
+  --surface: #1b2130;
+  --surface-2: #252c3d;
+  --track: #2a3142;
+  --border: #2a3142;
+  --border-strong: #646d82;
+  --text: #f3eee4;
+  --text-2: #a9a396;
+  --accent: #d8b26a;
+  --accent-text: #d8b26a;
+  --on-accent: #1a1408;
+  --nt: #8fb3c9;
+  --flash: #3b3423;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Nomes da v1, mantidos para as telas que ainda os usam. */
+  --accent-strong: var(--accent-text);
+  --progress: var(--accent);
+  --progress-track: var(--track);
+}

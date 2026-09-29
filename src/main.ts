@@ -4,6 +4,7 @@ import '@fontsource-variable/lora/wght-italic.css'
 import '@fontsource-variable/source-sans-3'
 import './styles/tokens.css'
 import './styles/themes/aurora.css'
+import './styles/themes/noite.css'
 import './styles/global.css'
 import App from './App.svelte'
 

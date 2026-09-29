@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Selah" />
     <title>Selah</title>
+    <!-- Evita um clarão de tela clara no modo escuro antes de o app carregar os ajustes. -->
+    <script>if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'noite'</script>
   </head>
   <body>
     <div id="app"></div>
