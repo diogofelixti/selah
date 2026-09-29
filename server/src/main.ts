@@ -4,7 +4,8 @@ import { createApp } from './app.js'
 import { loadConfig } from './config.js'
 import { connect } from './db.js'
 import { migrate } from './migrate.js'
-import { runDue, type Send } from './scheduler.js'
+import { makeSend } from './push.js'
+import { runDue } from './scheduler.js'
 
 const config = loadConfig()
 const sql = connect(config.databaseUrl)
@@ -16,10 +17,7 @@ const server = serve({ fetch: app.fetch, port: config.port, hostname: '0.0.0.0' 
 })
 
 webpush.setVapidDetails(config.vapid.subject, config.vapid.publicKey, config.vapid.privateKey)
-// Lembrete velho não serve: se o aparelho estiver desligado por mais de 30 minutos, o push expira.
-const send: Send = async (sub, payload) => {
-  await webpush.sendNotification(sub, payload, { TTL: 30 * 60, urgency: 'normal' })
-}
+const send = makeSend(webpush)
 
 // Roda a cada minuto; se uma rodada demorar, a próxima espera (sem rodadas sobrepostas).
 let running = false

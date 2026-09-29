@@ -1,6 +1,6 @@
 import { Hono, type Context } from 'hono'
 import type { Deps } from './app.js'
-import { dayDiff, isDate, isKey, isPushEndpoint, localDate, parseTime } from './validate.js'
+import { dayDiff, isAuth, isDate, isP256dh, isPushEndpoint, isTimeZone, localDate, parseTime } from './validate.js'
 
 const MAX_BODY = 4096
 
@@ -34,17 +34,14 @@ export function reminderRoutes(deps: Deps): Hono {
     throw err
   })
 
-  const isTimeZone = async (tz: unknown) =>
-    typeof tz === 'string' && tz.length <= 64 && (await sql`select 1 from pg_timezone_names where name = ${tz}`).length > 0
-
   r.put('/', async (c) => {
     const body = await readJson(c)
     const sub = body.subscription as { endpoint?: unknown; keys?: { p256dh?: unknown; auth?: unknown } } | undefined
     if (!isPushEndpoint(sub?.endpoint)) throw new Invalid('endpoint')
-    if (!isKey(sub?.keys?.p256dh, 200) || !isKey(sub?.keys?.auth, 100)) throw new Invalid('keys')
+    if (!isP256dh(sub?.keys?.p256dh) || !isAuth(sub?.keys?.auth)) throw new Invalid('keys')
     const minutes = parseTime(body.time)
     if (minutes === null) throw new Invalid('time')
-    if (!(await isTimeZone(body.tz))) throw new Invalid('tz')
+    if (!isTimeZone(body.tz)) throw new Invalid('tz')
     if (body.lang !== 'pt' && body.lang !== 'en') throw new Invalid('lang')
     const { endpoint, keys } = sub as { endpoint: string; keys: { p256dh: string; auth: string } }
     await sql`
@@ -69,8 +66,9 @@ export function reminderRoutes(deps: Deps): Hono {
     if (!isDate(body.date)) throw new Invalid('date')
     const [row] = await sql`select tz from reminders where endpoint = ${body.endpoint}`
     if (!row) return c.json({ error: 'not_found' }, 404)
-    // Só aceita "hoje" (com 1 dia de folga para relógios e fusos) no fuso do registro.
-    if (Math.abs(dayDiff(body.date, localDate(deps.now(), row.tz))) > 1) throw new Invalid('date')
+    // Hoje ou ontem no fuso do registro (aparelho atrasado). Amanhã apagaria o lembrete de amanhã sem leitura.
+    const diff = dayDiff(body.date, localDate(deps.now(), row.tz))
+    if (diff > 0 || diff < -1) throw new Invalid('date')
     await sql`
       update reminders set done_on = greatest(coalesce(done_on, ${body.date}::date), ${body.date}::date)
       where endpoint = ${body.endpoint}`

@@ -19,9 +19,18 @@ export function parseTime(value: unknown): number | null {
   return m ? Number(m[1]) * 60 + Number(m[2]) : null
 }
 
-/** Chave de inscrição em base64url, com tamanho razoável. */
-export function isKey(value: unknown, max: number): value is string {
-  return typeof value === 'string' && value.length > 0 && value.length <= max && /^[A-Za-z0-9_-]+=*$/.test(value)
+const decode = (value: unknown): Buffer | null =>
+  typeof value === 'string' && value.length <= 200 && /^[A-Za-z0-9_-]+=*$/.test(value) ? Buffer.from(value, 'base64url') : null
+
+/** Chave pública do aparelho: ponto P-256 não comprimido (65 bytes, começando com 0x04). */
+export function isP256dh(value: unknown): value is string {
+  const bytes = decode(value)
+  return bytes !== null && bytes.length === 65 && bytes[0] === 0x04
+}
+
+/** Segredo de autenticação da inscrição: 16 bytes. */
+export function isAuth(value: unknown): value is string {
+  return decode(value)?.length === 16
 }
 
 export function isDate(value: unknown): value is string {
@@ -36,4 +45,18 @@ export function localDate(at: Date, tz: string): string {
 /** Diferença em dias entre duas datas "AAAA-MM-DD". */
 export function dayDiff(a: string, b: string): number {
   return Math.round((Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000)
+}
+
+/**
+ * Fuso válido para o Node (ICU), que calcula o "hoje" do registro. Os fusos IANA do ICU também existem
+ * no Postgres, que calcula a hora local no agendador.
+ */
+export function isTimeZone(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length > 64 || !/^[A-Za-z_]+(\/[A-Za-z0-9_+-]+)*$/.test(value)) return false
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: value })
+    return true
+  } catch {
+    return false
+  }
 }

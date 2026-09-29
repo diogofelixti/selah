@@ -68,12 +68,12 @@ describe('runDue', () => {
     expect(sent).toEqual(['ontem'])
   })
 
-  it('apaga inscrições que o serviço de push diz não existir mais (404 e 410)', async () => {
-    await add('g1', 7 * 60, 'America/Sao_Paulo')
-    await add('g2', 7 * 60, 'America/Sao_Paulo')
-    fail = { g1: 410, g2: 404 }
+  it('apaga inscrições com falha permanente (404, 410, 400, 401, 403, 413)', async () => {
+    const codes = [404, 410, 400, 401, 403, 413]
+    for (const c of codes) await add(`g${c}`, 7 * 60, 'America/Sao_Paulo')
+    fail = Object.fromEntries(codes.map((c) => [`g${c}`, c]))
     const result = await runDue(sql, at('2026-09-29T10:00:00Z'), send)
-    expect(result).toEqual({ sent: 0, removed: 2, failed: 0 })
+    expect(result).toEqual({ sent: 0, removed: codes.length, failed: 0 })
     expect((await sql`select count(*)::int as n from reminders`)[0].n).toBe(0)
   })
 
