@@ -3,7 +3,7 @@
   import { app, markMany, markRead, unmarkRead, updateState } from '../lib/app.svelte'
   import { formatRef, parseRef } from '../lib/bible/refs'
   import { t } from '../lib/i18n/i18n.svelte'
-  import { PLANS, PLAN_IDS, type PlanId } from '../lib/plans/catalog'
+  import { PLANS, PLAN_GROUPS, type PlanId } from '../lib/plans/catalog'
   import { planStatus, planStrip, visibleDays } from '../lib/plans/status'
   import { readSet } from '../lib/progress/progress'
 
@@ -111,22 +111,27 @@
     <button class="btn btn-ghost stop" onclick={stop}>{t('plans.stop')}</button>
   {/if}
 
-  <div class="stack list">
-    {#each PLAN_IDS as id (id)}
-      <article class="card">
-        <h2>{t(`plans.catalog.${id}.title`)}</h2>
-        <p class="muted">{t(`plans.catalog.${id}.desc`)}</p>
-        <div class="list-row">
-          <span class="muted small">{t('plans.length', { count: PLANS[id].days.length })}</span>
-          {#if active?.id === id && status}
-            <span class="badge">{t('plans.percent', { percent: status.percent })}</span>
-          {:else}
-            <button class="pill" onclick={() => start(id)}>{t('plans.start')}</button>
-          {/if}
-        </div>
-      </article>
-    {/each}
-  </div>
+  {#each PLAN_GROUPS as group (group.id)}
+    <section aria-labelledby={`group-${group.id}`}>
+      <h2 class="section-title" id={`group-${group.id}`}>{t(`plans.groups.${group.id}`)}</h2>
+      <div class="stack list">
+        {#each group.plans as id (id)}
+          <article class="card">
+            <h3>{t(`plans.catalog.${id}.title`)}</h3>
+            <p class="muted">{t(`plans.catalog.${id}.desc`)}</p>
+            <div class="list-row">
+              <span class="muted small">{t('plans.length', { count: PLANS[id].days.length })}</span>
+              {#if active?.id === id && status}
+                <span class="badge">{t('plans.percent', { percent: status.percent })}</span>
+              {:else}
+                <button class="pill" onclick={() => start(id)}>{t('plans.start')}</button>
+              {/if}
+            </div>
+          </article>
+        {/each}
+      </div>
+    </section>
+  {/each}
 </div>
 
 <style>
@@ -182,7 +187,7 @@
     color: var(--text-2);
   }
   .stop { justify-self: start; color: var(--text-2); margin: var(--space-4) 0; }
-  .list { margin-top: var(--space-5); }
+  .list { margin-bottom: var(--space-2); }
   .list .card { display: grid; gap: var(--space-2); }
   .list-row { display: flex; justify-content: space-between; align-items: center; }
   .badge { font-size: 0.875rem; font-weight: 700; color: var(--accent-text); }

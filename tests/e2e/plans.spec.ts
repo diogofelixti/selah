@@ -47,3 +47,14 @@ test('capítulo lido antes do plano precisa ser marcado de novo para o plano', a
   await page.goto('/#/ler/MRK/1')
   await expect(page.getByRole('button', { name: 'Marcar como lido' })).toBeVisible()
 })
+
+test('planos em três grupos, com os novos para começar', async ({ page }) => {
+  await page.goto('/#/planos')
+  const groups = page.getByRole('heading', { level: 2 })
+  await expect(groups).toHaveText(['Para começar', 'Para aprofundar', 'A Bíblia inteira'])
+  await expect(page.getByRole('heading', { level: 3 })).toHaveCount(9)
+  const john = page.getByRole('article').filter({ has: page.getByRole('heading', { name: 'João em 21 dias' }) })
+  await expect(john.getByText('21 dias', { exact: true })).toBeVisible()
+  await john.getByRole('button', { name: 'Começar' }).click()
+  await expect(page.getByText('Dia 1 de 21').first()).toBeVisible()
+})

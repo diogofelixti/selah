@@ -252,6 +252,26 @@
       "psalms-proverbs-31": {
         "title": "Salmos e Provérbios em 31 dias",
         "desc": "Um capítulo de Provérbios e alguns salmos por dia, durante um mês."
+      },
+      "john-21": {
+        "title": "João em 21 dias",
+        "desc": "Um capítulo por dia do Evangelho de João. Um bom primeiro passo."
+      },
+      "proverbs-31": {
+        "title": "Provérbios em 31 dias",
+        "desc": "Um capítulo de sabedoria para cada dia do mês."
+      },
+      "psalms-30": {
+        "title": "Salmos em 30 dias",
+        "desc": "Os 150 salmos, 5 por dia, para orar e louvar durante um mês."
+      },
+      "paul-30": {
+        "title": "Cartas de Paulo em 30 dias",
+        "desc": "De Romanos a Filemom, em 2 ou 3 capítulos por dia."
+      },
+      "bible-2y": {
+        "title": "Bíblia em 2 anos",
+        "desc": "A Bíblia toda com calma, em 1 ou 2 capítulos por dia."
       }
     },
     "eyebrow": "Plano atual",
@@ -261,7 +281,12 @@
     "dayCount": "{done} de {total}",
     "markDay": "Marcar o dia todo",
     "readChapter": "Ler {ref}",
-    "percent": "{percent}% concluído"
+    "percent": "{percent}% concluído",
+    "groups": {
+      "start": "Para começar",
+      "deeper": "Para aprofundar",
+      "whole": "A Bíblia inteira"
+    }
   },
   "topics": {
     "title": "Temas",

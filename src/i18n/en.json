@@ -252,6 +252,26 @@
       "psalms-proverbs-31": {
         "title": "Psalms and Proverbs in 31 days",
         "desc": "One chapter of Proverbs and a few psalms each day for a month."
+      },
+      "john-21": {
+        "title": "John in 21 days",
+        "desc": "One chapter a day from the Gospel of John. A good first step."
+      },
+      "proverbs-31": {
+        "title": "Proverbs in 31 days",
+        "desc": "A chapter of wisdom for each day of the month."
+      },
+      "psalms-30": {
+        "title": "Psalms in 30 days",
+        "desc": "All 150 psalms, 5 a day, to pray and praise for a month."
+      },
+      "paul-30": {
+        "title": "Paul's letters in 30 days",
+        "desc": "From Romans to Philemon, 2 or 3 chapters a day."
+      },
+      "bible-2y": {
+        "title": "Bible in 2 years",
+        "desc": "The whole Bible at a gentle pace, 1 or 2 chapters a day."
       }
     },
     "eyebrow": "Current plan",
@@ -261,7 +281,12 @@
     "dayCount": "{done} of {total}",
     "markDay": "Mark the whole day",
     "readChapter": "Read {ref}",
-    "percent": "{percent}% complete"
+    "percent": "{percent}% complete",
+    "groups": {
+      "start": "Getting started",
+      "deeper": "Going deeper",
+      "whole": "The whole Bible"
+    }
   },
   "topics": {
     "title": "Topics",
