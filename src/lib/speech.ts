@@ -118,24 +118,43 @@ export function browserEngine(lang: string): SpeechEngine | null {
     return null
   }
   const synth = window.speechSynthesis
+  // As vozes carregam depois no Android: guarda a lista e atualiza quando o navegador avisar.
+  let voices = synth.getVoices()
+  synth.addEventListener?.('voiceschanged', () => (voices = synth.getVoices()))
+  // A fala atual fica referenciada: no Chrome do Android ela pode ser descartada antes do fim.
+  let current: SpeechSynthesisUtterance | null = null
+  let watchdog: ReturnType<typeof setInterval> | undefined
+
   return {
     speak(text, rate, done) {
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.lang = lang
       utterance.rate = rate
-      const voice = pickVoice(synth.getVoices(), lang)
+      const voice = pickVoice(voices, lang)
       if (voice) utterance.voice = voice
       let finished = false
       const finish = (result: 'end' | 'cancel' | 'error') => {
         if (finished) return
         finished = true
+        clearInterval(watchdog)
+        if (current === utterance) current = null
         done(result)
       }
       utterance.onend = () => finish('end')
       utterance.onerror = (e) => finish(e.error === 'interrupted' || e.error === 'canceled' ? 'cancel' : 'error')
+      current = utterance
       synth.speak(utterance)
+      // Alguns Android param de falar sem disparar onend: duas checagens seguidas em silêncio contam como fim.
+      clearInterval(watchdog)
+      let silent = 0
+      watchdog = setInterval(() => {
+        silent = synth.speaking || synth.pending ? 0 : silent + 1
+        if (silent >= 2) finish('end')
+      }, 1000)
     },
     cancel() {
+      clearInterval(watchdog)
+      current = null
       synth.cancel()
     },
   }
