@@ -31,12 +31,10 @@ Tudo do Selah fica em `/srv/selah`:
 ## Atualizar (no bilbo)
 
 ```sh
-npm run build
-rsync -a --delete dist/ frodo:/srv/selah/app/
-rsync -a --delete --exclude node_modules --exclude dist server/ frodo:/srv/selah/server/
-rsync -a deploy/docker-compose.yml deploy/backup.sh deploy/nginx/selah.conf frodo:/srv/selah/
-ssh frodo 'cd /srv/selah && docker compose up -d --build'
+SELAH_DEPLOY_TARGET=bilbo@frodo npm run deploy
 ```
+
+O script (`scripts/deploy.sh`) roda os testes, gera o `dist/`, copia o app, a API e os arquivos de deploy, e sobe os containers.
 
 ## Conferir
 

@@ -217,7 +217,7 @@ Cada módulo em `lib/` tem uma responsabilidade só e expõe funções puras sem
 ## 8. Deploy
 
 - O build gera a pasta `dist/` estática.
-- No frodo, os arquivos ficam em `/var/www/selah` e são servidos pelo servidor web que já roda lá (nginx, Caddy ou outro, verificado na tarefa de deploy do plano), com o host `selah.selatech.com.br`.
+- No frodo, os arquivos ficam em `/srv/selah/app` (atualizado na v8; ver `deploy/README.md`) e são servidos pelo servidor web que já roda lá (nginx, Caddy ou outro, verificado na tarefa de deploy do plano), com o host `selah.selatech.com.br`.
 - HTTPS obrigatório (o PWA exige). O frodo usa nginx atrás da Cloudflare (proxy ligado) com um Origin Certificate curinga `*.selatech.com.br` em `/etc/ssl/cloudflare/`, que já cobre `selah.selatech.com.br`.
 - O registro DNS `selah` é criado na Cloudflare com o proxy ligado.
 - Cabeçalhos de cache: `index.html` e `sw.js` sem cache longo; arquivos com hash no nome com cache longo e imutável.
