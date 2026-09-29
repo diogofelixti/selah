@@ -1,6 +1,6 @@
-import { mergeSync, type SyncDoc } from '../../../server/src/sync-doc'
-import { app, applySyncResult } from '../app.svelte'
-import { applyDoc, buildDoc } from './local-doc'
+import type { SyncDoc } from '../../../server/src/sync-doc'
+import { app, mergeRemote } from '../app.svelte'
+import { buildDoc } from './local-doc'
 
 const TOKEN_KEY = 'selah-session'
 const ACCOUNT_KEY = 'selah-account'
@@ -65,7 +65,11 @@ function api(path: string, init: RequestInit = {}): Promise<Response> {
   return fetchImpl(`/api${path}`, { ...init, headers })
 }
 
+/** Muda a cada entrada e saída da conta: resposta de uma sincronização de antes é descartada. */
+let generation = 0
+
 function forget(status: typeof account.status = 'idle'): void {
+  generation++
   account.token = null
   account.email = null
   account.lastSyncAt = null
@@ -91,6 +95,7 @@ export async function signInWithCredential(credential: string): Promise<boolean>
     const res = await api('/auth/google', { method: 'POST', body: JSON.stringify({ credential }) })
     if (!res.ok) return false
     const { token, email } = (await res.json()) as { token: string; email: string }
+    generation++
     account.token = token
     account.email = email
     account.status = 'idle'
@@ -146,9 +151,12 @@ async function syncOnce(): Promise<void> {
   if (!account.token || !app.ready) return
   account.status = 'syncing'
   const changesAtStart = app.changes
+  const started = generation
+  const stillValid = () => generation === started && account.token !== null
   let merged: SyncDoc
   try {
     const res = await api('/sync', { method: 'POST', body: JSON.stringify(buildDoc($state.snapshot(app), $state.snapshot(app.syncMeta))) })
+    if (!stillValid()) return
     if (res.status === 401) return forget('expired')
     if (!res.ok) {
       account.status = 'error'
@@ -159,15 +167,12 @@ async function syncOnce(): Promise<void> {
     account.status = 'error'
     return
   }
-  // Junta de novo com o aparelho agora: o que mudou durante o pedido continua valendo.
-  const local = buildDoc($state.snapshot(app), $state.snapshot(app.syncMeta))
-  const final = mergeSync(merged, local)
-  if (JSON.stringify(final) !== JSON.stringify(mergeSync(local, local))) {
-    const out = applyDoc(final, $state.snapshot(app.state), $state.snapshot(app.syncMeta))
-    if (!(await applySyncResult({ readings: out.readings, marks: out.marks, state: out.state }, out.meta))) {
-      account.status = 'error'
-      return
-    }
+  // Junta de novo com o aparelho agora (na fila das mudanças): o que mudou durante o pedido continua valendo.
+  const result = await mergeRemote(merged, stillValid)
+  if (result === 'stale') return
+  if (result === 'failed') {
+    account.status = 'error'
+    return
   }
   account.lastSyncAt = Date.now()
   account.status = 'idle'

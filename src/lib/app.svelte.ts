@@ -1,4 +1,6 @@
+import { emptyDoc, mergeSync, readingId, type SyncDoc } from '../../server/src/sync-doc'
 import { createMemoryRepository, openRepository } from './storage/repository'
+import { applyDoc, buildDoc } from './sync/local-doc'
 import {
   DEFAULT_SETTINGS, DEFAULT_STATE, EMPTY_SYNC_META, isEmptyMark, type AppData, type AppState, type MarkColor, type Reading,
   type Repository, type Settings, type SyncMeta, type VerseMark,
@@ -65,6 +67,15 @@ async function save(write: () => Promise<void>, apply: () => void): Promise<void
   apply()
 }
 
+// Uma mudança nos dados por vez (e a aplicação da sincronização entra na mesma fila): assim o resultado
+// de uma sincronização nunca é aplicado no meio de uma gravação, nem entre os dados e o registro dela.
+let queue: Promise<unknown> = Promise.resolve()
+function exclusive<T>(run: () => Promise<T>): Promise<T> {
+  const next = queue.then(run, run)
+  queue = next.catch(() => {})
+  return next
+}
+
 /** Registra o que a sincronização precisa saber sobre uma mudança e avisa que há algo a enviar. */
 async function recordSync(change: (meta: SyncMeta) => void): Promise<void> {
   const next = $state.snapshot(app.syncMeta)
@@ -89,47 +100,49 @@ async function guarded(refs: readonly string[], run: (refs: string[]) => Promise
 }
 
 export async function markRead(ref: string): Promise<void> {
-  await guarded([ref], async () => {
+  await guarded([ref], () => exclusive(async () => {
     const reading = { ref, readAt: Date.now() }
     await save(() => store().addReading(reading), () => (app.readings = [...app.readings, reading]))
     if (!app.saveError) app.changes++
-  })
+  }))
 }
 
+/** Identidades das leituras de um capítulo neste aparelho (o que a desmarcação remove em todos). */
+const readingIdsOf = (refs: Set<string>) => app.readings.filter((r) => refs.has(r.ref)).map((r) => readingId(r.ref, r.readAt))
+
 export async function unmarkRead(ref: string): Promise<void> {
-  await guarded([ref], async () => {
+  await guarded([ref], () => exclusive(async () => {
+    const ids = readingIdsOf(new Set([ref]))
     await save(() => store().removeReadingsFor(ref), () => (app.readings = app.readings.filter((r) => r.ref !== ref)))
-    if (!app.saveError) await recordSync((m) => (m.cleared[ref] = Date.now()))
-  })
+    if (!app.saveError) await recordSync((m) => (m.removedReadings = [...new Set([...m.removedReadings, ...ids])]))
+  }))
 }
 
 export async function markMany(refs: readonly string[]): Promise<void> {
-  await guarded(refs, async (free) => {
+  await guarded(refs, (free) => exclusive(async () => {
     const now = Date.now()
     const readings = free.map((ref) => ({ ref, readAt: now }))
     await save(() => store().addReadings(readings), () => (app.readings = [...app.readings, ...readings]))
     if (!app.saveError) app.changes++
-  })
+  }))
 }
 
 export async function unmarkMany(refs: readonly string[]): Promise<void> {
-  await guarded(refs, async (free) => {
+  await guarded(refs, (free) => exclusive(async () => {
     const remove = new Set(free)
+    const ids = readingIdsOf(remove)
     await save(
       () => store().removeReadingsForMany(free),
       () => (app.readings = app.readings.filter((r) => !remove.has(r.ref))),
     )
-    if (!app.saveError) {
-      const now = Date.now()
-      await recordSync((m) => free.forEach((ref) => (m.cleared[ref] = now)))
-    }
-  })
+    if (!app.saveError) await recordSync((m) => (m.removedReadings = [...new Set([...m.removedReadings, ...ids])]))
+  }))
 }
 
 /** Aplica cor e/ou nota a versículos. Sem cor e sem nota, a marcação é apagada. */
 export async function setMarks(refs: readonly string[], patch: { color?: MarkColor | null; note?: string }): Promise<void> {
   const keys = refs.map((ref) => `mark:${ref}`)
-  await guarded(keys, async (free) => {
+  await guarded(keys, (free) => exclusive(async () => {
     const now = Date.now()
     const byRef = new Map(app.marks.map((m) => [m.ref, $state.snapshot(m)]))
     const next: VerseMark[] = free.map((key) => {
@@ -152,7 +165,7 @@ export async function setMarks(refs: readonly string[], patch: { color?: MarkCol
         }
       })
     }
-  })
+  }))
 }
 
 // $state.snapshot: o IndexedDB não consegue clonar os proxies reativos do Svelte.
@@ -161,53 +174,74 @@ export async function updateSettings(patch: Partial<Settings>): Promise<void> {
   await save(() => store().saveSettings(next), () => (app.settings = next))
 }
 
-export async function updateState(patch: Partial<AppState>): Promise<void> {
-  const next = { ...$state.snapshot(app.state), ...patch }
-  await save(() => store().saveState(next), () => (app.state = next))
-  if (app.saveError) return
-  const now = Date.now()
-  await recordSync((m) => {
-    if ('activePlan' in patch) m.activePlanAt = now
-    if ('lastPosition' in patch) m.lastPositionAt = now
+export function updateState(patch: Partial<AppState>): Promise<void> {
+  return exclusive(async () => {
+    const next = { ...$state.snapshot(app.state), ...patch }
+    await save(() => store().saveState(next), () => (app.state = next))
+    if (app.saveError) return
+    const now = Date.now()
+    await recordSync((m) => {
+      if ('activePlan' in patch) m.activePlanAt = now
+      if ('lastPosition' in patch) m.lastPositionAt = now
+    })
   })
 }
 
 /** Retorna false se não conseguiu gravar (app.saveError fica ligado). */
-export async function replaceData(data: AppData): Promise<boolean> {
-  await save(() => store().replaceAll(data), () => {
-    app.readings = data.readings
-    app.settings = data.settings
-    app.state = data.state
-    app.marks = data.marks
+export function replaceData(data: AppData): Promise<boolean> {
+  return exclusive(async () => {
+    await save(() => store().replaceAll(data), () => {
+      app.readings = data.readings
+      app.settings = data.settings
+      app.state = data.state
+      app.marks = data.marks
+    })
+    if (app.saveError) return false
+    // Com conta, o backup se junta à conta na próxima sincronização. Plano e posição importados são a
+    // escolha mais recente da pessoa: valem sobre os da conta.
+    const now = Date.now()
+    await recordSync((m) => {
+      m.activePlanAt = now
+      m.lastPositionAt = now
+    })
+    return !app.saveError
   })
-  // Com conta, o que veio do backup se junta ao que está na conta na próxima sincronização.
-  if (!app.saveError) app.changes++
-  return !app.saveError
 }
 
-export async function clearData(): Promise<boolean> {
-  await save(() => store().clearAll(), () => {
-    app.readings = []
-    app.settings = { ...DEFAULT_SETTINGS }
-    app.state = { ...DEFAULT_STATE }
-    app.marks = []
-    app.syncMeta = structuredClone(EMPTY_SYNC_META)
+export function clearData(): Promise<boolean> {
+  return exclusive(async () => {
+    await save(() => store().clearAll(), () => {
+      app.readings = []
+      app.settings = { ...DEFAULT_SETTINGS }
+      app.state = { ...DEFAULT_STATE }
+      app.marks = []
+      app.syncMeta = structuredClone(EMPTY_SYNC_META)
+    })
+    return !app.saveError
   })
-  return !app.saveError
 }
 
 /**
- * Aplica o resultado de uma sincronização (tudo menos os ajustes). Não conta como mudança local,
- * senão cada sincronização dispararia outra.
+ * Junta o documento que veio da conta com o que está no aparelho agora e grava, na fila das mudanças.
+ * `stillValid` é conferido já com a vez garantida: depois de sair da conta, nada é aplicado.
+ * Não conta como mudança local, senão cada sincronização dispararia outra.
  */
-export async function applySyncResult(data: Pick<AppData, 'readings' | 'marks' | 'state'>, meta: SyncMeta): Promise<boolean> {
-  await save(() => store().applySync(data, meta), () => {
-    app.readings = data.readings
-    app.marks = data.marks
-    app.state = data.state
-    app.syncMeta = meta
+export function mergeRemote(remote: SyncDoc, stillValid: () => boolean): Promise<'applied' | 'unchanged' | 'stale' | 'failed'> {
+  return exclusive(async () => {
+    if (!stillValid()) return 'stale'
+    const local = buildDoc($state.snapshot(app), $state.snapshot(app.syncMeta))
+    const final = mergeSync(remote, local)
+    // Documentos canônicos (a junção sempre monta as chaves na mesma ordem): comparar o texto basta.
+    if (JSON.stringify(final) === JSON.stringify(mergeSync(local, emptyDoc()))) return 'unchanged'
+    const out = applyDoc(final, $state.snapshot(app.state), $state.snapshot(app.syncMeta))
+    await save(() => store().applySync({ readings: out.readings, marks: out.marks, state: out.state }, out.meta), () => {
+      app.readings = out.readings
+      app.marks = out.marks
+      app.state = out.state
+      app.syncMeta = out.meta
+    })
+    return app.saveError ? 'failed' : 'applied'
   })
-  return !app.saveError
 }
 
 export function snapshot(): AppData {

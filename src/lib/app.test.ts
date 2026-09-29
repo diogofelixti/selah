@@ -103,8 +103,9 @@ describe('registro para a sincronização', () => {
     await updateState({ activePlan: { id: 'nt-90', startedAt: before } })
     await updateState({ lastPosition: { book: 'RUT', chapter: 1 } })
     const meta = await repo.getSyncMeta()
-    expect(meta.cleared['RUT.1']).toBeGreaterThanOrEqual(before)
-    expect(meta.cleared['RUT.2']).toBeGreaterThanOrEqual(before)
+    // Desmarcar registra exatamente as leituras que estavam no aparelho.
+    expect(meta.removedReadings.map((id) => id.split('@')[0]).sort()).toEqual(['RUT.1', 'RUT.2'])
+    expect(meta.removedReadings.every((id) => Number(id.split('@')[1]) >= before)).toBe(true)
     expect(meta.removedMarks['RUT.1.16']).toBeGreaterThanOrEqual(before)
     expect(meta.activePlanAt).toBeGreaterThanOrEqual(before)
     expect(meta.lastPositionAt).toBeGreaterThanOrEqual(before)

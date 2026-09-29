@@ -15,8 +15,17 @@
     return () => clearInterval(timer)
   })
 
+  // O script do Google não carregou (sem internet): tenta de novo quando a conexão volta.
+  let online = $state(0)
+  $effect(() => {
+    const bump = () => online++
+    window.addEventListener('online', bump)
+    return () => window.removeEventListener('online', bump)
+  })
+
   // Sem conta e com login ligado: desenha o botão oficial do Google.
   $effect(() => {
+    void online
     const el = buttonEl
     const clientId = account.clientId
     const lang = locale.lang
@@ -25,6 +34,7 @@
     loadGoogle()
       .then((google) => {
         if (cancelled) return
+        message = null
         google.accounts.id.initialize({
           client_id: clientId,
           callback: async ({ credential }: { credential: string }) => {

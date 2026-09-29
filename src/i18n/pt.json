@@ -437,6 +437,6 @@
     "offline": "Sem conexão com o Google agora. Tente de novo quando estiver online.",
     "expired": "Sua sessão expirou. Entre de novo para continuar sincronizando.",
     "clearSignedIn": "Você está conectado à conta Google. Ao apagar os dados, o app sai da conta, e a cópia na conta continua (para apagá-la, use Excluir conta). Continuar?",
-    "privacy": "Conta e sincronização: se você entrar com a conta Google, o servidor do Selah guarda seu e-mail, o identificador da conta Google e suas leituras, planos, destaques e notas, para levá-los aos seus outros aparelhos. Não guarda nome, foto nem senha. Excluir conta apaga tudo isso."
+    "privacy": "Conta e sincronização: se você entrar com a conta Google, o servidor do Selah guarda seu e-mail, o identificador da conta Google, suas leituras, planos, destaques, notas e o último capítulo aberto (para levá-los aos seus outros aparelhos), além das datas de criação da conta e de uso das sessões. Não guarda nome, foto nem senha. Excluir conta apaga tudo isso. Enquanto você não entra, a tela de Ajustes carrega o botão oficial do Google, que faz um pedido aos servidores do Google."
   }
 }

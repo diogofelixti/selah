@@ -46,17 +46,17 @@ export interface VerseMark {
 export const isEmptyMark = (m: VerseMark) => m.color === null && m.note.trim() === ''
 
 /**
- * O que a sincronização precisa saber e que não aparece nos dados: quando um capítulo foi desmarcado,
- * quando uma marca foi removida e quando o plano e a posição mudaram.
+ * O que a sincronização precisa saber e que não aparece nos dados: quais leituras foram desmarcadas
+ * ("CAP@quando"), quando uma marca foi removida e quando o plano e a posição mudaram.
  */
 export interface SyncMeta {
-  cleared: Record<string, number>
+  removedReadings: string[]
   removedMarks: Record<string, number>
   activePlanAt: number
   lastPositionAt: number
 }
 
-export const EMPTY_SYNC_META: SyncMeta = { cleared: {}, removedMarks: {}, activePlanAt: 0, lastPositionAt: 0 }
+export const EMPTY_SYNC_META: SyncMeta = { removedReadings: [], removedMarks: {}, activePlanAt: 0, lastPositionAt: 0 }
 
 export interface AppData {
   readings: Reading[]

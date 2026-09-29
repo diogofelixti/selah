@@ -36,20 +36,31 @@
   })
 
   // Com conta: sincroniza ao abrir, 3 s depois de cada mudança e ao voltar ao app ou à internet.
+  // Ao abrir (ou ao entrar, que já sincroniza), vai direto; depois, espera as mudanças assentarem.
   let syncTimer: ReturnType<typeof setTimeout> | undefined
+  let syncedToken: string | null = null
   $effect(() => {
     void app.changes
     void resumeTick
     if (!app.ready || !account.token) return
+    if (syncedToken !== account.token) {
+      syncedToken = account.token
+      const justSynced = account.lastSyncAt !== null && Date.now() - account.lastSyncAt < 10_000
+      if (!justSynced) void syncNow()
+      return
+    }
     clearTimeout(syncTimer)
     syncTimer = setTimeout(() => void syncNow(), 3000)
     return () => clearTimeout(syncTimer)
   })
-  let syncedOnOpen = false
+
+  // Sem conexão ao abrir: quando a internet volta, pergunta de novo se o login está disponível.
   $effect(() => {
-    if (!app.ready || !account.token || syncedOnOpen) return
-    syncedOnOpen = true
-    void syncNow()
+    const retry = () => {
+      if (account.config === 'unreachable') void loadAccountConfig()
+    }
+    window.addEventListener('online', retry)
+    return () => window.removeEventListener('online', retry)
   })
 
   $effect(() => {

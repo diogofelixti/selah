@@ -99,4 +99,15 @@ describe('POST /sync', () => {
     expect(statuses.slice(0, 120).every((s) => s === 401)).toBe(true)
     expect(statuses.at(-1)).toBe(429)
   })
+  it('plano de antes da sincronização (data 0) chega ao aparelho novo e fica estável', async () => {
+    const phone = await login('u10')
+    const laptop = await login('u10')
+    const plan = { value: { id: 'nt-90', startedAt: T }, at: 0 }
+    await sync(phone, doc({ activePlan: plan }))
+    const onLaptop = (await (await sync(laptop, emptyDoc())).json()) as SyncDoc
+    expect(onLaptop.activePlan).toEqual(plan)
+    // Nem o aparelho novo nem o antigo fazem o plano ir e voltar.
+    expect(((await (await sync(phone, doc({ activePlan: plan }))).json()) as SyncDoc).activePlan).toEqual(plan)
+    expect(((await (await sync(laptop, emptyDoc())).json()) as SyncDoc).activePlan).toEqual(plan)
+  })
 })

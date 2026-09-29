@@ -22,7 +22,7 @@ describe.each(implementations)('repositório (%s)', (_name, create) => {
   it('guarda os metadados de sincronização à parte: substituir mantém, apagar tudo zera', async () => {
     const repo = await create()
     expect(await repo.getSyncMeta()).toEqual(EMPTY_SYNC_META)
-    const meta = { cleared: { 'JHN.1': 5 }, removedMarks: { 'JHN.3.16': 6 }, activePlanAt: 7, lastPositionAt: 8 }
+    const meta = { removedReadings: ['JHN.1@5'], removedMarks: { 'JHN.3.16': 6 }, activePlanAt: 7, lastPositionAt: 8 }
     await repo.saveSyncMeta(meta)
     expect(await repo.getSyncMeta()).toEqual(meta)
     // O estado continua separado dos metadados.
@@ -38,7 +38,7 @@ describe.each(implementations)('repositório (%s)', (_name, create) => {
     await repo.saveSettings({ ...DEFAULT_SETTINGS, fontSize: 4 })
     await repo.addReading({ ref: 'GEN.1', readAt: 1 })
     const state = { lastPosition: { book: 'JHN', chapter: 2 }, activePlan: null }
-    const meta = { cleared: { 'GEN.1': 2 }, removedMarks: {}, activePlanAt: 0, lastPositionAt: 3 }
+    const meta = { removedReadings: ['GEN.1@1'], removedMarks: {}, activePlanAt: 0, lastPositionAt: 3 }
     await repo.applySync({ readings: [{ ref: 'JHN.1', readAt: 4 }], marks: [{ ref: 'JHN.3.16', color: 'gold', note: '', updatedAt: 5 }], state }, meta)
     expect(await repo.getReadings()).toEqual([{ ref: 'JHN.1', readAt: 4 }])
     expect(await repo.getMarks()).toEqual([{ ref: 'JHN.3.16', color: 'gold', note: '', updatedAt: 5 }])

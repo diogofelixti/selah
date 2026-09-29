@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { emptyDoc, mergeSync, type SyncDoc } from '../../../server/src/sync-doc'
-import { app, initApp, markRead } from '../app.svelte'
+import { app, clearData, initApp, markRead } from '../app.svelte'
 import { createMemoryRepository } from '../storage/repository'
-import { account, setFetch, signInWithCredential, syncNow } from './account.svelte'
+import type { Repository } from '../storage/types'
+import { account, setFetch, signInWithCredential, signOut, syncNow } from './account.svelte'
 
 const T = Date.now() - 60_000
 
@@ -87,5 +88,45 @@ describe('entrar e sincronizar', () => {
     expect(account.status).toBe('error')
     expect(account.token).not.toBeNull()
     expect(app.readings.map((r) => r.ref)).toEqual(['JHN.4'])
+  })
+})
+
+describe('corridas com a sincronização', () => {
+  it('gravação ainda em andamento quando o resultado chega não se perde', async () => {
+    const repo = createMemoryRepository()
+    let releaseWrite!: () => void
+    const slow: Repository = {
+      ...repo,
+      async addReading(r) {
+        await new Promise<void>((res) => (releaseWrite = res))
+        await repo.addReading(r)
+      },
+    }
+    await initApp(async () => slow)
+    fakeServer({ remote: { ...emptyDoc(), readings: [['GEN.1', T]] } })
+    await signInWithCredential('credencial')
+    const writing = markRead('JHN.9')
+    await new Promise((r) => setTimeout(r, 0))
+    const syncing = syncNow()
+    await new Promise((r) => setTimeout(r, 10))
+    releaseWrite()
+    await writing
+    await syncing
+    expect(app.readings.map((r) => r.ref).sort()).toEqual(['GEN.1', 'JHN.9'])
+    expect((await repo.getReadings()).map((r) => r.ref).sort()).toEqual(['GEN.1', 'JHN.9'])
+  })
+
+  it('sair e apagar os dados durante uma sincronização não traz nada de volta', async () => {
+    let release!: () => void
+    const gate = new Promise<void>((r) => (release = r))
+    fakeServer({ remote: { ...emptyDoc(), readings: [['GEN.1', T]] } })
+    await signInWithCredential('credencial')
+    fakeServer({ remote: { ...emptyDoc(), readings: [['GEN.1', T]] }, delay: gate })
+    const running = syncNow()
+    await signOut()
+    await clearData()
+    release()
+    await running
+    expect(app.readings).toEqual([])
   })
 })
