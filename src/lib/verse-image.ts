@@ -49,3 +49,59 @@ export function imageFilename(book: string, chapter: number, verses: number[], b
   const last = sorted[sorted.length - 1]
   return `selah-${slug}-${chapter}-${first === last ? first : `${first}-${last}`}.png`
 }
+
+const SIZE = { width: 1080, height: 1350 }
+
+/**
+ * Desenha a imagem do versículo (1080 × 1350) com as cores do tema e devolve um PNG.
+ * null quando o texto não cabe nem no menor tamanho de fonte.
+ */
+export async function renderVerseImage(opts: {
+  text: string
+  reference: string
+  colors: { bg: string; text: string; accent: string }
+}): Promise<Blob | null> {
+  const family = '"Lora Variable", Georgia, serif'
+  // A imagem só sai com a fonte do app se ela já estiver carregada.
+  await Promise.all([document.fonts.load(`64px ${family}`), document.fonts.load(`600 40px ${family}`)])
+  const canvas = document.createElement('canvas')
+  canvas.width = SIZE.width
+  canvas.height = SIZE.height
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  const measure: Measure = (text, size) => {
+    ctx.font = `${size}px ${family}`
+    return ctx.measureText(text).width
+  }
+  const layout = layoutVerseImage(opts.text, measure, { width: 900, maxHeight: 900 })
+  if (!layout) return null
+
+  ctx.fillStyle = opts.colors.bg
+  ctx.fillRect(0, 0, SIZE.width, SIZE.height)
+
+  // Aspas decorativas no topo.
+  ctx.fillStyle = opts.colors.accent
+  ctx.font = `160px ${family}`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillText('“', SIZE.width / 2, 200)
+
+  // Texto centralizado verticalmente na área útil.
+  const lineHeight = layout.fontSize * 1.4
+  const blockHeight = layout.lines.length * lineHeight
+  const top = 240 + (900 - blockHeight) / 2
+  ctx.fillStyle = opts.colors.text
+  ctx.font = `${layout.fontSize}px ${family}`
+  ctx.textBaseline = 'middle'
+  layout.lines.forEach((line, i) => ctx.fillText(line, SIZE.width / 2, top + i * lineHeight + lineHeight / 2))
+
+  // Rodapé: referência e marca.
+  ctx.font = `600 40px ${family}`
+  ctx.fillStyle = opts.colors.text
+  ctx.fillText(opts.reference, SIZE.width / 2, 1200)
+  ctx.font = `32px ${family}`
+  ctx.fillStyle = opts.colors.accent
+  ctx.fillText('Selah', SIZE.width / 2, 1270)
+
+  return new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'))
+}
