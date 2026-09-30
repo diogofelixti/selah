@@ -1,6 +1,6 @@
 # Selah · Leitura bíblica / Bible reading
 
-Especificação do produto e do design técnico. Data: 2026-09-27.
+Especificação do produto e do design técnico. Data: 2026-09-27. Andamento atualizado em 2026-09-29 (ver seção 12).
 
 ## 1. Visão
 
@@ -216,12 +216,22 @@ Cada módulo em `lib/` tem uma responsabilidade só e expõe funções puras sem
 
 ## 8. Deploy
 
-- O build gera a pasta `dist/` estática.
-- No frodo, os arquivos ficam em `/srv/selah/app` (atualizado na v8; ver `deploy/README.md`) e são servidos pelo servidor web que já roda lá (nginx, Caddy ou outro, verificado na tarefa de deploy do plano), com o host `selah.selatech.com.br`.
-- HTTPS obrigatório (o PWA exige). O frodo usa nginx atrás da Cloudflare (proxy ligado) com um Origin Certificate curinga `*.selatech.com.br` em `/etc/ssl/cloudflare/`, que já cobre `selah.selatech.com.br`.
-- O registro DNS `selah` é criado na Cloudflare com o proxy ligado.
-- Cabeçalhos de cache: `index.html` e `sw.js` sem cache longo; arquivos com hash no nome com cache longo e imutável.
-- Deploy por um script `scripts/deploy.sh` que roda o build e envia o `dist/` com `rsync` via SSH.
+Publicado em 2026-09-29. Passo a passo em `deploy/README.md`.
+
+- **Onde fica:** tudo do Selah fica em `/srv/selah` no frodo:
+  - `app/`: o `dist/` estático;
+  - `server/` e `docker-compose.yml`: a API e o Postgres exclusivo;
+  - `.env`: os segredos, gerados no próprio frodo;
+  - `backups/`.
+- **nginx:** fica atrás da Cloudflare (proxy ligado) e usa o Origin Certificate curinga `*.selatech.com.br` (`/etc/ssl/cloudflare/`).
+  - O site `selah` serve o app e repassa `/api` para a API, que só escuta em `127.0.0.1:8787`.
+  - Manda os cabeçalhos de segurança, inclusive a CSP.
+  - `/api/health` só responde de dentro do servidor.
+- **DNS:** registro `selah` na Cloudflare, com proxy ligado.
+- **Cache:** `index.html`, `sw.js` e o manifesto sem cache longo; os arquivos com hash no nome com cache longo e imutável.
+- **Publicar:** `SELAH_DEPLOY_TARGET=frodo npm run deploy`. O comando roda os testes, gera o build, copia o app e a API com `rsync` via SSH e sobe os containers.
+- **Mudanças no nginx:** exigem sudo do dono.
+- **Backup:** `pg_dump` diário às 03:30 em `/srv/selah/backups`, guardando os 14 mais recentes.
 
 ## 9. Testes
 
@@ -232,22 +242,61 @@ Cada módulo em `lib/` tem uma responsabilidade só e expõe funções puras sem
 
 ## 10. Fora do MVP (próximas versões)
 
-Em ordem aproximada de prioridade:
+Em ordem aproximada de prioridade. Situação em 2026-09-29:
 
-1. Temas "Noite", "Pergaminho" e "Oliveira"
-2. Destaques de versículos e anotações curtas
-3. Compartilhar um versículo como imagem no estilo do tema ativo
-4. Leitura em voz alta (Web Speech API)
-5. Busca por palavra no texto bíblico
-6. Tradução licenciada em português (se a licença for aprovada) e seletor de versão
-7. Lembrete diário por notificação
-8. Botão de doação
-9. Sincronização opcional entre aparelhos (exige backend e conta)
-10. Mais planos e temas
+| # | Item | Situação |
+|---|---|---|
+| 1 | Temas "Noite", "Pergaminho" e "Oliveira" | Feito (Noite depois da v2; Pergaminho e Oliveira na v5) |
+| 2 | Destaques de versículos e anotações curtas | Feito (v3) |
+| 3 | Compartilhar um versículo como imagem no estilo do tema ativo | Feito (v4) |
+| 4 | Leitura em voz alta (Web Speech API) | Feito (v3) |
+| 5 | Busca por palavra no texto bíblico | Feito (v3) |
+| 6 | Tradução licenciada em português e seletor de versão | **Pendente:** depende da licença, que será pedida com o app pronto |
+| 7 | Lembrete diário por notificação | Feito (v8, com servidor no frodo) |
+| 8 | Botão de doação | Feito (v7: Pix e WhatsApp) |
+| 9 | Sincronização opcional entre aparelhos | Feito (v9: conta Google) |
+| 10 | Mais planos e temas | Feito (v6 e v7: 19 planos, 16 temas, personagens da Bíblia) |
 
 ## 11. Pendências fora do código
 
-- Enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA).
-- Criar o registro DNS `selah.selatech.com.br` na Cloudflare, com proxy ligado.
-- Criar o ícone e a identidade visual do Selah (ícone do app em 192px, 512px e versão maskable).
-- Revisar a curadoria de temas, dicas e versículos do dia antes do lançamento.
+- [ ] Enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA). O dono decidiu pedir com o app pronto.
+- [x] Criar o registro DNS `selah.selatech.com.br` na Cloudflare, com proxy ligado.
+- [x] Criar o ícone e a identidade visual do Selah (logo da lamparina, ícones gerados por `npm run icons`).
+- [ ] Revisar a curadoria de temas, dicas, versículos do dia e planos. Pontos já apontados:
+  - Provérbios 3:6 tem erro de concordância na Bíblia Livre ("todas os teus caminhos").
+  - Josué 24:15, primeiro versículo de Família, só fala de família na última frase.
+  - Mateus 28:20 e Efésios 4:2 começam no meio da frase.
+  - Salmos em 30 dias: o dia 24 inclui o Salmo 119 (176 versículos).
+  - Bíblia em 2 anos faz 2 capítulos por dia até o dia 459 e depois 1 por dia.
+- [ ] Página sobre o Selah no site selatech.com.br: o que é, como usar e o link. O prompt para o projeto do site está em `docs/divulgacao/prompt-pagina-selatech.md`.
+- [ ] Ajustar o README do projeto para uso público.
+- [ ] Tornar o repositório público (github.com/diogofelixti/selah). **Só com aprovação do dono**, depois de revisar o README. Antes, limpar do histórico o print do celular que entrou por engano (`tests/Screenshot_...jpg`).
+- [ ] Decidir quando juntar `feat/mvp` no `master` (hoje o GitHub mostra `feat/mvp` como padrão; `master` só tem os documentos iniciais).
+- [ ] Ajuste visual: no leitor, os botões "Capítulo anterior" e "Próximo capítulo" quebram em duas linhas em telas de 390px.
+- [ ] Rodar o Lighthouse no site publicado (critério da seção 9: PWA instalável, Performance e Acessibilidade acima de 90).
+- [ ] Guardar uma cópia dos backups fora do frodo. Hoje eles ficam só no próprio servidor.
+
+## 12. Andamento
+
+**Situação em 2026-09-29:**
+- Publicado em https://selah.selatech.com.br, versão beta `v0.1.0-beta`.
+- Código privado em github.com/diogofelixti/selah.
+- Todos os critérios de sucesso do MVP (seção 1) estão atendidos no app publicado.
+- O dono confirmou a instalação no celular (Android, Xiaomi com Chrome).
+
+| Versão | O que entrou | Spec |
+|---|---|---|
+| MVP | Leitor, progresso por livro e testamento, planos, temas de versículos, dicas, pt/en, offline, backup em arquivo | `2026-09-27-selah-design.md` |
+| v2 | Visual novo (estrutura B), aba Controle de leitura, planos com marcação | `2026-09-28-selah-v2-visual-controle-design.md` |
+| v2.1 | Fontes Lora e Source Sans 3, cópia de versículos | `2026-09-28-selah-v2-1-fonte-e-copia.md` |
+| Tema Noite | Tema escuro, com opção automática que segue o aparelho | (sem spec própria) |
+| v3 | Leitura em voz alta, busca, destaques e anotações | `2026-09-28-selah-v3-voz-busca-marcacoes.md` |
+| v4 | Versículo como imagem | `2026-09-28-selah-v4-imagem.md` |
+| v5 | Temas ilustrados Pergaminho e Oliveira | `2026-09-28-selah-v5-temas-ilustrados.md` |
+| v6 | Mais planos, em grupos, e 6 temas novos | `2026-09-28-selah-v6-planos-e-temas.md` |
+| v7 | Planos de personagens da Bíblia e doação (Pix e WhatsApp) | `2026-09-29-selah-v7-personagens-e-doacao.md` |
+| v8 | Servidor no frodo (API e Postgres) e lembrete diário por notificação | `2026-09-29-selah-v8-servidor-e-lembrete.md` |
+| v9 | Conta Google e sincronização entre aparelhos | `2026-09-29-selah-v9-conta-e-sincronizacao.md` |
+| Publicação | CSP no nginx, logo como ícone, cartão Instalar o app | (seção 8) |
+
+**Como foi feito:** cada versão passou por spec, plano, TDD e revisão independente no fim. Os testes eram 451 unitários do app, 71 do servidor (com Postgres de verdade) e 135 no navegador, incluindo sincronização de ponta a ponta e o nginx de produção.
