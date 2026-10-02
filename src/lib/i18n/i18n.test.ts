@@ -47,8 +47,8 @@ describe('arquivos de idioma', () => {
     for (const b of BOOKS) expect(keys.has(`books.${b.id}`), b.id).toBe(true)
     for (const s of SECTIONS) expect(keys.has(`sections.${s.id}`), s.id).toBe(true)
     for (const id of PLAN_IDS) {
+      // A descrição e a frase de propósito são conferidas por grupo em plans/catalog.test.ts.
       expect(keys.has(`plans.catalog.${id}.title`), id).toBe(true)
-      expect(keys.has(`plans.catalog.${id}.desc`), id).toBe(true)
     }
   })
 

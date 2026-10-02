@@ -1,13 +1,46 @@
 import { describe, expect, it } from 'vitest'
 import { ALL_CHAPTER_REFS, chapterRefs, getBook } from '../bible/books'
 import { readFileSync } from 'node:fs'
-import { PLANS, PLAN_GROUPS, PLAN_IDS, isPlanId, planContains, splitEvenly } from './catalog'
+import { verseCount } from '../bible/verse-counts'
+import { PLANS, PLAN_GROUPS, PLAN_IDS, isPlanId, planContains, splitByVerses, splitEvenly } from './catalog'
 
 const sizes = (days: string[][]) => days.map((d) => d.length)
+const verses = (day: string[]) => day.reduce((sum, ref) => sum + verseCount(ref), 0)
+const average = (days: string[][]) => days.reduce((sum, d) => sum + verses(d), 0) / days.length
 
 describe('splitEvenly', () => {
   it('dá um item a mais para os primeiros dias', () => {
     expect(sizes(splitEvenly(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'], 3))).toEqual([4, 3, 3])
+  })
+})
+
+describe('splitByVerses', () => {
+  it('divide em dias seguidos, sem dia vazio, e cada capítulo entra uma vez', () => {
+    const refs = chapterRefs('PSA')
+    const days = splitByVerses(refs, 30)
+    expect(days).toHaveLength(30)
+    expect(days.flat()).toEqual(refs)
+    expect(days.every((d) => d.length > 0)).toBe(true)
+  })
+
+  it('deixa um capítulo longo sozinho quando ele já passa da média', () => {
+    expect(splitByVerses(chapterRefs('PSA'), 30)).toContainEqual(['PSA.119'])
+  })
+
+  it('cada dia fica perto da média de versículos', () => {
+    // Salmos tem 2.461 versículos: cerca de 82 por dia em 30 dias.
+    const days = splitByVerses(chapterRefs('PSA'), 30)
+    const others = days.filter((d) => !d.includes('PSA.119'))
+    expect(Math.max(...others.map(verses))).toBeLessThan(120)
+    expect(Math.min(...others.map(verses))).toBeGreaterThan(50)
+  })
+
+  it('com tantos dias quanto capítulos, faz um capítulo por dia', () => {
+    expect(splitByVerses(['JHN.1', 'JHN.2'], 2)).toEqual([['JHN.1'], ['JHN.2']])
+  })
+
+  it('recusa mais dias que capítulos, em vez de deixar dias vazios', () => {
+    expect(() => splitByVerses(['JHN.1', 'JHN.2'], 4)).toThrow()
   })
 })
 
@@ -55,11 +88,11 @@ describe('PLANS', () => {
     expect(PLANS['proverbs-31'].days).toEqual(chapterRefs('PRO').map((r) => [r]))
   })
 
-  it('Salmos em 30 dias: 5 salmos por dia, em ordem', () => {
+  it('Salmos em 30 dias: em ordem, divididos por versículos, com o Salmo 119 num dia só', () => {
     const plan = PLANS['psalms-30']
     expect(plan.days).toHaveLength(30)
-    expect(sizes(plan.days).every((n) => n === 5)).toBe(true)
     expect(plan.days.flat()).toEqual(chapterRefs('PSA'))
+    expect(plan.days).toContainEqual(['PSA.119'])
   })
 
   it('Cartas de Paulo em 30 dias: de Romanos a Filemom, 3 ou 2 por dia', () => {
@@ -71,11 +104,15 @@ describe('PLANS', () => {
     expect(sizes(plan.days).every((n) => n === 3 || n === 2)).toBe(true)
   })
 
-  it('Bíblia em 2 anos: 730 dias, 1 ou 2 capítulos por dia', () => {
+  it('Bíblia em 2 anos: 730 dias, em ordem, no mesmo ritmo do começo ao fim', () => {
     const plan = PLANS['bible-2y']
     expect(plan.days).toHaveLength(730)
     expect(plan.days.flat()).toEqual(ALL_CHAPTER_REFS)
-    expect(sizes(plan.days).every((n) => n === 1 || n === 2)).toBe(true)
+    expect(plan.days.every((d) => d.length > 0)).toBe(true)
+    // Antes eram 2 capítulos por dia até o dia 459 e 1 por dia depois disso.
+    const first = average(plan.days.slice(0, 365))
+    const second = average(plan.days.slice(365))
+    expect(Math.abs(first - second) / first).toBeLessThan(0.05)
   })
 })
 
@@ -109,25 +146,74 @@ describe('planos de personagens', () => {
     expect(PLANS.david.days).toHaveLength(42)
   })
 
-  it('o grupo de personagens vem por último, na ordem da Bíblia', () => {
-    expect(PLAN_GROUPS.map((g) => g.id)).toEqual(['start', 'deeper', 'whole', 'people'])
+  it('o grupo de personagens está na ordem da Bíblia', () => {
     expect(PLAN_GROUPS.find((g) => g.id === 'people')!.plans).toEqual(cases.map(([id]) => id))
   })
 })
 
+describe('um livro para cada momento', () => {
+  const range = (book: string, from: number, to: number) => chapterRefs(book).slice(from - 1, to)
+  const psalms = [3, 4, 6, 13, 22, 23, 25, 27, 31, 32, 34, 38, 39, 40, 42, 43, 46, 51, 55, 56, 62, 69, 73, 77, 86, 88, 90, 121, 130, 142]
+  const cases: [string, string[]][] = [
+    ['mark', chapterRefs('MRK')],
+    ['john-21', chapterRefs('JHN')],
+    ['luke', chapterRefs('LUK')],
+    ['matthew', chapterRefs('MAT')],
+    ['acts', chapterRefs('ACT')],
+    ['romans', chapterRefs('ROM')],
+    ['galatians', chapterRefs('GAL')],
+    ['ephesians', chapterRefs('EPH')],
+    ['philippians', chapterRefs('PHP')],
+    ['james', chapterRefs('JAS')],
+    ['1-corinthians', chapterRefs('1CO')],
+    ['hebrews', chapterRefs('HEB')],
+    ['psalms-lament', psalms.map((n) => `PSA.${n}`)],
+    ['proverbs-31', chapterRefs('PRO')],
+    ['ecclesiastes', chapterRefs('ECC')],
+    ['genesis', chapterRefs('GEN')],
+    ['exodus', range('EXO', 1, 20)],
+    ['numbers', [...range('NUM', 9, 14), 'NUM.16', 'NUM.17', 'NUM.20', 'NUM.21']],
+    ['revelation', chapterRefs('REV')],
+  ]
+
+  it.each(cases)('%s: um capítulo por dia', (id, refs) => {
+    expect(PLANS[id as keyof typeof PLANS].days).toEqual(refs.map((r) => [r]))
+  })
+
+  it('a seleção de Salmos tem 30 dias', () => {
+    expect(PLANS['psalms-lament'].days).toHaveLength(30)
+  })
+
+  it('o grupo vem logo depois de Para começar, na ordem da trilha', () => {
+    expect(PLAN_GROUPS.map((g) => g.id)).toEqual(['start', 'purpose', 'deeper', 'whole', 'people'])
+    expect(PLAN_GROUPS.find((g) => g.id === 'purpose')!.plans).toEqual(cases.map(([id]) => id))
+  })
+
+  it('os planos novos ficam no fim da lista de ids, para não mexer nos antigos', () => {
+    expect(PLAN_IDS.indexOf('paul-story')).toBe(18)
+    expect(PLAN_IDS.indexOf('mark')).toBe(19)
+  })
+})
+
 describe('PLAN_GROUPS', () => {
-  it('cada plano aparece em exatamente um grupo', () => {
+  it('cada plano aparece num grupo; só João e Provérbios aparecem em dois', () => {
     const listed = PLAN_GROUPS.flatMap((g) => g.plans)
-    expect([...listed].sort()).toEqual([...PLAN_IDS].sort())
+    expect([...new Set(listed)].sort()).toEqual([...PLAN_IDS].sort())
+    const twice = listed.filter((id, i) => listed.indexOf(id) !== i)
+    expect(twice.sort()).toEqual(['john-21', 'proverbs-31'])
   })
 
   it('grupos e planos têm textos nos dois idiomas', () => {
     for (const lang of ['pt', 'en']) {
       const dict = JSON.parse(readFileSync(`src/i18n/${lang}.json`, 'utf8'))
       for (const g of PLAN_GROUPS) expect(dict.plans.groups[g.id], `${lang} ${g.id}`).toBeTruthy()
-      for (const id of PLAN_IDS) {
-        expect(dict.plans.catalog[id]?.title, `${lang} ${id}`).toBeTruthy()
-        expect(dict.plans.catalog[id]?.desc, `${lang} ${id}`).toBeTruthy()
+      for (const id of PLAN_IDS) expect(dict.plans.catalog[id]?.title, `${lang} ${id}`).toBeTruthy()
+      // A descrição só aparece fora do grupo de propósito; lá o título do cartão é a frase.
+      for (const g of PLAN_GROUPS) {
+        for (const id of g.plans) {
+          if (g.id === 'purpose') expect(dict.plans.purpose[id], `${lang} purpose ${id}`).toBeTruthy()
+          else expect(dict.plans.catalog[id]?.desc, `${lang} ${id}`).toBeTruthy()
+        }
       }
     }
   })

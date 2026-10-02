@@ -1,4 +1,5 @@
 import { ALL_CHAPTER_REFS, BOOKS, chapterRefs } from '../bible/books'
+import { verseCount } from '../bible/verse-counts'
 
 // Ids novos entram no fim: os antigos ficam salvos no plano ativo e nos backups.
 export const PLAN_IDS = [
@@ -21,12 +22,39 @@ export const PLAN_IDS = [
   'esther',
   'daniel',
   'paul-story',
+  'mark',
+  'luke',
+  'matthew',
+  'acts',
+  'romans',
+  'galatians',
+  'ephesians',
+  'philippians',
+  'james',
+  '1-corinthians',
+  'hebrews',
+  'psalms-lament',
+  'ecclesiastes',
+  'genesis',
+  'exodus',
+  'numbers',
+  'revelation',
 ] as const
 export type PlanId = (typeof PLAN_IDS)[number]
 
 /** Grupos da tela Planos, do mais curto e simples à Bíblia inteira. */
-export const PLAN_GROUPS: readonly { id: 'start' | 'deeper' | 'people' | 'whole'; plans: readonly PlanId[] }[] = [
+export const PLAN_GROUPS: readonly { id: 'start' | 'purpose' | 'deeper' | 'people' | 'whole'; plans: readonly PlanId[] }[] = [
   { id: 'start', plans: ['john-21', 'proverbs-31', 'psalms-30'] },
+  // Um livro para cada momento: uma trilha dos Evangelhos ao Apocalipse. João e Provérbios
+  // aparecem também em "Para começar"; é o mesmo plano, com o mesmo progresso.
+  {
+    id: 'purpose',
+    plans: [
+      'mark', 'john-21', 'luke', 'matthew', 'acts', 'romans', 'galatians', 'ephesians', 'philippians', 'james',
+      '1-corinthians', 'hebrews', 'psalms-lament', 'proverbs-31', 'ecclesiastes', 'genesis', 'exodus', 'numbers',
+      'revelation',
+    ],
+  },
   { id: 'deeper', plans: ['gospels-30', 'paul-30', 'psalms-proverbs-31', 'nt-90'] },
   { id: 'whole', plans: ['bible-1y', 'bible-2y'] },
   { id: 'people', plans: ['abraham', 'joseph', 'moses', 'ruth', 'samuel', 'david', 'elijah', 'esther', 'daniel', 'paul-story'] },
@@ -51,6 +79,35 @@ export function splitEvenly<T>(items: readonly T[], parts: number): T[][] {
   return out
 }
 
+/**
+ * Divide em `parts` dias seguidos pelo número de versículos. Cada dia leva capítulos até chegar o mais
+ * perto possível da média do que falta, e sempre pelo menos um. Um capítulo longo pode ficar sozinho.
+ */
+export function splitByVerses(refs: readonly string[], parts: number): string[][] {
+  if (parts > refs.length) throw new Error(`${parts} dias para ${refs.length} capítulos deixariam dias vazios`)
+  let remaining = refs.reduce((sum, ref) => sum + verseCount(ref), 0)
+  const out: string[][] = []
+  let i = 0
+  for (let d = 0; d < parts; d++) {
+    const daysLeft = parts - d
+    const target = remaining / daysLeft
+    // O último dia leva o resto; os outros deixam ao menos um capítulo para cada dia seguinte.
+    const end = daysLeft === 1 ? refs.length : refs.length - (daysLeft - 1)
+    const day: string[] = []
+    let sum = 0
+    while (i < end) {
+      const n = verseCount(refs[i])
+      if (day.length > 0 && daysLeft > 1 && Math.abs(sum + n - target) > Math.abs(sum - target)) break
+      day.push(refs[i])
+      sum += n
+      i++
+    }
+    out.push(day)
+    remaining -= sum
+  }
+  return out
+}
+
 const refsOf = (ids: string[]) => ids.flatMap((id) => chapterRefs(id))
 
 function build(): Record<PlanId, PlanDef> {
@@ -71,9 +128,9 @@ function build(): Record<PlanId, PlanDef> {
     },
     'john-21': { id: 'john-21', days: oneADay('JHN') },
     'proverbs-31': { id: 'proverbs-31', days: oneADay('PRO') },
-    'psalms-30': { id: 'psalms-30', days: splitEvenly(chapterRefs('PSA'), 30) },
+    'psalms-30': { id: 'psalms-30', days: splitByVerses(chapterRefs('PSA'), 30) },
     'paul-30': { id: 'paul-30', days: splitEvenly(refsOf(paul), 30) },
-    'bible-2y': { id: 'bible-2y', days: splitEvenly(ALL_CHAPTER_REFS, 730) },
+    'bible-2y': { id: 'bible-2y', days: splitByVerses(ALL_CHAPTER_REFS, 730) },
     abraham: { id: 'abraham', days: daily(chapters('GEN', 12, 25)) },
     joseph: { id: 'joseph', days: daily(chapters('GEN', 37, 50)) },
     // A vida inteira de Moisés, só nos capítulos em que a história dele avança: do Egito ao Sinai,
@@ -95,6 +152,29 @@ function build(): Record<PlanId, PlanDef> {
     daniel: { id: 'daniel', days: oneADay('DAN') },
     // Conversão (9), chegada a Antioquia com Barnabé (11), viagens, prisão e Roma (13 a 28).
     'paul-story': { id: 'paul-story', days: daily(['ACT.9', 'ACT.11', ...chapters('ACT', 13, 28)]) },
+    mark: { id: 'mark', days: oneADay('MRK') },
+    luke: { id: 'luke', days: oneADay('LUK') },
+    matthew: { id: 'matthew', days: oneADay('MAT') },
+    acts: { id: 'acts', days: oneADay('ACT') },
+    romans: { id: 'romans', days: oneADay('ROM') },
+    galatians: { id: 'galatians', days: oneADay('GAL') },
+    ephesians: { id: 'ephesians', days: oneADay('EPH') },
+    philippians: { id: 'philippians', days: oneADay('PHP') },
+    james: { id: 'james', days: oneADay('JAS') },
+    '1-corinthians': { id: '1-corinthians', days: oneADay('1CO') },
+    hebrews: { id: 'hebrews', days: oneADay('HEB') },
+    // Salmos de lamento e de confiança: o autor fala com Deus sobre a dor sem esconder nada.
+    'psalms-lament': {
+      id: 'psalms-lament',
+      days: daily([3, 4, 6, 13, 22, 23, 25, 27, 31, 32, 34, 38, 39, 40, 42, 43, 46, 51, 55, 56, 62, 69, 73, 77, 86, 88, 90, 121, 130, 142].map((n) => `PSA.${n}`)),
+    },
+    ecclesiastes: { id: 'ecclesiastes', days: oneADay('ECC') },
+    genesis: { id: 'genesis', days: oneADay('GEN') },
+    // Da escravidão à aliança no Sinai. Do 21 em diante vêm as leis e o tabernáculo.
+    exodus: { id: 'exodus', days: daily(chapters('EXO', 1, 20)) },
+    // A nuvem que guia, as reclamações, os espias, Corá, a água da rocha e a serpente de bronze.
+    numbers: { id: 'numbers', days: daily([...chapters('NUM', 9, 14), 'NUM.16', 'NUM.17', 'NUM.20', 'NUM.21']) },
+    revelation: { id: 'revelation', days: oneADay('REV') },
   }
 }
 

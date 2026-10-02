@@ -75,19 +75,19 @@
     "id": "solidao", "icon": "moon",
     "title": { "pt": "Solidão", "en": "Loneliness" },
     "intro": { "pt": "Quando parece que ninguém vê você, Deus vê. Ele promete estar presente todos os dias.", "en": "When it feels like no one sees you, God does. He promises to be with you every day." },
-    "refs": ["PSA.68.6", "MAT.28.20", "DEU.31.8", "HEB.13.5", "JHN.14.18", "PSA.73.23", "ISA.49.15", "PSA.139.7"]
+    "refs": ["PSA.68.6", "PSA.27.10", "DEU.31.8", "HEB.13.5", "JHN.14.18", "PSA.73.23", "ISA.49.15", "PSA.139.7"]
   },
   {
     "id": "familia", "icon": "house",
     "title": { "pt": "Família", "en": "Family" },
     "intro": { "pt": "Paciência, cuidado e amor no dia a dia. A Bíblia fala da casa como lugar de cuidado.", "en": "Patience, care and love in everyday life. The Bible speaks of home as a place of care." },
-    "refs": ["JOS.24.15", "RUT.1.16", "PRO.22.6", "EPH.4.2", "PRO.17.17", "EPH.6.4", "1CO.16.14", "1PE.3.8"]
+    "refs": ["RUT.1.16", "PRO.22.6", "PSA.127.1", "PRO.17.17", "EPH.6.4", "1CO.16.14", "1PE.3.8", "JOS.24.15"]
   },
   {
     "id": "sabedoria", "icon": "compass",
     "title": { "pt": "Sabedoria para decidir", "en": "Wisdom for decisions" },
     "intro": { "pt": "Diante de uma escolha difícil, peça sabedoria. Deus promete guiar quem busca a direção Dele.", "en": "Facing a hard choice, ask for wisdom. God promises to guide those who seek His direction." },
-    "refs": ["JAS.1.5", "PRO.3.5", "PRO.3.6", "PRO.4.11", "PRO.2.6", "PRO.16.9", "PRO.19.21", "ISA.30.21"]
+    "refs": ["JAS.1.5", "PRO.3.5", "PSA.143.8", "PRO.4.11", "PRO.2.6", "PRO.16.9", "PRO.19.21", "ISA.30.21"]
   },
   {
     "id": "cansaco", "icon": "feather",

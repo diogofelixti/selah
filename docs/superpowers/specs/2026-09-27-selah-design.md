@@ -1,6 +1,6 @@
 # Selah · Leitura bíblica / Bible reading
 
-Especificação do produto e do design técnico. Data: 2026-09-27. Andamento atualizado em 2026-09-29 (ver seção 12).
+Especificação do produto e do design técnico. Data: 2026-09-27. Andamento atualizado em 2026-10-02 (ver seção 12).
 
 ## 1. Visão
 
@@ -255,19 +255,20 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
 | 7 | Lembrete diário por notificação | Feito (v8, com servidor no frodo) |
 | 8 | Botão de doação | Feito (v7: Pix e WhatsApp) |
 | 9 | Sincronização opcional entre aparelhos | Feito (v9: conta Google) |
-| 10 | Mais planos e temas | Feito (v6 e v7: 19 planos, 16 temas, personagens da Bíblia) |
+| 10 | Mais planos e temas | Feito (v6, v7 e v10: 36 planos, 16 temas, personagens da Bíblia, um livro para cada momento) |
 
 ## 11. Pendências fora do código
 
 - [ ] Enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA). O dono decidiu pedir com o app pronto.
 - [x] Criar o registro DNS `selah.selatech.com.br` na Cloudflare, com proxy ligado.
 - [x] Criar o ícone e a identidade visual do Selah (logo da lamparina, ícones gerados por `npm run icons`).
-- [ ] Revisar a curadoria de temas, dicas, versículos do dia e planos. Pontos já apontados:
-  - Provérbios 3:6 tem erro de concordância na Bíblia Livre ("todas os teus caminhos").
-  - Josué 24:15, primeiro versículo de Família, só fala de família na última frase.
-  - Mateus 28:20 e Efésios 4:2 começam no meio da frase.
-  - Salmos em 30 dias: o dia 24 inclui o Salmo 119 (176 versículos).
-  - Bíblia em 2 anos faz 2 capítulos por dia até o dia 459 e depois 1 por dia.
+- [ ] Revisar a curadoria de temas, dicas, versículos do dia e planos. Os pontos já apontados foram corrigidos na v10 (2026-10-02):
+  - [x] Provérbios 3:6 tem erro de concordância na Bíblia Livre ("todas os teus caminhos"). Trocado.
+  - [x] Josué 24:15, primeiro versículo de Família, só fala de família na última frase. Foi para o fim.
+  - [x] Mateus 28:20 e Efésios 4:2 começam no meio da frase. Trocados.
+  - [x] Salmos em 30 dias: o dia 24 inclui o Salmo 119 (176 versículos). Agora divide por versículos.
+  - [x] Bíblia em 2 anos faz 2 capítulos por dia até o dia 459 e depois 1 por dia. Agora divide por versículos.
+  - [ ] Revisar as frases do grupo "Um livro para cada momento", em especial a de Efésios (ver a spec da v10).
 - [ ] Página sobre o Selah no site selatech.com.br: o que é, como usar e o link. O prompt para o projeto do site está em `docs/divulgacao/prompt-pagina-selatech.md`.
 - [ ] Ajustar o README do projeto para uso público.
 - [ ] Tornar o repositório público (github.com/diogofelixti/selah). **Só com aprovação do dono**, depois de revisar o README. Antes, limpar do histórico o print do celular que entrou por engano (`tests/Screenshot_...jpg`).
@@ -298,5 +299,6 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
 | v8 | Servidor no frodo (API e Postgres) e lembrete diário por notificação | `2026-09-29-selah-v8-servidor-e-lembrete.md` |
 | v9 | Conta Google e sincronização entre aparelhos | `2026-09-29-selah-v9-conta-e-sincronizacao.md` |
 | Publicação | CSP no nginx, logo como ícone, cartão Instalar o app | (seção 8) |
+| v10 | Grupo de planos Um livro para cada momento, planos divididos por versículos e revisão da curadoria | `2026-10-02-selah-v10-livros-e-curadoria.md` |
 
 **Como foi feito:** cada versão passou por spec, plano, TDD e revisão independente no fim. Os testes eram 451 unitários do app, 71 do servidor (com Postgres de verdade) e 135 no navegador, incluindo sincronização de ponta a ponta e o nginx de produção.

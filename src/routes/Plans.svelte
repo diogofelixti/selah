@@ -116,15 +116,22 @@
       <h2 class="section-title" id={`group-${group.id}`}>{t(`plans.groups.${group.id}`)}</h2>
       <div class="stack list">
         {#each group.plans as id (id)}
+          <!-- No grupo de propósito, a frase é o título e o nome do plano vai em cima, pequeno. -->
+          {@const name = group.id === 'purpose' ? t(`plans.purpose.${id}`) : t(`plans.catalog.${id}.title`)}
           <article class="card">
-            <h3>{t(`plans.catalog.${id}.title`)}</h3>
-            <p class="muted">{t(`plans.catalog.${id}.desc`)}</p>
+            {#if group.id === 'purpose'}
+              <p class="eyebrow">{t(`plans.catalog.${id}.title`)}</p>
+              <h3>{name}</h3>
+            {:else}
+              <h3>{name}</h3>
+              <p class="muted">{t(`plans.catalog.${id}.desc`)}</p>
+            {/if}
             <div class="list-row">
               <span class="muted small">{t('plans.length', { count: PLANS[id].days.length })}</span>
               {#if active?.id === id && status}
                 <span class="badge">{t('plans.percent', { percent: status.percent })}</span>
               {:else}
-                <button class="pill" onclick={() => start(id)} aria-label={t('plans.startPlan', { plan: t(`plans.catalog.${id}.title`) })}>{t('plans.start')}</button>
+                <button class="pill" onclick={() => start(id)} aria-label={t('plans.startPlan', { plan: name })}>{t('plans.start')}</button>
               {/if}
             </div>
           </article>

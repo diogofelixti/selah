@@ -263,7 +263,7 @@
       },
       "psalms-30": {
         "title": "Psalms in 30 days",
-        "desc": "All 150 psalms, 5 a day, to pray and praise for a month."
+        "desc": "All 150 psalms in a month, about 80 verses a day, to pray and praise."
       },
       "paul-30": {
         "title": "Paul's letters in 30 days",
@@ -271,7 +271,7 @@
       },
       "bible-2y": {
         "title": "Bible in 2 years",
-        "desc": "The whole Bible at a gentle pace, 1 or 2 chapters a day."
+        "desc": "The whole Bible at a gentle pace, about 40 verses a day."
       },
       "abraham": {
         "title": "The story of Abraham",
@@ -312,6 +312,57 @@
       "paul-story": {
         "title": "The story of Paul",
         "desc": "From the road to Damascus to chains in Rome. Acts 9, 11 and 13 to 28."
+      },
+      "mark": {
+        "title": "Mark in 16 days"
+      },
+      "luke": {
+        "title": "Luke in 24 days"
+      },
+      "matthew": {
+        "title": "Matthew in 28 days"
+      },
+      "acts": {
+        "title": "Acts in 28 days"
+      },
+      "romans": {
+        "title": "Romans in 16 days"
+      },
+      "galatians": {
+        "title": "Galatians in 6 days"
+      },
+      "ephesians": {
+        "title": "Ephesians in 6 days"
+      },
+      "philippians": {
+        "title": "Philippians in 4 days"
+      },
+      "james": {
+        "title": "James in 5 days"
+      },
+      "1-corinthians": {
+        "title": "1 Corinthians in 16 days"
+      },
+      "hebrews": {
+        "title": "Hebrews in 13 days"
+      },
+      "psalms-lament": {
+        "title": "30 psalms for praying through pain"
+      },
+      "ecclesiastes": {
+        "title": "Ecclesiastes in 12 days"
+      },
+      "genesis": {
+        "title": "Genesis in 50 days"
+      },
+      "exodus": {
+        "title": "Exodus 1 to 20"
+      },
+      "numbers": {
+        "title": "Numbers, crossing the wilderness"
+      },
+      "revelation": {
+        "title": "Revelation in 22 days"
       }
     },
     "eyebrow": "Current plan",
@@ -324,9 +375,31 @@
     "percent": "{percent}% complete",
     "groups": {
       "start": "Getting started",
+      "purpose": "A book for every season",
       "deeper": "Going deeper",
       "people": "People of the Bible",
       "whole": "The whole Bible"
+    },
+    "purpose": {
+      "mark": "Know what Jesus did",
+      "john-21": "Know who Jesus is",
+      "luke": "Know the heart of Jesus",
+      "matthew": "Know the teachings of Jesus",
+      "acts": "See the birth of the church and the power of the Holy Spirit",
+      "romans": "Clarity about the Gospel",
+      "galatians": "Live free from religious chains",
+      "ephesians": "Know your identity in Christ",
+      "philippians": "Find joy in hard times",
+      "james": "A faith that shows in how you live",
+      "1-corinthians": "How to live a holy life in a corrupt world",
+      "hebrews": "Why Jesus is better than anything in this world",
+      "psalms-lament": "Learn to pray honestly, even in pain",
+      "proverbs-31": "How to have wisdom for everyday life",
+      "ecclesiastes": "Understand why life without God has no meaning",
+      "genesis": "Know where the world came from and why it is broken",
+      "exodus": "How God frees those who believe",
+      "numbers": "Trust God in the wilderness",
+      "revelation": "The final victory of Jesus"
     },
     "startPlan": "Start: {plan}"
   },

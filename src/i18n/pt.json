@@ -263,7 +263,7 @@
       },
       "psalms-30": {
         "title": "Salmos em 30 dias",
-        "desc": "Os 150 salmos, 5 por dia, para orar e louvar durante um mês."
+        "desc": "Os 150 salmos em um mês, cerca de 80 versículos por dia, para orar e louvar."
       },
       "paul-30": {
         "title": "Cartas de Paulo em 30 dias",
@@ -271,7 +271,7 @@
       },
       "bible-2y": {
         "title": "Bíblia em 2 anos",
-        "desc": "A Bíblia toda com calma, em 1 ou 2 capítulos por dia."
+        "desc": "A Bíblia toda com calma, cerca de 40 versículos por dia."
       },
       "abraham": {
         "title": "História de Abraão",
@@ -312,6 +312,57 @@
       "paul-story": {
         "title": "História de Paulo",
         "desc": "Da estrada de Damasco à prisão em Roma. Atos 9, 11 e 13 a 28."
+      },
+      "mark": {
+        "title": "Marcos em 16 dias"
+      },
+      "luke": {
+        "title": "Lucas em 24 dias"
+      },
+      "matthew": {
+        "title": "Mateus em 28 dias"
+      },
+      "acts": {
+        "title": "Atos em 28 dias"
+      },
+      "romans": {
+        "title": "Romanos em 16 dias"
+      },
+      "galatians": {
+        "title": "Gálatas em 6 dias"
+      },
+      "ephesians": {
+        "title": "Efésios em 6 dias"
+      },
+      "philippians": {
+        "title": "Filipenses em 4 dias"
+      },
+      "james": {
+        "title": "Tiago em 5 dias"
+      },
+      "1-corinthians": {
+        "title": "1 Coríntios em 16 dias"
+      },
+      "hebrews": {
+        "title": "Hebreus em 13 dias"
+      },
+      "psalms-lament": {
+        "title": "30 salmos para orar na dor"
+      },
+      "ecclesiastes": {
+        "title": "Eclesiastes em 12 dias"
+      },
+      "genesis": {
+        "title": "Gênesis em 50 dias"
+      },
+      "exodus": {
+        "title": "Êxodo 1 a 20"
+      },
+      "numbers": {
+        "title": "Números, a travessia do deserto"
+      },
+      "revelation": {
+        "title": "Apocalipse em 22 dias"
       }
     },
     "eyebrow": "Plano atual",
@@ -324,9 +375,31 @@
     "percent": "{percent}% concluído",
     "groups": {
       "start": "Para começar",
+      "purpose": "Um livro para cada momento",
       "deeper": "Para aprofundar",
       "people": "Personagens da Bíblia",
       "whole": "A Bíblia inteira"
+    },
+    "purpose": {
+      "mark": "Conhecer o que Jesus fez",
+      "john-21": "Conhecer quem Jesus é",
+      "luke": "Conhecer o coração de Jesus",
+      "matthew": "Conhecer os ensinamentos de Jesus",
+      "acts": "Conhecer o nascimento da igreja e o poder do Espírito Santo",
+      "romans": "Clareza sobre o Evangelho",
+      "galatians": "Viver livre, sem amarras religiosas",
+      "ephesians": "Conhecer sua identidade em Cristo",
+      "philippians": "Encontrar alegria nas provações",
+      "james": "Uma fé que aparece nas atitudes",
+      "1-corinthians": "Como ter uma vida santa em um mundo corrupto",
+      "hebrews": "Por que Jesus é melhor que qualquer coisa deste mundo",
+      "psalms-lament": "Aprender a orar com honestidade e em meio à dor",
+      "proverbs-31": "Como ter sabedoria no dia a dia",
+      "ecclesiastes": "Entender por que a vida sem Deus não tem significado",
+      "genesis": "Conhecer a origem do mundo e por que ele está quebrado",
+      "exodus": "Como Deus liberta os que creem",
+      "numbers": "Confiar em Deus no deserto",
+      "revelation": "A vitória final de Jesus"
     },
     "startPlan": "Começar: {plan}"
   },

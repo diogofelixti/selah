@@ -37,10 +37,15 @@ async function download(url: string): Promise<Uint8Array> {
   return data
 }
 
+let verseCounts: Record<string, number[]> | null = null
 for (const [id, source] of Object.entries(SOURCES) as [TranslationId, Source][]) {
   const books = toBookFiles(source.parse(source.read(await download(source.url))))
   const dir = join('public', 'bibles', id)
   mkdirSync(dir, { recursive: true })
   for (const book of books) writeFileSync(join(dir, `${book.book}.json`), JSON.stringify(book))
   console.log(`${id}: ${books.length} livros gravados em ${dir}`)
+  // As traduções têm o mesmo número de versículos em cada capítulo; um teste confere.
+  verseCounts ??= Object.fromEntries(books.map((b) => [b.book, b.chapters.map((c) => c.length)]))
 }
+// Usado para dividir os planos por versículos.
+writeFileSync(join('src', 'lib', 'bible', 'verse-counts.json'), `${JSON.stringify(verseCounts)}\n`)

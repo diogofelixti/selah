@@ -45,6 +45,24 @@ describe('conteúdo editorial', () => {
     }
   })
 
+  it('não usa versículos com erro na Bíblia Livre nem que começam no meio da frase', () => {
+    // Provérbios 3:6: "todas os teus caminhos". Mateus 28:20 e Efésios 4:2 começam no meio da frase.
+    for (const ref of ['PRO.3.6', 'MAT.28.20', 'EPH.4.2']) expect(allRefs, ref).not.toContain(ref)
+  })
+
+  it('Família abre com Rute 1:16 e deixa Josué 24:15 para o fim', () => {
+    const refs = TOPICS.find((t) => t.id === 'familia')!.refs
+    expect(refs[0]).toBe('RUT.1.16')
+    expect(refs.at(-1)).toBe('JOS.24.15')
+    expect(refs).toContain('PSA.127.1')
+  })
+
+  it('as trocas da revisão de curadoria', () => {
+    expect(TOPICS.find((t) => t.id === 'solidao')!.refs).toContain('PSA.27.10')
+    expect(TOPICS.find((t) => t.id === 'sabedoria')!.refs).toContain('PSA.143.8')
+    expect(DAILY_VERSES).toContain('PRO.16.3')
+  })
+
   it('Cansaço abre com o convite aos cansados (Mateus 11:28)', () => {
     expect(TOPICS.find((t) => t.id === 'cansaco')!.refs[0]).toBe('MAT.11.28')
   })
