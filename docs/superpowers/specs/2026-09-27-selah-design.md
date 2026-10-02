@@ -276,16 +276,16 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
 - [x] Tornar o repositório público (github.com/diogofelixti/selah), em 2026-10-02. O print do celular saiu do histórico antes do envio, feito com push forçado do `feat/mvp` e da tag `v0.1.0-beta`.
 - [x] Juntar `feat/mvp` no `master` (2026-10-02, avanço direto, sem commit de merge). O `master` agora é a branch padrão no GitHub.
 - [x] Ajuste visual: no leitor, os botões "Capítulo anterior" e "Próximo capítulo" quebravam em duas linhas em telas de 390px. Agora mostram "Anterior" e "Próximo"; o nome completo continua para leitores de tela (2026-10-02).
-- [ ] **Por último:** rodar o Lighthouse no site publicado (critério da seção 9: PWA instalável, Performance e Acessibilidade acima de 90). No build local, sem gzip, em 2026-10-02: Performance 96, Acessibilidade 100, Boas práticas 100 e SEO 100.
+- [x] Rodar o Lighthouse no site publicado (2026-10-02, celular simulado, três rodadas). Performance 85, 92 e 93 (mediana 92); Acessibilidade, Boas práticas e SEO em 100. Antes de atrasar o download dos livros, a Performance dava 75 e 86. O Lighthouse 12 não mede mais se o app é instalável, mas o dono já tinha confirmado a instalação no Android. O que ainda pesa: o CSS bloqueia a renderização (cerca de 0,6 s) e o JavaScript tem 95 KB compactados.
 - [x] Guardar uma cópia dos backups fora do frodo (2026-10-02). O bilbo copia todo dia para `/mnt/dados2/selah-backups` e guarda 90 dias. Os detalhes estão em `deploy/README.md`. Mais tarde, dá para levar a cópia para um armazenamento externo, como o Cloudflare R2.
-- [ ] **Por último:** publicar a v10, a revisão da curadoria, os botões do leitor, o `robots.txt` e o README. Os dois primeiros já estão commitados (`fe8ca84` e `bfe7d2a`). Os outros três estão prontos, mas ainda sem commit. A publicação de 2026-10-02 falhou porque a chave SSH do frodo (`~/.ssh/contabo_bilbo`) tem senha e não estava no agente. Antes de publicar, rodar `ssh-add ~/.ssh/contabo_bilbo`.
+- [x] Publicar a v10, a revisão da curadoria, os botões do leitor, o versículo do dia embutido, o `robots.txt` e o atraso do download dos livros (2026-10-02).
 - [x] Versículo do dia sem esperar o livro (2026-10-02): o texto dos 40 versículos vem embutido no app (`src/content/daily-verse-texts.json`, gerado por `npm run daily-texts`). No Lighthouse local, a Performance foi de 90 para 96.
 
 ## 12. Andamento
 
-**Situação em 2026-09-29:**
+**Situação em 2026-10-02:**
 - Publicado em https://selah.selatech.com.br, versão beta `v0.1.0-beta`.
-- Código privado em github.com/diogofelixti/selah.
+- Código público em github.com/diogofelixti/selah (licença MIT), branch padrão `master`.
 - Todos os critérios de sucesso do MVP (seção 1) estão atendidos no app publicado.
 - O dono confirmou a instalação no celular (Android, Xiaomi com Chrome).
 
