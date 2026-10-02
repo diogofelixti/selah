@@ -259,7 +259,7 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
 
 ## 11. Pendências fora do código
 
-- [ ] Enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA). O dono decidiu pedir com o app pronto.
+- [ ] **Por último:** enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA). O dono decidiu pedir com o app pronto.
 - [x] Criar o registro DNS `selah.selatech.com.br` na Cloudflare, com proxy ligado.
 - [x] Criar o ícone e a identidade visual do Selah (logo da lamparina, ícones gerados por `npm run icons`).
 - [x] Revisar a curadoria de temas, dicas, versículos do dia e planos. Feito na v10 (2026-10-02); detalhes na spec da v10:
@@ -270,13 +270,16 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
   - [x] Bíblia em 2 anos faz 2 capítulos por dia até o dia 459 e depois 1 por dia. Agora divide por versículos.
   - [x] Revisar as frases do grupo "Um livro para cada momento". Efésios confirmada; Eclesiastes e 1 Coríntios suavizadas.
   - [x] Revisão geral dos temas, versículos do dia e dicas. Trocas aprovadas pelo dono, e os espaços soltos da Bíblia Livre foram limpos.
-- [ ] Página sobre o Selah no site selatech.com.br: o que é, como usar e o link. O prompt para o projeto do site está em `docs/divulgacao/prompt-pagina-selatech.md`.
-- [ ] Ajustar o README do projeto para uso público.
-- [ ] Tornar o repositório público (github.com/diogofelixti/selah). **Só com aprovação do dono**, depois de revisar o README. Antes, limpar do histórico o print do celular que entrou por engano (`tests/Screenshot_...jpg`).
-- [ ] Decidir quando juntar `feat/mvp` no `master` (hoje o GitHub mostra `feat/mvp` como padrão; `master` só tem os documentos iniciais).
-- [ ] Ajuste visual: no leitor, os botões "Capítulo anterior" e "Próximo capítulo" quebram em duas linhas em telas de 390px.
-- [ ] Rodar o Lighthouse no site publicado (critério da seção 9: PWA instalável, Performance e Acessibilidade acima de 90).
-- [ ] Guardar uma cópia dos backups fora do frodo. Hoje eles ficam só no próprio servidor.
+- [x] Página sobre o Selah no site selatech.com.br: pronta em https://selatech.com.br/pt/selah (confirmado pelo dono em 2026-10-02). O README aponta para ela.
+- [x] Ajustar o README do projeto para uso público (2026-10-02).
+- [x] Escolher a licença do código: MIT, decidido pelo dono em 2026-10-02. O arquivo `LICENSE` está em nome da Selatech.
+- [ ] Tornar o repositório público (github.com/diogofelixti/selah). **Só com aprovação do dono**, depois de ele validar o README. O dono quer enviar tudo ao GitHub de uma vez, já pronto. Antes, limpar do histórico o print do celular que entrou por engano (`tests/Screenshot_...jpg`). Isso reescreve o histórico e exige push forçado, o que não tem volta.
+- [ ] Decidir quando juntar `feat/mvp` no `master` (hoje o GitHub mostra `feat/mvp` como padrão; `master` só tem os documentos iniciais). Pode ser por pull request ou direto.
+- [x] Ajuste visual: no leitor, os botões "Capítulo anterior" e "Próximo capítulo" quebravam em duas linhas em telas de 390px. Agora mostram "Anterior" e "Próximo"; o nome completo continua para leitores de tela (2026-10-02).
+- [ ] **Por último:** rodar o Lighthouse no site publicado (critério da seção 9: PWA instalável, Performance e Acessibilidade acima de 90). No build local, sem gzip, em 2026-10-02: Performance 96, Acessibilidade 100, Boas práticas 100 e SEO 100.
+- [ ] Guardar uma cópia dos backups fora do frodo. Hoje eles ficam só no próprio servidor. Falta decidir o destino: cópia diária para o bilbo ou um armazenamento como o Cloudflare R2.
+- [ ] **Por último:** publicar a v10, a revisão da curadoria, os botões do leitor, o `robots.txt` e o README. Os dois primeiros já estão commitados (`fe8ca84` e `bfe7d2a`). Os outros três estão prontos, mas ainda sem commit. A publicação de 2026-10-02 falhou porque a chave SSH do frodo (`~/.ssh/contabo_bilbo`) tem senha e não estava no agente. Antes de publicar, rodar `ssh-add ~/.ssh/contabo_bilbo`.
+- [x] Versículo do dia sem esperar o livro (2026-10-02): o texto dos 40 versículos vem embutido no app (`src/content/daily-verse-texts.json`, gerado por `npm run daily-texts`). No Lighthouse local, a Performance foi de 90 para 96.
 
 ## 12. Andamento
 

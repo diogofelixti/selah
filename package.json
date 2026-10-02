@@ -1,6 +1,7 @@
 {
   "name": "selah",
   "private": true,
+  "license": "MIT",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -11,6 +12,7 @@
     "test:watch": "TZ=America/Sao_Paulo vitest",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "bibles": "tsx scripts/build-bibles.ts",
+    "daily-texts": "tsx scripts/daily-texts.ts",
     "check:dashes": "tsx scripts/check-dashes.ts",
     "e2e": "playwright test",
     "icons": "python3 scripts/icons.py",
