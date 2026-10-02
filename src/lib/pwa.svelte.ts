@@ -3,6 +3,7 @@ import { BOOKS } from './bible/books'
 import { cleanupOldBibleCaches, createOfflineSync } from './bible/offline'
 import { prefetchTranslation } from './bible/prefetch'
 import type { TranslationId } from './bible/types'
+import { afterStartup } from './startup'
 import { createUpdateChecker } from './update-check'
 
 const UPDATE_INTERVAL_MS = 60 * 60 * 1000
@@ -18,6 +19,8 @@ export const pwa = $state({
 let updateSW: ((reload?: boolean) => Promise<void>) | null = null
 let checkForUpdate: () => void = () => {}
 let wanted: TranslationId | null = null
+// Só a primeira vez espera a tela inicial terminar; depois (troca de idioma, volta ao app) é imediato.
+let started: Promise<void> | null = null
 
 const sync = createOfflineSync(
   (tr, onProgress) => prefetchTranslation(tr, onProgress),
@@ -66,5 +69,8 @@ export function ensureOffline(tr: TranslationId): void {
   if (!pwa.offlineSupported) return
   if (wanted !== tr) pwa.offlineDone = 0
   wanted = tr
-  void sync.ensure(tr)
+  started ??= afterStartup()
+  void started.then(() => {
+    if (wanted === tr) void sync.ensure(tr)
+  })
 }
