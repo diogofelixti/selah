@@ -34,7 +34,18 @@ function* matchLines(text: string, re: RegExp): Generator<[string, number, numbe
 
 /** Formato VPL do eBible.org: "GEN 1:1 texto". */
 export function parseVpl(text: string): RawBook[] {
-  return collect(matchLines(text, /^(\S+) (\d+):(\d+) ?(.*)$/))
+  const lines = matchLines(text, /^(\S+) (\d+):(\d+) ?(.*)$/)
+  return collect((function* () {
+    for (const [code, chapter, verse, t] of lines) yield [code, chapter, verse, tidyVpl(t)] as [string, number, number, string]
+  })())
+}
+
+/**
+ * A fonte da Bíblia Livre deixa espaços soltos, quase sempre perto das palavras implícitas:
+ * "criatura [é] ;" e "dá- [la]". Só os espaços mudam; as palavras ficam como na fonte.
+ */
+export function tidyVpl(text: string): string {
+  return text.replace(/\s+([,.;:!?])/g, '$1').replace(/-\s+\[/g, '-[')
 }
 
 /** bsb.txt do BereanBible.com: "Genesis 1:1<TAB>texto", com 3 linhas de cabeçalho. */

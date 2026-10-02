@@ -22,6 +22,24 @@ describe('parseVpl', () => {
   })
 })
 
+describe('parseVpl: espaços da fonte', () => {
+  const verse = (line: string) => [...[...parseVpl(line)[0].chapters.values()][0].values()][0]
+
+  it('tira o espaço antes da pontuação que vem depois de uma palavra implícita', () => {
+    expect(verse('2CO 5:17 uma nova criatura [é] ; as coisas velhas')).toBe('uma nova criatura [é]; as coisas velhas')
+    expect(verse('HEB 11:6 impossível agradar [a Deus] . Pois')).toBe('impossível agradar [a Deus]. Pois')
+    expect(verse('PSA 9:1 Louvarei a [ti] , SENHOR')).toBe('Louvarei a [ti], SENHOR')
+  })
+
+  it('junta o hífen da ênclise à palavra implícita', () => {
+    expect(verse('JHN 14:27 vou dá- [la] a vós')).toBe('vou dá-[la] a vós')
+  })
+
+  it('não mexe em palavras nem em espaços normais', () => {
+    expect(verse('GEN 1:1 No princípio, criou Deus: os céus.')).toBe('No princípio, criou Deus: os céus.')
+  })
+})
+
 describe('parseBsbTxt', () => {
   it('pula o cabeçalho e lê linhas separadas por tab', () => {
     const text = [

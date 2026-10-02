@@ -26,7 +26,7 @@ describe('prefetch', () => {
     await prefetchTranslation('BSB', (done) => progress.push(done), api)
     expect(stored.size).toBe(66)
     expect(stored.has('/bibles/BSB/GEN.json')).toBe(true)
-    expect(opened.every((n) => n === 'bibles-v1')).toBe(true)
+    expect(opened.every((n) => n === 'bibles-v2')).toBe(true)
     expect(progress.at(-1)).toBe(66)
     expect(await countCachedBooks('BSB', api)).toBe(66)
     expect(await countCachedBooks('BLIVRE', api)).toBe(0)

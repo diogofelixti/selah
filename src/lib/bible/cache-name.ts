@@ -1,2 +1,3 @@
 /** Cache compartilhado entre o app e o service worker. Troque o sufixo quando os textos mudarem. */
-export const BIBLE_CACHE = 'bibles-v1'
+// v2 (2026-10-02): espaços soltos da Bíblia Livre limpos na conversão.
+export const BIBLE_CACHE = 'bibles-v2'

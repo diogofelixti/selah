@@ -262,13 +262,14 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
 - [ ] Enviar o pedido de licença para a Biblica (NVI) ou para a SBB (NAA/ARA). O dono decidiu pedir com o app pronto.
 - [x] Criar o registro DNS `selah.selatech.com.br` na Cloudflare, com proxy ligado.
 - [x] Criar o ícone e a identidade visual do Selah (logo da lamparina, ícones gerados por `npm run icons`).
-- [ ] Revisar a curadoria de temas, dicas, versículos do dia e planos. Os pontos já apontados foram corrigidos na v10 (2026-10-02):
+- [x] Revisar a curadoria de temas, dicas, versículos do dia e planos. Feito na v10 (2026-10-02); detalhes na spec da v10:
   - [x] Provérbios 3:6 tem erro de concordância na Bíblia Livre ("todas os teus caminhos"). Trocado.
   - [x] Josué 24:15, primeiro versículo de Família, só fala de família na última frase. Foi para o fim.
   - [x] Mateus 28:20 e Efésios 4:2 começam no meio da frase. Trocados.
   - [x] Salmos em 30 dias: o dia 24 inclui o Salmo 119 (176 versículos). Agora divide por versículos.
   - [x] Bíblia em 2 anos faz 2 capítulos por dia até o dia 459 e depois 1 por dia. Agora divide por versículos.
-  - [ ] Revisar as frases do grupo "Um livro para cada momento", em especial a de Efésios (ver a spec da v10).
+  - [x] Revisar as frases do grupo "Um livro para cada momento". Efésios confirmada; Eclesiastes e 1 Coríntios suavizadas.
+  - [x] Revisão geral dos temas, versículos do dia e dicas. Trocas aprovadas pelo dono, e os espaços soltos da Bíblia Livre foram limpos.
 - [ ] Página sobre o Selah no site selatech.com.br: o que é, como usar e o link. O prompt para o projeto do site está em `docs/divulgacao/prompt-pagina-selatech.md`.
 - [ ] Ajustar o README do projeto para uso público.
 - [ ] Tornar o repositório público (github.com/diogofelixti/selah). **Só com aprovação do dono**, depois de revisar o README. Antes, limpar do histórico o print do celular que entrou por engano (`tests/Screenshot_...jpg`).

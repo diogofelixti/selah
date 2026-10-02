@@ -25,11 +25,11 @@ Complemento das specs anteriores. Data: 2026-10-02.
 | `ephesians` | Conhecer sua identidade em Cristo | Efésios | 6 |
 | `philippians` | Encontrar alegria nas provações | Filipenses | 4 |
 | `james` | Uma fé que aparece nas atitudes | Tiago | 5 |
-| `1-corinthians` | Como ter uma vida santa em um mundo corrupto | 1 Coríntios | 16 |
+| `1-corinthians` | Como viver uma vida santa no mundo de hoje | 1 Coríntios | 16 |
 | `hebrews` | Por que Jesus é melhor que qualquer coisa deste mundo | Hebreus | 13 |
 | `psalms-lament` | Aprender a orar com honestidade e em meio à dor | Salmos 3, 4, 6, 13, 22, 23, 25, 27, 31, 32, 34, 38, 39, 40, 42, 43, 46, 51, 55, 56, 62, 69, 73, 77, 86, 88, 90, 121, 130 e 142 | 30 |
 | `proverbs-31` | Como ter sabedoria no dia a dia | Provérbios | 31 |
-| `ecclesiastes` | Entender por que a vida sem Deus não tem significado | Eclesiastes | 12 |
+| `ecclesiastes` | Encontrar sentido para a vida em Deus | Eclesiastes | 12 |
 | `genesis` | Conhecer a origem do mundo e por que ele está quebrado | Gênesis | 50 |
 | `exodus` | Como Deus liberta os que creem | Êxodo 1 a 20 | 20 |
 | `numbers` | Confiar em Deus no deserto | Números 9 a 14, 16, 17, 20 e 21 | 10 |
@@ -38,8 +38,8 @@ Complemento das specs anteriores. Data: 2026-10-02.
 - **Salmos:** salmos de lamento e de confiança, em que o autor fala com Deus sobre a dor sem esconder nada.
 - **Êxodo:** da escravidão à aliança no Sinai. Do capítulo 21 em diante vêm as leis e a construção do tabernáculo.
 - **Números:** a nuvem que guia, as reclamações, os espias, Corá, a água da rocha e a serpente de bronze. O censo e as leis ficam de fora.
-- **Efésios:** o pedido dizia "a identidade de Cristo". A frase virou "sua identidade em Cristo", que é o tema da carta (capítulos 1 a 3). **Revisar com o dono.**
-- **Tom, para revisar com o dono:** "Entender por que a vida sem Deus não tem significado" e "Como ter uma vida santa em um mundo corrupto" soam mais duras que as outras. Ficaram como o dono escreveu.
+- **Efésios:** o pedido dizia "a identidade de Cristo". A frase virou "sua identidade em Cristo", que é o tema da carta (capítulos 1 a 3). O dono confirmou em 2026-10-02.
+- **Tom:** "Entender por que a vida sem Deus não tem significado" e "Como ter uma vida santa em um mundo corrupto" soavam mais duras que as outras. O dono escolheu suavizar as duas em 2026-10-02.
 - **As outras frases** são as do dono, com a ortografia corrigida ("por que", "mundo", "origem", "liberta", "Espírito") e "ele é quebrado" trocado por "ele está quebrado".
 - **Frases ajustadas com aprovação do dono:** "Confiar em Deus no deserto" (era sobre a reclamação atrasar as promessas), "Uma fé que aparece nas atitudes" e "A vitória final de Jesus".
 
@@ -64,6 +64,36 @@ Complemento das specs anteriores. Data: 2026-10-02.
 - **Josué 24:15** só fala de família na última frase. Passa para o fim do tema Família, que agora começa por Rute 1:16.
 - **Mateus 28:20** começa no meio da frase. No tema Solidão, dá lugar a Salmos 27:10 ("meu pai e minha mãe me abandonaram, mas o Senhor me recolherá").
 - **Efésios 4:2** começa no meio da frase. No tema Família, dá lugar a Salmos 127:1 ("Se o SENHOR não estiver edificando a casa"). Efésios 4:32 já está no tema Perdão, e um versículo não se repete entre temas.
+
+## Revisão geral da curadoria (2026-10-02)
+
+Todos os versículos dos temas e do versículo do dia foram lidos nas duas traduções. O dono aprovou as trocas.
+
+- **Erros na Bíblia Livre:**
+  - Dor: sai Salmos 34:18 ("sava os aflitos") e Isaías 43:2 ("nem a chamas arderão"). Entram Salmos 31:7 e 2 Coríntios 1:3 e 1:4. Salmos 147:3 passa a abrir o tema.
+  - Família: sai Josué 24:15 ("aos deuses a os quais").
+  - Perdão: Isaías 1:18 ("as contas,diz") dá lugar a Miqueias 7:18.
+- **Títulos de salmo pesados:**
+  - Gratidão: Salmos 9:1 ("em Mute-Laben") dá lugar a Salmos 103:2.
+  - Medo: Salmos 46:1 ("Cântico sobre Alamote") dá lugar a Salmos 91:2.
+- **Versículos cortados:**
+  - Ansiedade: 1 Pedro 5:6 entra antes do 5:7.
+  - O amor de Deus: Efésios 2:4 dá lugar a 1 João 3:1. Juntar com o 2:5 não resolvia, porque o 2:5 também termina em vírgula.
+  - Fé: Hebreus 6:19 dá lugar a João 20:29.
+- **Versículo do dia:** Salmos 46:1, Salmos 119:105 ("[Nun]:") e 1 Pedro 5:7 dão lugar a Salmos 16:8, Salmos 118:24 e Salmos 55:22.
+- **Regra nova, com teste:**
+  - Nos temas, um versículo que começa no meio da frase só entra logo depois do anterior.
+  - Um versículo que termina em vírgula só entra logo antes do seguinte.
+  - O versículo do dia precisa ser uma frase inteira.
+- **Espaços da Bíblia Livre:**
+  - A fonte deixa espaços soltos, como em "criatura [é] ;", "agradar [a Deus] ." e "dá- [la]".
+  - A conversão (`npm run bibles`) agora tira o espaço antes da pontuação e depois do hífen.
+  - Foram 812 versículos, e um teste confirmou que nenhuma palavra mudou.
+  - O cache dos livros passou para `bibles-v2`, para os aparelhos baixarem o texto novo.
+- **Dicas:** revisadas, sem mudança.
+- **Fica como está:**
+  - Na BSB, aspas que abrem num versículo e fecham em outro.
+  - Títulos curtos como "Salmo de Davi:" em Salmos 23:1 e 27:1.
 
 ## Testes
 

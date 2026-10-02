@@ -62,10 +62,10 @@ describe('cleanupOldBibleCaches', () => {
   it('apaga só caches antigos de Bíblias', async () => {
     const deleted: string[] = []
     const api = {
-      keys: async () => ['bibles-v0', 'bibles-v1', 'workbox-precache-v2', 'bibles-old'],
+      keys: async () => ['bibles-v0', 'bibles-v1', 'bibles-v2', 'workbox-precache-v2', 'bibles-old'],
       delete: async (name: string) => { deleted.push(name); return true },
     } as unknown as CacheStorage
     await cleanupOldBibleCaches(api)
-    expect(deleted.sort()).toEqual(['bibles-old', 'bibles-v0'])
+    expect(deleted.sort()).toEqual(['bibles-old', 'bibles-v0', 'bibles-v1'])
   })
 })

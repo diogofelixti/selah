@@ -45,16 +45,47 @@ describe('conteúdo editorial', () => {
     }
   })
 
-  it('não usa versículos com erro na Bíblia Livre nem que começam no meio da frase', () => {
-    // Provérbios 3:6: "todas os teus caminhos". Mateus 28:20 e Efésios 4:2 começam no meio da frase.
-    for (const ref of ['PRO.3.6', 'MAT.28.20', 'EPH.4.2']) expect(allRefs, ref).not.toContain(ref)
+  it('não usa versículos com erro na Bíblia Livre, com título de salmo pesado ou cortados', () => {
+    const avoid = {
+      'PRO.3.6': '"todas os teus caminhos"',
+      'PSA.34.18': '"sava os aflitos"',
+      'ISA.43.2': '"nem a chamas arderão"',
+      'JOS.24.15': '"aos deuses a os quais"',
+      'ISA.1.18': '"as contas,diz"',
+      'PSA.9.1': 'título "em Mute-Laben"',
+      'PSA.46.1': 'título "Cântico sobre Alamote"',
+      'PSA.119.105': 'letra hebraica "[Nun]:"',
+      'MAT.28.20': 'começa no meio da frase',
+      'EPH.4.2': 'começa no meio da frase',
+      'HEB.6.19': 'termina no meio da frase',
+    }
+    for (const [ref, why] of Object.entries(avoid)) expect(allRefs, `${ref}: ${why}`).not.toContain(ref)
   })
 
-  it('Família abre com Rute 1:16 e deixa Josué 24:15 para o fim', () => {
-    const refs = TOPICS.find((t) => t.id === 'familia')!.refs
-    expect(refs[0]).toBe('RUT.1.16')
-    expect(refs.at(-1)).toBe('JOS.24.15')
-    expect(refs).toContain('PSA.127.1')
+  // Um versículo cortado só entra junto com o vizinho que completa a frase (como Filipenses 4:6 e 4:7).
+  const next = (ref: string) => ref.replace(/\.(\d+)$/, (_, v) => `.${Number(v) + 1}`)
+  const prev = (ref: string) => ref.replace(/\.(\d+)$/, (_, v) => `.${Number(v) - 1}`)
+  const startsMidSentence = (ref: string) => /^[a-zà-ú]/.test(verseText('BLIVRE', ref)!)
+  const endsMidSentence = (ref: string) => /,$/.test(verseText('BLIVRE', ref)!.trim())
+
+  it.each(TOPICS.map((t) => [t.id, t.refs] as const))('%s: versículo cortado vem junto do vizinho', (_, refs) => {
+    refs.forEach((ref, i) => {
+      if (startsMidSentence(ref)) expect(refs[i - 1], ref).toBe(prev(ref))
+      if (endsMidSentence(ref)) expect(refs[i + 1], ref).toBe(next(ref))
+    })
+  })
+
+  it('o versículo do dia é uma frase inteira, porque aparece sozinho', () => {
+    for (const ref of DAILY_VERSES) {
+      expect(startsMidSentence(ref), ref).toBe(false)
+      expect(endsMidSentence(ref), ref).toBe(false)
+    }
+  })
+
+  it('Família abre com Rute 1:16 e Dor abre com Salmos 147:3', () => {
+    expect(TOPICS.find((t) => t.id === 'familia')!.refs[0]).toBe('RUT.1.16')
+    expect(TOPICS.find((t) => t.id === 'familia')!.refs).toContain('PSA.127.1')
+    expect(TOPICS.find((t) => t.id === 'dor')!.refs[0]).toBe('PSA.147.3')
   })
 
   it('as trocas da revisão de curadoria', () => {
