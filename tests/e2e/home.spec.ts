@@ -44,3 +44,14 @@ test('abre os ajustes', async ({ page }) => {
   await page.getByRole('link', { name: 'Ajustes' }).click()
   await expect(page).toHaveURL(/#\/ajustes$/)
 })
+
+test.describe('versículo do dia embutido', () => {
+  test.use({ serviceWorkers: 'block' })
+
+  test('aparece mesmo sem conseguir baixar nenhum livro', async ({ page }) => {
+    await page.route('**/bibles/**', (route) => route.abort())
+    await page.goto('/')
+    // Antes, sem o livro, aparecia "Não foi possível carregar o versículo." (review-fixes.spec.ts).
+    await expect(page.locator('.verse-card blockquote')).not.toBeEmpty()
+  })
+})

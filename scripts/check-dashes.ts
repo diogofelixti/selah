@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs'
-import { extname, join } from 'node:path'
+import { extname, join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const DASH_RE = /[–—]/
@@ -22,10 +22,15 @@ function walk(dir: string): string[] {
   })
 }
 
-/** Textos do app: tudo em src/ (menos testes) e o index.html. */
+// Cópia do texto bíblico (gerada por npm run daily-texts). A Escritura mantém os travessões da fonte.
+const BIBLE_TEXT_FILES = new Set([join('src', 'content', 'daily-verse-texts.json')])
+
+/** Textos do app: tudo em src/ (menos testes e cópias do texto bíblico) e o index.html. */
 export function collectAppFiles(root = '.'): { path: string; text: string }[] {
   const paths = [
-    ...walk(join(root, 'src')).filter((p) => EXTENSIONS.has(extname(p)) && !p.endsWith('.test.ts')),
+    ...walk(join(root, 'src')).filter(
+      (p) => EXTENSIONS.has(extname(p)) && !p.endsWith('.test.ts') && !BIBLE_TEXT_FILES.has(relative(root, p)),
+    ),
     join(root, 'index.html'),
   ]
   return paths.map((path) => ({ path, text: readFileSync(path, 'utf8') }))

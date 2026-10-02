@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { strFromU8, unzipSync } from 'fflate'
 import type { TranslationId } from '../src/lib/bible/types'
 import { parseBsbTxt, parseVpl, toBookFiles, type RawBook } from './lib/bible-sources'
+import { writeDailyTexts } from './lib/daily-texts'
 
 const CACHE_DIR = '.cache'
 
@@ -49,3 +50,5 @@ for (const [id, source] of Object.entries(SOURCES) as [TranslationId, Source][])
 }
 // Usado para dividir os planos por versículos.
 writeFileSync(join('src', 'lib', 'bible', 'verse-counts.json'), `${JSON.stringify(verseCounts)}\n`)
+// O versículo do dia vem embutido no app; acompanha os textos novos.
+writeDailyTexts()

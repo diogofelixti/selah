@@ -7,9 +7,9 @@
   import { shareVerseImage } from '../lib/share-image'
   import { showToast } from '../lib/toast.svelte'
   import { imageFilename } from '../lib/verse-image'
-  import { TRANSLATION_BY_LANG, bible } from '../lib/bible/loader'
+  import { TRANSLATION_BY_LANG } from '../lib/bible/loader'
   import { formatChapterList, formatRef, parseRef } from '../lib/bible/refs'
-  import { tipOfTheDay, verseOfTheDay } from '../lib/daily/daily'
+  import { dailyVerseText, tipOfTheDay, verseOfTheDay } from '../lib/daily/daily'
   import { locale, t } from '../lib/i18n/i18n.svelte'
   import { PLANS } from '../lib/plans/catalog'
   import { planStatus } from '../lib/plans/status'
@@ -39,29 +39,9 @@
   const bookName = (id: string) => t(`books.${id}`)
   const OT_SHARE = (929 / 1189) * 100
 
-  let verseText = $state<string | null>(null)
-  let verseFailed = $state(false)
-  let verseToken = 0
-
-  async function loadVerse() {
-    const token = ++verseToken
-    const tr = TRANSLATION_BY_LANG[locale.lang]
-    const p = parseRef(verseRef)!
-    verseText = null
-    verseFailed = false
-    try {
-      const text = await bible.getVerse(tr, p.book, p.chapter, p.verse!)
-      if (token === verseToken) verseText = text
-    } catch {
-      if (token === verseToken) verseFailed = true
-    }
-  }
-
-  $effect(() => {
-    void locale.lang
-    void verseRef
-    void loadVerse()
-  })
+  // O texto vem embutido no app (um teste garante que todo versículo do dia tem o seu):
+  // a tela inicial não espera nenhum livro baixar e funciona sem internet.
+  const verseText = $derived(dailyVerseText(TRANSLATION_BY_LANG[locale.lang], verseRef) ?? '')
 
   const numberFmt = $derived(new Intl.NumberFormat(locale.lang === 'pt' ? 'pt-BR' : 'en'))
   const set = $derived(readSet(app.readings))
@@ -82,7 +62,7 @@
   function verseCopy() {
     const p = parseRef(verseRef)!
     const texts: string[] = []
-    texts[p.verse! - 1] = verseText ?? ''
+    texts[p.verse! - 1] = verseText
     return formatSelection({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts, bookName, translation: TRANSLATION_BY_LANG[locale.lang] })
   }
 
@@ -91,7 +71,7 @@
   async function shareImage() {
     const p = parseRef(verseRef)!
     const texts: string[] = []
-    texts[p.verse! - 1] = verseText ?? ''
+    texts[p.verse! - 1] = verseText
     const parts = selectionParts({ book: p.book, chapter: p.chapter, verses: [p.verse!], texts, bookName })
     if (!parts || imageBusy) return
     imageBusy = true
@@ -171,27 +151,19 @@
     </a>
   </div>
 
-  {#if verseFailed}
-    <section class="card verse-card">
+  <section class="card verse-card">
+    <div class="verse-head">
       <p class="eyebrow">{t('home.verseOfDay')}</p>
-      <p>{t('home.verseError')}</p>
-      <button class="btn retry" onclick={() => loadVerse()}>{t('common.retry')}</button>
-    </section>
-  {:else}
-    <section class="card verse-card">
-      <div class="verse-head">
-        <p class="eyebrow">{t('home.verseOfDay')}</p>
-        <span class="verse-actions">
-          <button class="icon-btn" onclick={shareImage} disabled={!verseText || imageBusy} aria-label={t('image.shareVerse')}><ImageIcon size={18} aria-hidden="true" /></button>
-          <CopyButton text={verseCopy} disabled={!verseText} />
-        </span>
-      </div>
-      <a class="verse-link" href={verseLink}>
-        <blockquote><VerseText text={verseText ?? ''} /></blockquote>
-        <p class="muted small">{formatRef(verseRef, bookName)}</p>
-      </a>
-    </section>
-  {/if}
+      <span class="verse-actions">
+        <button class="icon-btn" onclick={shareImage} disabled={imageBusy} aria-label={t('image.shareVerse')}><ImageIcon size={18} aria-hidden="true" /></button>
+        <CopyButton text={verseCopy} />
+      </span>
+    </div>
+    <a class="verse-link" href={verseLink}>
+      <blockquote><VerseText text={verseText} /></blockquote>
+      <p class="muted small">{formatRef(verseRef, bookName)}</p>
+    </a>
+  </section>
 
   {#if plan}
     <a class="card plan-card" href="#/planos">
@@ -295,7 +267,6 @@
   .title { font-family: var(--font-display); font-size: 1.375rem; }
   .verse-card { display: grid; gap: var(--space-3); }
   .verse-card blockquote { margin: 0; font-family: var(--font-display); font-size: 1.375rem; line-height: 1.45; min-height: 2.9em; }
-  .retry { justify-self: start; }
   .verse-head { display: flex; justify-content: space-between; align-items: center; margin: -8px -8px 0 0; }
   .verse-link { display: grid; gap: var(--space-3); }
   .verse-actions { display: flex; color: var(--text-2); }

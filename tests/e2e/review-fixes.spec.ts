@@ -2,16 +2,6 @@ import { expect, test } from '@playwright/test'
 
 test.use({ locale: 'pt-BR', serviceWorkers: 'block' })
 
-test('versículo do dia mostra erro e tenta de novo quando não carrega', async ({ page }) => {
-  let fail = true
-  await page.route('**/bibles/BLIVRE/*.json', (route) => (fail ? route.abort() : route.continue()))
-  await page.goto('/')
-  await expect(page.getByText('Não foi possível carregar o versículo.')).toBeVisible()
-  fail = false
-  await page.getByRole('button', { name: 'Tentar de novo' }).click()
-  await expect(page.locator('.verse-card blockquote')).not.toBeEmpty()
-})
-
 test('com movimento reduzido, o versículo aberto continua destacado', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/#/ler/PSA/23/4')
