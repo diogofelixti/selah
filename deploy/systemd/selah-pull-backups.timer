@@ -1,0 +1,10 @@
+[Unit]
+Description=Copia diária dos backups do Selah
+
+[Timer]
+# O backup no frodo roda às 03:30. Persistent: se o computador estiver desligado, roda ao ligar.
+OnCalendar=*-*-* 10:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

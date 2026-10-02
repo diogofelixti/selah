@@ -273,11 +273,11 @@ Em ordem aproximada de prioridade. Situação em 2026-09-29:
 - [x] Página sobre o Selah no site selatech.com.br: pronta em https://selatech.com.br/pt/selah (confirmado pelo dono em 2026-10-02). O README aponta para ela.
 - [x] Ajustar o README do projeto para uso público (2026-10-02).
 - [x] Escolher a licença do código: MIT, decidido pelo dono em 2026-10-02. O arquivo `LICENSE` está em nome da Selatech.
-- [ ] Tornar o repositório público (github.com/diogofelixti/selah). **Só com aprovação do dono**, depois de ele validar o README. O dono quer enviar tudo ao GitHub de uma vez, já pronto. O print do celular que entrou por engano (`tests/Screenshot_...jpg`) já saiu do histórico local em 2026-10-02 (`feat/mvp` e a tag `v0.1.0-beta`; backup em bundle antes da limpeza). O envio ao GitHub precisa de push forçado do `feat/mvp` e da tag. Ele vai uma vez só, depois de o dono validar o README.
-- [ ] Decidir quando juntar `feat/mvp` no `master` (hoje o GitHub mostra `feat/mvp` como padrão; `master` só tem os documentos iniciais). Pode ser por pull request ou direto.
+- [x] Tornar o repositório público (github.com/diogofelixti/selah), em 2026-10-02. O print do celular saiu do histórico antes do envio, feito com push forçado do `feat/mvp` e da tag `v0.1.0-beta`.
+- [x] Juntar `feat/mvp` no `master` (2026-10-02, avanço direto, sem commit de merge). O `master` agora é a branch padrão no GitHub.
 - [x] Ajuste visual: no leitor, os botões "Capítulo anterior" e "Próximo capítulo" quebravam em duas linhas em telas de 390px. Agora mostram "Anterior" e "Próximo"; o nome completo continua para leitores de tela (2026-10-02).
 - [ ] **Por último:** rodar o Lighthouse no site publicado (critério da seção 9: PWA instalável, Performance e Acessibilidade acima de 90). No build local, sem gzip, em 2026-10-02: Performance 96, Acessibilidade 100, Boas práticas 100 e SEO 100.
-- [ ] Guardar uma cópia dos backups fora do frodo. Hoje eles ficam só no próprio servidor. Falta decidir o destino: cópia diária para o bilbo ou um armazenamento como o Cloudflare R2.
+- [x] Guardar uma cópia dos backups fora do frodo (2026-10-02). O bilbo copia todo dia para `/mnt/dados2/selah-backups` e guarda 90 dias. Os detalhes estão em `deploy/README.md`. Mais tarde, dá para levar a cópia para um armazenamento externo, como o Cloudflare R2.
 - [ ] **Por último:** publicar a v10, a revisão da curadoria, os botões do leitor, o `robots.txt` e o README. Os dois primeiros já estão commitados (`fe8ca84` e `bfe7d2a`). Os outros três estão prontos, mas ainda sem commit. A publicação de 2026-10-02 falhou porque a chave SSH do frodo (`~/.ssh/contabo_bilbo`) tem senha e não estava no agente. Antes de publicar, rodar `ssh-add ~/.ssh/contabo_bilbo`.
 - [x] Versículo do dia sem esperar o livro (2026-10-02): o texto dos 40 versículos vem embutido no app (`src/content/daily-verse-texts.json`, gerado por `npm run daily-texts`). No Lighthouse local, a Performance foi de 90 para 96.
 

@@ -40,3 +40,27 @@ O script (`scripts/deploy.sh`) roda os testes, gera o `dist/`, copia o app, a AP
 
 - `curl -s https://selah.selatech.com.br/api/health` deve responder `{"ok":true}`.
 - Logs: `cd /srv/selah && docker compose logs -f api`.
+
+## Cópia dos backups fora do frodo
+
+O frodo grava um `pg_dump` por dia em `/srv/selah/backups` e guarda 14 dias. O bilbo copia esses arquivos para `/mnt/dados2/selah-backups` e guarda 90 dias.
+
+- **Script:** `deploy/pull-backups.sh`.
+- **Agendamento:** um timer do systemd do usuário, em `deploy/systemd/`. Ele roda às 10:00, e se o computador estiver desligado nesse horário, roda quando ligar.
+- **Chave:** `~/.ssh/selah_backup`, sem senha.
+  - No `~/.ssh/authorized_keys` do frodo, ela fica presa a leitura da pasta de backups:
+    `command="/usr/bin/rrsync -ro /srv/selah/backups/",restrict ssh-ed25519 ... selah-backup@bilbo`
+  - Ela não abre terminal, não grava e não sai da pasta.
+
+Para instalar em outro computador:
+
+```sh
+ssh-keygen -t ed25519 -N "" -C selah-backup@bilbo -f ~/.ssh/selah_backup
+# no frodo, acrescentar a linha acima ao ~/.ssh/authorized_keys, com a chave pública nova
+cp deploy/systemd/selah-pull-backups.* ~/.config/systemd/user/
+systemctl --user daemon-reload && systemctl --user enable --now selah-pull-backups.timer
+loginctl enable-linger "$USER"   # para rodar mesmo sem sessão aberta
+```
+
+- **Conferir:** `journalctl --user -u selah-pull-backups.service -n 5`.
+- **Restaurar um backup:** `zcat selah-AAAA-MM-DD.sql.gz | docker compose exec -T db psql -U selah selah`.

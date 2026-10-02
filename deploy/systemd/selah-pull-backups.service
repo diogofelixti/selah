@@ -1,0 +1,7 @@
+[Unit]
+Description=Copia os backups do Selah do frodo para este computador
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/app-leitura-biblica/deploy/pull-backups.sh
