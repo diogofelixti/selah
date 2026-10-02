@@ -220,6 +220,8 @@
     "read": "Lido ✓",
     "next": "Próximo capítulo",
     "prev": "Capítulo anterior",
+    "prevShort": "Anterior",
+    "nextShort": "Próximo",
     "loadError": "Não foi possível carregar este capítulo. Verifique sua conexão.",
     "fontSmaller": "Diminuir letra",
     "fontLarger": "Aumentar letra"

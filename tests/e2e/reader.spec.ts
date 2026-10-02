@@ -81,3 +81,19 @@ test.describe('leitor em inglês', () => {
     await expect(page.locator('#v22')).toBeVisible()
   })
 })
+
+test.describe('tela de 390px', () => {
+  test.use({ locale: 'pt-BR', serviceWorkers: 'block', viewport: { width: 390, height: 844 } })
+
+  test('os botões de capítulo anterior e próximo cabem numa linha só', async ({ page }) => {
+    await page.goto('/#/ler/GEN/2')
+    const prev = page.getByRole('link', { name: 'Capítulo anterior' })
+    const next = page.getByRole('link', { name: 'Próximo capítulo' })
+    await expect(next).toBeVisible()
+    for (const link of [prev, next]) {
+      const box = (await link.boundingBox())!
+      // Uma linha só: a altura mínima do botão é 44px.
+      expect(box.height).toBeLessThanOrEqual(48)
+    }
+  })
+})

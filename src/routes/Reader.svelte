@@ -381,15 +381,16 @@
       </button>
       <nav class="chapters">
         {#if prev}
-          <a class="btn btn-ghost" href={`#/ler/${prev.book}/${prev.chapter}`}>
-            <ChevronLeft size={18} aria-hidden="true" />{t('reader.prev')}
+          <!-- Rótulo curto na tela, para caber numa linha em 390px; o nome completo fica para leitores de tela. -->
+          <a class="btn btn-ghost" href={`#/ler/${prev.book}/${prev.chapter}`} aria-label={t('reader.prev')}>
+            <ChevronLeft size={18} aria-hidden="true" />{t('reader.prevShort')}
           </a>
         {:else}
           <span></span>
         {/if}
         {#if next}
-          <a class="btn" class:btn-dark={done} href={`#/ler/${next.book}/${next.chapter}`}>
-            {t('reader.next')}<ChevronRight size={18} aria-hidden="true" />
+          <a class="btn" class:btn-dark={done} href={`#/ler/${next.book}/${next.chapter}`} aria-label={t('reader.next')}>
+            {t('reader.nextShort')}<ChevronRight size={18} aria-hidden="true" />
           </a>
         {/if}
       </nav>
@@ -563,4 +564,5 @@
   .end { display: grid; gap: var(--space-5); margin: var(--space-6) 0 96px; }
   .mark { width: 100%; }
   .chapters { display: flex; justify-content: space-between; gap: var(--space-2); }
+  .chapters .btn { white-space: nowrap; }
 </style>

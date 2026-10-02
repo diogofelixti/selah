@@ -220,6 +220,8 @@
     "read": "Read ✓",
     "next": "Next chapter",
     "prev": "Previous chapter",
+    "prevShort": "Previous",
+    "nextShort": "Next",
     "loadError": "This chapter could not be loaded. Check your connection.",
     "fontSmaller": "Smaller text",
     "fontLarger": "Larger text"
